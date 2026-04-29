@@ -1,0 +1,112 @@
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { sharedImports } from '../../../shared/sharedImports';
+import { Subject, takeUntil } from 'rxjs';
+import { AppComponent } from '../../../app.component';
+import { ActivatedRoute } from '@angular/router';
+import { ScreenFilter, ScreenOperatingHour, Screens } from '../../model/Screen';
+import { AddEditScreenComponent } from '../add-edit-screen/add-edit-screen.component';
+import { ScreenOperatingHourComponent } from '../screen-operating-hour/screen-operating-hour.component';
+
+@Component({
+    selector: 'screen-list',
+    standalone: true,
+    imports: [sharedImports, AddEditScreenComponent, ScreenOperatingHourComponent],
+    
+    templateUrl: './screen-list.component.html',
+    styleUrl: './screen-list.component.scss',
+})
+export class ScreenListComponent
+    extends AppComponent
+    implements OnInit, OnDestroy
+{
+    private readonly destroy$ = new Subject<void>();
+
+    isLoading: boolean = false;
+    screens: Screens[] = [];
+
+    filter: ScreenFilter = {
+        search: '',
+        status: null,
+    };
+
+    @ViewChild(AddEditScreenComponent) addEditScreenComponent!: AddEditScreenComponent;
+
+    constructor(
+        injector: Injector,
+        private route: ActivatedRoute,
+    ) {
+        super(injector);
+    }
+    
+    ngOnInit(): void {
+        this.route.queryParams
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((params) => {
+                this.filter = {
+                    search: params['search'] ?? '',
+                    status: null,
+                };
+                this.loadScreens();
+            });
+    }
+
+    openAdd(): void {
+  console.log('button clicked');
+  console.log('addedit ref:', this.addEditScreenComponent);
+  this.addEditScreenComponent.onShow();
+}
+
+    applyFilter(): void {
+        this.loadScreens();
+    }
+
+    clearFilter(): void {
+        this.filter = { search: '', status: null };
+        this.loadScreens();
+    }
+
+    loadScreens(): void {
+        this.screenService
+            .getAll(this.filter)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    this.screens = res.data ?? [];
+                },
+                error: (err) => {
+                    this.showMessage('Error', err.message, 'error');
+                },
+            });
+    }
+
+    deleteScreen(screen: Screens): void {
+        this.confirmAction({
+            message: `Are you sure you want to delete screen ${screen.name}?`,
+            header: 'Confirm Deletion',
+            accept: () => {
+                this.screenService
+                    .delete(screen.id!)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: () => {
+                            this.showMessage(
+                                'Success',
+                                'Screen deleted successfully',
+                                'success',
+                            );
+                            this.loadScreens();
+                        },
+                        error: (err: Error) =>
+                            this.showMessage('Error', err.message, 'error'),
+                    });
+            },
+            reject: () =>
+                this.showMessage('Info', 'Screen deletion cancelled', 'info'),
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+}

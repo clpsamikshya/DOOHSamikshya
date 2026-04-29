@@ -1,0 +1,45 @@
+.screen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.screen-card {
+  background: #fafaf8;
+  border: 0.5px solid #e5e5e3;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: background 0.12s;
+
+  &:hover { background: #f0f0ee; }
+}
+
+.screen-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.screen-card-name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.screen-card-location {
+  font-size: 11px;
+  color: #888;
+}
+
+.screen-card-id {
+  font-size: 10px;
+  color: #aaa;
+  font-family: 'DM Mono', monospace;
+}

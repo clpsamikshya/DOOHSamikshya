@@ -1,0 +1,93 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="page-header">
+    <h1 class="page-title">
+        <!-- <i class="pi pi-box"></i>  -->
+        <!-- Screens -->
+    </h1>
+    <div class="page-actions">
+        <p-button
+            icon="pi pi-plus"
+            severity="success"
+            [rounded]="true"
+            size="small"
+            label="Add Screen"
+            class="p-button-sm p-button-primary"
+            (onClick)="addedit.onShow()"
+        />
+    </div>
+</div>
+
+<div class="table-card">
+<p-table
+    [value]="screens"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [loading]="isLoading"
+    responsiveLayout="scroll"
+    class="p-datatable-sm"
+>
+    <!-- HEADER -->
+    <ng-template pTemplate="header">
+        <tr>
+            <th pSortableColumn="name">Name</th>
+            <th>Location</th>
+            <th>Resolution</th>
+            <th>Tags</th>
+            <th pSortableColumn="orientation">Orientation</th>
+            <th pSortableColumn="status">Status</th>
+            <th>Actions</th>
+        </tr>
+    </ng-template>
+
+    <!-- BODY -->
+    <ng-template pTemplate="body" let-screen>
+        <tr>
+            <!-- <td>{{ screen.id }}</td> -->
+
+            <td><strong>{{ screen.name }}</strong></td>
+
+            <td>{{ screen.location }}</td>
+
+            <td>{{ screen.resolution }}</td>
+
+            <td>
+                <ng-container *ngIf="screen.tag?.length; else noTags">
+                    <p-chip
+                        *ngFor="let t of screen.tag"
+                        [label]="t"
+                        class="mr-1"
+                    ></p-chip>
+                </ng-container>
+                <ng-template #noTags>—</ng-template>
+            </td>
+
+            <td>
+                {{ screen.orientation === 1 ? 'Portrait' : 'Landscape' }}
+            </td>
+
+            <td>
+                <span
+                    class="status"
+                    [ngClass]="screen.status === 1 ? 'active' : 'inactive'"
+                >
+                    {{ screen.status === 1 ? 'Active' : 'Inactive' }}
+                </span>
+            </td>
+
+            <!-- ACTIONS -->
+            <td class="action-cell">
+          <p-button icon="pi pi-pencil" severity="info"   [rounded]="true" [text]="true" (onClick)="addedit.onShow(screen)" />
+          <p-button icon="pi pi-trash"  severity="danger" [rounded]="true" [text]="true" (onClick)="deleteScreen(screen)" />
+          <p-button icon="pi pi-clock"  severity="secondary" [rounded]="true" [text]="true" (onClick)="opHours.onShow(screen)" />
+        </td>
+
+        </tr>
+    </ng-template>
+</p-table>
+</div>
+
+<add-edit-screen #addedit (onSave)="loadScreens()" />
+<screen-operating-hour #opHours />

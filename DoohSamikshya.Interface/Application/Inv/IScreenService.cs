@@ -14,10 +14,10 @@ namespace DoohSamikshya.Interface.Application.Inv
 
        Task<List<Screen>?> UpdateScreen(Screen screen);
 
-        Task<List<Screen>?> Upsert(List<Screen> screens);
+     //Task<List<Screen>?> Upsert(List<Screen> screens);
 
         Task<List<Screen>?> DropDown();
 
-        Task<Screen?> DeleteScreen(int id);
+        Task<Screen?> DeleteScreen(int id, bool cascade = true);
     }
 }

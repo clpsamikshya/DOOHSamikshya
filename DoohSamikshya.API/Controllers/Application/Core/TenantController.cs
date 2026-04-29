@@ -41,7 +41,7 @@ namespace DoohSamikshya.API.Controllers.Application.Core
         }
         
         [HttpPost]
-        public async Task<IActionResult> AddTenant([FromQuery] Tenant tenant)
+        public async Task<IActionResult> AddTenant([FromBody] Tenant tenant)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace DoohSamikshya.API.Controllers.Application.Core
         }
        
         [HttpPut]
-            public async Task<IActionResult> UpdateTenant([FromQuery] Tenant tenant)
+            public async Task<IActionResult> UpdateTenant([FromBody] Tenant tenant)
             {
                 try
                 {

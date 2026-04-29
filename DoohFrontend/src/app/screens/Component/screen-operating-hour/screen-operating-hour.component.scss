@@ -1,0 +1,38 @@
+.op-hours-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+
+    .op-hours-screen-name {
+        font-weight: 400;
+        color: var(--text-color-secondary);
+        font-size: 0.875rem;
+
+        &::before {
+            content: '—';
+            margin-right: 0.35rem;
+        }
+    }
+}
+
+.no-hours-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--text-color-secondary);
+    gap: 0.5rem;
+
+    i {
+        font-size: 2rem;
+        opacity: 0.4;
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,76 @@
+// add-edit-screen.component.scss
+
+::ng-deep {
+    .screen-dialog {
+        .p-dialog {
+            background: var(--surface-overlay);  // 👈 add this
+        }
+
+        .p-dialog-header {
+            background: var(--surface-overlay);  // 👈 changed from surface-ground
+            border-bottom: 1px solid var(--surface-border);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .p-dialog-content {
+            background: var(--surface-overlay);  // 👈 add this
+            padding: 1.5rem;
+        }
+
+        .p-dialog-footer {
+            background: var(--surface-overlay);  // 👈 add this
+        }
+    }
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &.full-width {
+        grid-column: 1 / -1;
+    }
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-color);
+
+    &.required::after {
+        content: ' *';
+        color: var(--red-500);
+    }
+}
+
+.error-message {
+    color: var(--red-500);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.field-hint {
+    color: var(--text-color-secondary);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--surface-border);
+}
+
+.w-full {
+    width: 100%;
+}

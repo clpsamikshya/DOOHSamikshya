@@ -1,0 +1,13 @@
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\bin\Debug\net8.0\DoohSamikshya.Model.deps.json
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\bin\Debug\net8.0\DoohSamikshya.Model.dll
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\bin\Debug\net8.0\DoohSamikshya.Model.pdb
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.csproj.AssemblyReference.cache
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.AssemblyInfoInputs.cache
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.AssemblyInfo.cs
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.csproj.CoreCompileInputs.cache
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.sourcelink.json
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.dll
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\refint\DoohSamikshya.Model.dll
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\DoohSamikshya.Model.pdb
+C:\Users\khati\source\repos\DoohSamikshya.API\DoohSamikshya.Model\obj\Debug\net8.0\ref\DoohSamikshya.Model.dll

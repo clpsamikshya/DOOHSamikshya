@@ -25,7 +25,6 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
-
         [HttpGet]
         public async Task<IActionResult> GetScreen([FromQuery] string? name, [FromQuery] bool? isActive)
         {
@@ -41,19 +40,19 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         }
     
 
-        [HttpPost("Upsert")]
-        public async Task<IActionResult> Upsert([FromBody] List<Screen> screens)
-        {
-            try
-            {
-                var response = await ss.Upsert(screens);
-                return Ok(ApiResponse.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResponse.Fail(ex.Message));
-            }
-        }
+        //[HttpPost("Upsert")]
+        //public async Task<IActionResult> Upsert([FromBody] List<Screen> screens)
+        //{
+        //    try
+        //    {
+        //        var response = await ss.Upsert(screens);
+        //        return Ok(ApiResponse.Success(response));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ApiResponse.Fail(ex.Message));
+        //    }
+        //}
 
     
 
@@ -87,25 +86,41 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
             }
 
         }
-        
 
-        [HttpDelete("{Id}")]
-        public async Task<IActionResult> DeleteScreens([FromRoute] int Id)
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteScreens(
+    [FromRoute] int id,
+    [FromQuery] bool cascade = true)
         {
             try
             {
-                var response = await ss.DeleteScreen(Id);
+                var response = await ss.DeleteScreen(id, cascade);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
             {
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
-
         }
 
-       
-      
+        //[HttpDelete("Id")]
+        //public async Task<IActionResult> DeleteScreens([FromRoute] int Id,[FromQuery] bool cascade = true)
+        //{
+        //    try
+        //    {
+        //        var response = await ss.DeleteScreen(Id, cascade);
+        //        return Ok(ApiResponse.Success(response));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ApiResponse.Fail(ex.Message));
+        //    }
+
+        //}
+
+
+
 
 
 

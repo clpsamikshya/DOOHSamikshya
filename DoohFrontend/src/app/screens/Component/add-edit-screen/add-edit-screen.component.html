@@ -1,0 +1,283 @@
+<p-dialog
+    [(visible)]="isShow"
+    [header]="existingData ? 'Edit Screen' : 'Add Screen'"
+    [modal]="true"
+    [style]="{ width: '750px' }"
+    [draggable]="false"
+    [resizable]="false"
+    styleClass="screen-dialog"
+    (onHide)="onCancel()"
+>
+    <form (ngSubmit)="onSubmit()" #screenForm="ngForm">
+        <p-tabView>
+            <!-- ─── TAB 1: Screen Details ─── -->
+            <p-tabPanel header="Screen">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="name" class="form-label required"
+                            >Screen Name</label
+                        >
+                        <input
+                            pInputText
+                            id="name"
+                            name="name"
+                            [(ngModel)]="screen.name"
+                            placeholder="Enter screen name"
+                            required
+                            #nameInput="ngModel"
+                            class="w-full"
+                        />
+                        <small
+                            class="error-message"
+                            *ngIf="nameInput.invalid && nameInput.touched"
+                        >
+                            Screen name is required
+                        </small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="location" class="form-label required"
+                            >Location</label
+                        >
+                        <input
+                            pInputText
+                            id="location"
+                            name="location"
+                            [(ngModel)]="screen.location"
+                            placeholder="e.g., 27.7172, 85.3240"
+                            required
+                            #locationInput="ngModel"
+                            class="w-full"
+                        />
+                        <small
+                            class="error-message"
+                            *ngIf="
+                                locationInput.invalid && locationInput.touched
+                            "
+                        >
+                            Location is required
+                        </small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="resolution" class="form-label required"
+                            >Resolution</label
+                        >
+                        <input
+                            pInputText
+                            id="resolution"
+                            name="resolution"
+                            [(ngModel)]="screen.resolution"
+                            placeholder="e.g., 1920x1080"
+                            required
+                            #resolutionInput="ngModel"
+                            class="w-full"
+                        />
+                        <small
+                            class="error-message"
+                            *ngIf="
+                                resolutionInput.invalid &&
+                                resolutionInput.touched
+                            "
+                        >
+                            Resolution is required
+                        </small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="orientation" class="form-label"
+                            >Orientation</label
+                        >
+                        <p-dropdown
+                            id="orientation"
+                            name="orientation"
+                            [(ngModel)]="screen.orientation"
+                            [options]="orientationOptions"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select orientation"
+                            styleClass="w-full"
+                        />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="status" class="form-label">Status</label>
+                        <p-dropdown
+                            id="status"
+                            name="status"
+                            [(ngModel)]="screen.status"
+                            [options]="statusOptions"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select status"
+                            styleClass="w-full"
+                        />
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="tags" class="form-label">Tags</label>
+                        <p-chips
+                            id="tags"
+                            name="tags"
+                            [(ngModel)]="screen.tag"
+                            placeholder="Add tags (press Enter)"
+                            styleClass="w-full"
+                            separator=","
+                            ngDefaultControl
+                        />
+                        <small class="field-hint"
+                            >Press Enter or comma to add multiple tags</small
+                        >
+                    </div>
+                </div>
+            </p-tabPanel>
+
+            <!-- ─── TAB 2: Operating Hours ─── -->
+            <p-tabPanel header="Operating Hours">
+                <div class="operating-hours-wrapper">
+                    <!-- Everyday toggle -->
+                    <!-- <div class="everyday-row">
+                        <p-checkbox
+                            [(ngModel)]="slot.everyday"
+                            [binary]="true"
+                            [name]="'everyday_' + slot.id"
+                            [inputId]="'everyday_' + slot.id"
+                            (onChange)="onEverydayChange(slot)"
+                        />
+                        <label
+                            [for]="'everyday_' + slot.id"
+                            class="checkbox-label"
+                        >
+                            Everyday (Select all days)
+                        </label>
+                    </div> -->
+
+                    <!-- Loop through all slots -->
+                    <div
+                        *ngFor="
+                            let slot of operatingHourSlots;
+                            let i = index;
+                            trackBy: trackBySlotId
+                        "
+                        class="operating-hour-slot"
+                    >
+                        <div class="slot-header">
+                            <h4 class="slot-title">Time Slot {{ i + 1 }}</h4>
+                            <p-button
+                                *ngIf="operatingHourSlots.length > 1"
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [text]="true"
+                                [rounded]="true"
+                                size="small"
+                                (click)="removeSlot(slot.id)"
+                                type="button"
+                                pTooltip="Remove this slot"
+                            />
+                        </div>
+
+                        <!-- Day multiselect -->
+                        <div class="form-field">
+                            <label class="form-label required"
+                                >Select Days</label
+                            >
+                            <p-multiSelect
+                                [name]="'selectedDays_' + slot.id"
+                                [(ngModel)]="slot.selectedDays"
+                                [options]="days"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select days"
+                                styleClass="w-full"
+                                ngDefaultControl
+                                required
+                            />
+                        </div>
+
+                        <!-- Time + Audience -->
+                        <div class="time-row">
+                            <div class="form-field">
+                                <label class="form-label required"
+                                    >Start Time</label
+                                >
+                                <input
+                                    pInputText
+                                    type="time"
+                                    [name]="'startTime_' + slot.id"
+                                    [(ngModel)]="slot.startTime"
+                                    class="w-full"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label required"
+                                    >End Time</label
+                                >
+                                <input
+                                    pInputText
+                                    type="time"
+                                    [name]="'endTime_' + slot.id"
+                                    [(ngModel)]="slot.endTime"
+                                    class="w-full"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-field">
+                                <label class="form-label">Avg. Audience</label>
+                                <input
+                                    pInputText
+                                    type="number"
+                                    [name]="'avgAudienceCount_' + slot.id"
+                                    [(ngModel)]="slot.avgAudienceCount"
+                                    placeholder="0"
+                                    class="w-full"
+                                    min="0"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Summary of selected days -->
+                        <div class="days-summary">
+                            <small class="field-hint">
+                                {{ getSelectedDayLabels(slot) }}
+                            </small>
+                        </div>
+
+                        <p-divider *ngIf="i < operatingHourSlots.length - 1" />
+                    </div>
+
+                    <!-- Add slot button -->
+                    <div class="add-slot-section">
+                        <p-button
+                            label="Add Another Time Slot"
+                            icon="pi pi-plus"
+                            severity="secondary"
+                            [outlined]="true"
+                            (click)="addNewSlot()"
+                            type="button"
+                        />
+                    </div>
+                </div>
+            </p-tabPanel>
+        </p-tabView>
+
+        <!-- Footer always visible -->
+        <div class="dialog-footer">
+            <p-button
+                label="Cancel"
+                severity="secondary"
+                [text]="true"
+                (click)="onCancel()"
+                type="button"
+            />
+            <p-button
+                [label]="(existingData ? 'Update' : 'Create') + ' Screen'"
+                severity="success"
+                [disabled]="screenForm.invalid"
+                type="submit"
+            />
+        </div>
+    </form>
+</p-dialog>

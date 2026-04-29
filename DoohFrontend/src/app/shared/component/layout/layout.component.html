@@ -1,0 +1,77 @@
+<div class="shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.collapsed]="isCollapsed">
+
+    <div class="sidebar-header">
+      <div class="logo-area">
+        <div class="logo-mark">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <rect x="2" y="2" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+            <rect x="9" y="2" width="5" height="5" rx="1" fill="white" opacity="0.5"/>
+            <rect x="2" y="9" width="5" height="5" rx="1" fill="white" opacity="0.5"/>
+            <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
+          </svg>
+        </div>
+        <span class="logo-text">DOOH Admin</span>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path [attr.d]="isCollapsed ? 'M5 2l5 5-5 5' : 'M9 2L4 7l5 5'"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-section">
+      <span class="nav-label">Main</span>
+      <a class="nav-item"
+         *ngFor="let item of mainNav"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-text">{{ item.label }}</span>
+        <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
+      </a>
+
+      <span class="nav-label">Manage</span>
+      <a class="nav-item"
+         *ngFor="let item of manageNav"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-text">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">S</div>
+        <div class="user-info">
+          <div class="user-name">Samikshya</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title">{{ pageTitle }}</span>
+      <div class="topbar-right">
+        <button class="icon-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="6" cy="6" r="4"/><path d="M10 10l2.5 2.5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- This is where dashboard/screens/etc render -->
+    <div class="content">
+      <router-outlet />
+    </div>
+
+  </div>
+</div>
