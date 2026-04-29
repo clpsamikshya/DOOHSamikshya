@@ -31,9 +31,16 @@ namespace DoohSamikshya.Service.Application.Media
 
         public async Task<MediaLibrary?> DeleteMediaLibrary(int id)
         {
-            string json = JsonConvert.SerializeObject(new { Id = id });
-            string result = await da.ActionProcedure("[dbo].[SpMediaLibraryDel]", json);
-            return JsonConvert.DeserializeObject<MediaLibrary>(result);
+            var payload = new
+            {
+                Id = id,
+                tenantId = 1,
+                DeletedBy = 1,
+            };
+
+           string json = JsonConvert.SerializeObject(payload);
+           string result = await da.ActionProcedure("[dbo].[SpMediaLibraryDel]", json);
+           return JsonConvert.DeserializeObject<MediaLibrary>(result);
         }
 
         public async Task<List<MediaLibrary>?> GetMediaLibrary()
