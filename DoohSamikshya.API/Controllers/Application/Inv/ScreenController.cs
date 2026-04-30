@@ -4,6 +4,7 @@ using DoohSamikshya.Interface.Application.Inv;
 using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Shared;
 using DoohSamikshya.Model.Shared.Enum;
+using DoohSamikshya.Service.Application.Inv;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -26,19 +27,6 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
-        //[HttpGet]
-        //public async Task<IActionResult> GetScreen([FromQuery] string? name, [FromQuery] bool? isActive)
-        //{
-        //    try
-        //    {
-        //        var response = await ss.GetScreen(name, isActive);
-        //        return Ok(ApiResponse.Success(response));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ApiResponse.Fail(ex.Message));
-        //    }
-        //}
 
         [HttpGet]
         public async Task<IActionResult> GetScreen(
@@ -96,14 +84,28 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
 
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteScreens(
-    [FromRoute] int id,
-    [FromQuery] bool cascade = true)
+        public async Task<IActionResult> DeleteScreen([FromRoute] int id)
         {
             try
             {
-                var response = await ss.DeleteScreen(id, cascade);
-                return Ok(ApiResponse.Success(response));
+                var result = await ss.DeleteScreen(id);
+                return Ok(ApiResponse.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse.Fail(ex.Message));
+            }
+        }
+
+        [HttpDelete("operating-hour/{id}")]
+        public async Task<IActionResult> DeleteOperatingHour(
+            [FromRoute] int id,
+            [FromQuery] int screenId)
+        {
+            try
+            {
+                var result = await ss.DeleteOperatingHour(id, screenId, deletedBy: 1);
+                return Ok(ApiResponse.Success(result));
             }
             catch (Exception ex)
             {

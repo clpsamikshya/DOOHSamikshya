@@ -8,132 +8,79 @@ namespace DoohSamikshya.Service.Application.Inv
 {
     public class ScreenService(IDataAccessService da) : IScreenService
     {
-
-        #region 
-        public async Task<List<Screen>?> GetScreenById(int Id)
+        public async Task<List<Screen>?> GetScreenById(int id)
         {
-            try
-            {
-                string json = JsonConvert.SerializeObject(new { Id });
-                string result = await da.RetrievalProcedure("core.SpScreenByIdSel", json);
-                return JsonConvert.DeserializeObject<List<Screen>>(result);
-            }
-            catch (Exception )
-            {
-                throw;
-            }
-
+            string json = JsonConvert.SerializeObject(new { Id = id });
+            string result = await da.RetrievalProcedure("inv.SpScreenByIdSel", json);
+            return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
-
-        #endregion
-
-
-        #region
-        //public async Task<List<Screen>?> GetScreen(string? name, bool? isActive)
-        //{
-        //    string json = JsonConvert.SerializeObject(new { Name = name, IsActive = isActive });
-        //    string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
-        //    return JsonConvert.DeserializeObject<List<Screen>>(result);
-        //}
 
         public async Task<List<Screen>?> GetScreen(ScreenFilter filter)
         {
             string json = JsonConvert.SerializeObject(new
             {
-                Search = filter.Search,
-                Status = filter.Status,
-                Orientation = filter.Orientation
+                filter.Search,
+                filter.Status,
+                filter.Orientation
             });
-
             string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
             return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
-
-        #endregion
-
-        #region
 
         public async Task<List<Screen>?> AddScreen(Screen screen)
         {
             try
             {
-                // Fix Tag from TagList
-                if (screen.TagList != null && screen.TagList.Count > 0)
-                {
+                if (screen.TagList?.Count > 0)
                     screen.Tag = string.Join(",", screen.TagList.Select(t => t.Trim()));
-                }
 
                 string json = JsonConvert.SerializeObject(screen);
                 string result = await da.ActionProcedure("inv.SpScreenIns", json);
                 return JsonConvert.DeserializeObject<List<Screen>>(result);
             }
-            catch (SqlException ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        #endregion
-
-        #region
         public async Task<List<Screen>?> UpdateScreen(Screen screen)
         {
-
             try
             {
+                if (screen.TagList?.Count > 0)
+                    screen.Tag = string.Join(",", screen.TagList.Select(t => t.Trim()));
+
                 string json = JsonConvert.SerializeObject(screen);
                 string result = await da.ActionProcedure("inv.SpScreenUpd", json);
                 return JsonConvert.DeserializeObject<List<Screen>>(result);
             }
-
-            catch (SqlException ex)
-            {
-                throw new Exception(ex.Message);
-            }
+            catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        #endregion
-
-        #region
-
-        public async Task<Screen?> DeleteScreen(int id, bool cascade = true)
+        public async Task<Screen?> DeleteScreen(int id)
         {
-            var payload = new
+            try
             {
-                ScreenId = id,
-                DeletedBy = 1,
-                CascadeDelete = cascade
-            };
-
-            string json = JsonConvert.SerializeObject(payload);
-
-            string result = await da.ActionProcedure("inv.SpScreenDel", json);
-
-            return JsonConvert.DeserializeObject<Screen>(result);
+                string json = JsonConvert.SerializeObject(new { Id = id, TenantId = 1, DeletedBy = 1 });
+                string result = await da.ActionProcedure("inv.SpScreenDel", json);
+                return JsonConvert.DeserializeObject<Screen>(result);
+            }
+            catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        //public async Task<Screen?> DeleteScreen(int id, bool cascade = true)
-        //{
-        //    try
-        //    {
-        //        string json = JsonConvert.SerializeObject(new { ScreenId = id, Cascade = cascade });
-        //        string result = await da.ActionProcedure("inv.SpScreenDel", json);
-        //        return JsonConvert.DeserializeObject<Screen>(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-
-        //}
+        public async Task<string> DeleteOperatingHour(int id, int screenId, int deletedBy)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(new { Id = id, ScreenId = screenId, DeletedBy = deletedBy });
+                string result = await da.ActionProcedure("inv.SpScreenOperatingHourDel", json);
+                return result;
+            }
+            catch (SqlException ex) { throw new Exception(ex.Message); }
+        }
 
         public async Task<List<Screen>?> DropDown()
         {
             string result = await da.RetrievalProcedure("inv.SpScreenDropDownSel", null);
             return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
-
-        #endregion
-
     }
 }

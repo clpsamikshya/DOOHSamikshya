@@ -13,7 +13,7 @@
             <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.9"/>
           </svg>
         </div>
-        <span class="logo-text">DOOH Admin</span>
+        <span class="logo-text">Lumina Displays</span>
       </div>
       <button class="toggle-btn" (click)="toggleSidebar()">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -23,7 +23,7 @@
     </div>
 
     <nav class="nav-section">
-      <span class="nav-label">Main</span>
+      <span class="nav-label">Overview</span>
       <a class="nav-item"
          *ngFor="let item of mainNav"
          [routerLink]="item.route"
@@ -33,14 +33,14 @@
         <span class="badge" *ngIf="item.badge">{{ item.badge }}</span>
       </a>
 
-      <span class="nav-label">Manage</span>
+       <span class="nav-label">Inventory</span>
       <a class="nav-item"
          *ngFor="let item of manageNav"
          [routerLink]="item.route"
          routerLinkActive="active"
          [routerLinkActiveOptions]="{ exact: true }">
         <span class="nav-text">{{ item.label }}</span>
-      </a>
+      </a> 
     </nav>
 
     <div class="sidebar-footer">
@@ -48,7 +48,7 @@
         <div class="avatar">S</div>
         <div class="user-info">
           <div class="user-name">Samikshya</div>
-          <div class="user-role">Administrator</div>
+          <div class="user-role">Admin</div>
         </div>
       </div>
     </div>
@@ -73,5 +73,5 @@
       <router-outlet />
     </div>
 
-  <!--  see how the status and orientation is proper but not search  </div> -->
+  <!-- </div> -->
 </div>

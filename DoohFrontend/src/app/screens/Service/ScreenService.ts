@@ -31,4 +31,10 @@ export class ScreenService {
   delete(id: number): Observable<ApiResponse<Screens>>{
     return this.http.delete<ApiResponse<Screens>>(`${this.apiUrl}/${id}`);
 }
+
+deleteOperatingHour(id: number, screenId: number): Observable<ApiResponse<Screens>> {
+    return this.http.delete<ApiResponse<Screens>>(
+        `${this.apiUrl}/operating-hour/${id}?screenId=${screenId}`
+    );
+}
 }

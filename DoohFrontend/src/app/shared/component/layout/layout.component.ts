@@ -17,6 +17,8 @@ export class LayoutComponent implements OnInit {
 
   mainNav = [
     { key: 'dashboard', label: 'Dashboard', route: '/dashboard',   badge: null },
+  ]; 
+  manageNav = [ 
     { key: 'screens',   label: 'Screens',   route: '/screen-name', badge: null },
     { key: 'media',   label: 'Media',   route: '/media-library', badge: null }, 
     { key: 'campaigns', label: 'Campaigns', route: '/campaigns',   badge: null },
@@ -24,10 +26,10 @@ export class LayoutComponent implements OnInit {
     // { key: 'reports',   label: 'Reports',   route: '/reports',     badge: null },
   ];
 
-  manageNav = [
-    { key: 'users',    label: 'Users',    route: '/users',    badge: null },
-    { key: 'settings', label: 'Settings', route: '/settings', badge: null },
-  ];
+  // manageNav = [
+  //   { key: 'users',    label: 'Users',    route: '/users',    badge: null },
+  //   { key: 'settings', label: 'Settings', route: '/settings', badge: null },
+  // ];
 
   constructor(private router: Router) {}
 
