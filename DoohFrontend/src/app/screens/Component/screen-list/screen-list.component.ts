@@ -1,4 +1,10 @@
-import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+    Component,
+    Injector,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { sharedImports } from '../../../shared/sharedImports';
 import { Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../app.component';
@@ -6,12 +12,17 @@ import { ActivatedRoute } from '@angular/router';
 import { ScreenFilter, ScreenOperatingHour, Screens } from '../../model/Screen';
 import { AddEditScreenComponent } from '../add-edit-screen/add-edit-screen.component';
 import { ScreenOperatingHourComponent } from '../screen-operating-hour/screen-operating-hour.component';
+import { ScreenStatus, ScreenOrientation } from '../../model/ScreenEnum';
 
 @Component({
     selector: 'screen-list',
     standalone: true,
-    imports: [sharedImports, AddEditScreenComponent, ScreenOperatingHourComponent],
-    
+    imports: [
+        sharedImports,
+        AddEditScreenComponent,
+        ScreenOperatingHourComponent,
+    ],
+
     templateUrl: './screen-list.component.html',
     styleUrl: './screen-list.component.scss',
 })
@@ -20,6 +31,8 @@ export class ScreenListComponent
     implements OnInit, OnDestroy
 {
     private readonly destroy$ = new Subject<void>();
+    protected readonly ScreenStatus = ScreenStatus;
+    protected readonly ScreenOrientation = ScreenOrientation;
 
     isLoading: boolean = false;
     screens: Screens[] = [];
@@ -27,9 +40,11 @@ export class ScreenListComponent
     filter: ScreenFilter = {
         search: '',
         status: null,
+        orientation: null,
     };
 
-    @ViewChild(AddEditScreenComponent) addEditScreenComponent!: AddEditScreenComponent;
+    @ViewChild(AddEditScreenComponent)
+    addEditScreenComponent!: AddEditScreenComponent;
 
     constructor(
         injector: Injector,
@@ -37,7 +52,20 @@ export class ScreenListComponent
     ) {
         super(injector);
     }
-    
+
+    statusOptions = [
+        { label: 'Active', value: ScreenStatus.Active },
+        { label: 'Inactive', value: ScreenStatus.InActive },
+        { label: 'Under Maintenance', value: ScreenStatus.UnderMaintenance },
+    ];
+
+    orientationOptions = [
+    { label: 'Portrait',  value: ScreenOrientation.Portrait  },
+    { label: 'Square',    value: ScreenOrientation.Square    }, 
+    { label: 'Landscape', value: ScreenOrientation.Landscape }, 
+     
+];
+
     ngOnInit(): void {
         this.route.queryParams
             .pipe(takeUntil(this.destroy$))
@@ -51,10 +79,10 @@ export class ScreenListComponent
     }
 
     openAdd(): void {
-  console.log('button clicked');
-  console.log('addedit ref:', this.addEditScreenComponent);
-  this.addEditScreenComponent.onShow();
-}
+        console.log('button clicked');
+        console.log('addedit ref:', this.addEditScreenComponent);
+        this.addEditScreenComponent.onShow();
+    }
 
     applyFilter(): void {
         this.loadScreens();

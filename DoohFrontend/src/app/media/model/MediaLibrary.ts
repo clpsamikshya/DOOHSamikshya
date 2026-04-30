@@ -12,6 +12,13 @@ export interface MediaLibrary {
   createdBy: number;
 }
 
+export class MediaFilter {
+  search?: string;
+  isVideo?: boolean;
+
+  constructor() {}
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

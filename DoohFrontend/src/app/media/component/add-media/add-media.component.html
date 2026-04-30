@@ -1,1 +1,78 @@
-<p>add-media works!</p>
+<p-dialog
+    [(visible)]="visible"
+    [modal]="true"
+    [closable]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    header="Upload Media"
+    [style]="{ width: '480px' }"
+    (onHide)="onHide()"
+>
+    <ng-template pTemplate="content">
+        <div class="upload-body">
+
+            <!-- Drop / Select area -->
+            <div class="upload-zone" (click)="fileInput.click()">
+                <input
+                    #fileInput
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,video/mp4,video/webm,video/mov"
+                    (change)="onFileSelected($event)"
+                    style="display:none"
+                />
+
+                <ng-container *ngIf="!selectedFile">
+                    <i class="pi pi-cloud-upload upload-icon"></i>
+                    <p class="upload-hint">Click to browse</p>
+                    <p class="upload-sub">JPG, PNG, GIF, MP4, WEBM, MOV</p>
+                </ng-container>
+
+                <!-- Preview after selection -->
+                <ng-container *ngIf="selectedFile">
+                    <img
+                        *ngIf="!isVideo() && previewUrl"
+                        [src]="previewUrl"
+                        class="preview-thumb"
+                        alt="preview"
+                    />
+                    <div *ngIf="isVideo()" class="video-preview-placeholder">
+                        <i class="pi pi-video" style="font-size:2.5rem"></i>
+                        <p>{{ selectedFile.name }}</p>
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- File name -->
+            <div *ngIf="selectedFile" class="file-info">
+                <i class="pi pi-file mr-2"></i>
+                <span>{{ selectedFile.name }}</span>
+                <p-button
+                    icon="pi pi-times"
+                    [text]="true"
+                    severity="secondary"
+                    size="small"
+                    (onClick)="selectedFile = null; previewUrl = null"
+                />
+            </div>
+
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <p-button
+            label="Cancel"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="onHide()"
+        />
+        <p-button
+            label="Upload"
+            icon="pi pi-upload"
+            severity="success"
+            [loading]="isUploading"
+            [disabled]="!selectedFile"
+            (onClick)="onUpload()"
+        />
+    </ng-template>
+</p-dialog>

@@ -1,5 +1,6 @@
 ﻿using DoohSamikshya.DataAccess;
 using DoohSamikshya.Interface.Application.Media;
+using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Application.Media;
 using Newtonsoft.Json;
 
@@ -43,9 +44,15 @@ namespace DoohSamikshya.Service.Application.Media
            return JsonConvert.DeserializeObject<MediaLibrary>(result);
         }
 
-        public async Task<List<MediaLibrary>?> GetMediaLibrary()
+        public async Task<List<MediaLibrary>?> GetMediaLibrary(MediaFilter filter)
         {
-            string json = JsonConvert.SerializeObject(new { TenantId = 1 });
+            string json = JsonConvert.SerializeObject(new 
+            { 
+                TenantId = 1, 
+                Search = filter.Search,
+                IsVideo = filter.IsVideo
+            
+            });
             string result = await da.RetrievalProcedure("[dbo].[SpMediaLibrarySel]", json);
             return JsonConvert.DeserializeObject<List<MediaLibrary>>(result);
         }

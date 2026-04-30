@@ -1,33 +1,57 @@
+<p-toast />
+<p-confirmDialog />
+
 <div class="ml-wrap">
-    <!-- Upload Card -->
-    <div class="ml-upload-card">
-        <div class="ml-field">
-            <span class="ml-label">Select file</span>
-            <div style="display: flex; align-items: center; gap: 10px">
-                <label class="ml-file-label">
-                    <i class="pi pi-upload"></i>
-                    Choose file
-                    <input
-                        type="file"
-                        accept="image/jpeg,image/png,image/gif,video/mp4,video/webm,video/mov"
-                        (change)="onFileSelected($event)"
-                        style="display: none"
-                    />
-                </label>
-                <span class="ml-filename">
-                    {{ selectedFile ? selectedFile.name : 'No file chosen' }}
-                </span>
-            </div>
+
+    <!-- Header / Filter Bar -->
+    <div class="ml-header">
+        <p-button
+            icon="pi pi-plus"
+            label="Upload Media"
+            severity="success"
+            [rounded]="true"
+            size="small"
+            (onClick)="addMedia.onShow()"
+        /><br>
+
+        <div class="search-wrapper">
+            <i class="pi pi-search search-icon"></i>
+            <input
+                pInputText
+                type="text"
+                placeholder="Search by name..."
+                [(ngModel)]="filter.search"
+                (keyup.enter)="applyFilter()"
+                class="search-input"
+            />
         </div>
 
-        <button
-            class="ml-upload-btn"
-            (click)="onUpload()"
-            [disabled]="!selectedFile || isUploading"
-        >
-            <i class="pi pi-upload"></i>
-            {{ isUploading ? 'Uploading...' : 'Upload' }}
-        </button>
+        <!-- <p-dropdown
+            [options]="typeOptions"
+            [(ngModel)]="filter.isVideo"
+            placeholder="All Types"
+            (onChange)="applyFilter()"
+            [showClear]="true"
+            optionLabel="label"
+            optionValue="value"
+        /> -->
+
+        <p-button
+            icon="pi pi-search"
+            label="Search"
+            severity="primary"
+            size="small"
+            (onClick)="applyFilter()"
+        />
+
+        <p-button
+            icon="pi pi-times"
+            label="Clear"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            (onClick)="clearFilter()"
+        />
     </div>
 
     <!-- Table Card -->
@@ -55,7 +79,6 @@
 
             <ng-template pTemplate="body" let-media>
                 <tr>
-                    <!-- Preview thumbnail — click to open lightbox -->
                     <td>
                         <img
                             *ngIf="!media.isVideo"
@@ -71,32 +94,18 @@
                             (click)="openPreview(media)"
                             title="Click to play"
                         >
-                            <i
-                                class="pi pi-play-circle"
-                                style="font-size: 1.8rem"
-                            ></i>
+                            <i class="pi pi-play-circle" style="font-size: 1.8rem"></i>
                         </div>
                     </td>
-
+                    <td><span class="ml-name">{{ media.name }}</span></td>
                     <td>
-                        <span class="ml-name">{{ media.name }}</span>
-                    </td>
-
-                    <td>
-                        <span
-                            class="ml-badge"
-                            [ngClass]="media.isVideo ? 'video' : 'image'"
-                        >
+                        <span class="ml-badge" [ngClass]="media.isVideo ? 'video' : 'image'">
                             {{ media.isVideo ? 'Video' : 'Image' }}
                         </span>
                     </td>
-
                     <td class="ml-text-muted">{{ media.extension }}</td>
                     <td class="ml-text-muted">{{ media.resolution }}</td>
-                    <td class="ml-text-muted">
-                        {{ media.duration ? media.duration + 's' : '—' }}
-                    </td>
-
+                    <td class="ml-text-muted">{{ media.duration ? media.duration + 's' : '—' }}</td>
                     <td class="ml-actions-col">
                         <p-button
                             icon="pi pi-trash"
@@ -111,19 +120,15 @@
 
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td
-                        colspan="7"
-                        class="ml-text-muted"
-                        style="text-align: center; padding: 2.5rem"
-                    >
-                        No media uploaded yet.
+                    <td colspan="7" class="ml-text-muted" style="text-align:center; padding: 2.5rem">
+                        No media found.
                     </td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
 
-    <!-- ── Lightbox Dialog ── -->
+    <!-- Lightbox -->
     <p-dialog
         [(visible)]="previewVisible"
         [modal]="true"
@@ -136,64 +141,30 @@
         (onHide)="closePreview()"
     >
         <ng-template pTemplate="header">
-            <span style="color: #fff; font-weight: 500">
-                {{ previewMedia?.name }}
-            </span>
+            <span style="color:#fff; font-weight:500">{{ previewMedia?.name }}</span>
         </ng-template>
-
         <ng-template pTemplate="content">
-            <!-- Image preview -->
             <img
                 *ngIf="previewMedia && !previewMedia.isVideo"
                 [src]="previewMedia.url"
                 [alt]="previewMedia.name"
-                style="
-                    width: 100%;
-                    height: auto;
-                    max-height: 80vh;
-                    object-fit: contain;
-                    display: block;
-                "
+                style="width:100%; height:auto; max-height:80vh; object-fit:contain; display:block;"
             />
-
-            <!-- Video preview -->
             <video
                 *ngIf="previewMedia && previewMedia.isVideo"
                 [src]="previewMedia.url"
-                controls
-                autoplay
-                style="
-                    width: 100%;
-                    height: auto;
-                    max-height: 80vh;
-                    display: block;
-                "
+                controls autoplay
+                style="width:100%; height:auto; max-height:80vh; display:block;"
             ></video>
         </ng-template>
-
-        <!-- Meta footer -->
         <ng-template pTemplate="footer">
-            <div
-                style="
-                    display: flex;
-                    gap: 1.5rem;
-                    font-size: 0.82rem;
-                    color: #aaa;
-                    padding: 0.5rem 0;
-                "
-            >
-                <span
-                    ><b>Resolution:</b>
-                    {{ previewMedia?.resolution ?? '—' }}</span
-                >
-                <span
-                    ><b>Extension:</b>
-                    {{ previewMedia?.extension ?? '—' }}</span
-                >
-                <span *ngIf="previewMedia?.isVideo">
-                    <b>Duration:</b> {{ previewMedia?.duration }}s
-                </span>
+            <div style="display:flex; gap:1.5rem; font-size:0.82rem; color:#aaa; padding:0.5rem 0;">
+                <span><b>Resolution:</b> {{ previewMedia?.resolution ?? '—' }}</span>
+                <span><b>Extension:</b> {{ previewMedia?.extension ?? '—' }}</span>
+                <span *ngIf="previewMedia?.isVideo"><b>Duration:</b> {{ previewMedia?.duration }}s</span>
             </div>
         </ng-template>
     </p-dialog>
+
+    <add-media #addMedia (onSave)="loadMedia()" />
 </div>

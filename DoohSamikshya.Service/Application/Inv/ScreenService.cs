@@ -29,9 +29,22 @@ namespace DoohSamikshya.Service.Application.Inv
 
 
         #region
-        public async Task<List<Screen>?> GetScreen(string? name, bool? isActive)
+        //public async Task<List<Screen>?> GetScreen(string? name, bool? isActive)
+        //{
+        //    string json = JsonConvert.SerializeObject(new { Name = name, IsActive = isActive });
+        //    string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
+        //    return JsonConvert.DeserializeObject<List<Screen>>(result);
+        //}
+
+        public async Task<List<Screen>?> GetScreen(ScreenFilter filter)
         {
-            string json = JsonConvert.SerializeObject(new { Name = name, IsActive = isActive });
+            string json = JsonConvert.SerializeObject(new
+            {
+                Search = filter.Search,
+                Status = filter.Status,
+                Orientation = filter.Orientation
+            });
+
             string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
             return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
@@ -61,13 +74,6 @@ namespace DoohSamikshya.Service.Application.Inv
         }
 
         #endregion
-
-        //public async Task<List<Screen>?> Upsert(List<Screen> screens)
-        //{
-        //    string json = JsonConvert.SerializeObject(screens);
-        //    string result = await da.ActionProcedure("inv.SpScreenTsk", json);
-        //    return JsonConvert.DeserializeObject<List<Screen>>(result);
-        //}
 
         #region
         public async Task<List<Screen>?> UpdateScreen(Screen screen)

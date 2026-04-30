@@ -93,9 +93,18 @@ export class ScreenOperatingHour {
   }
 }
 
+export interface OperatingHourSlot {
+  id: string;
+  selectedDays: number[];
+  startTime: string;
+  endTime: string;
+  avgAudienceCount: number;
+}
+
 export class ScreenFilter {
-   search?: string;
+  search?: string;
   status?: number | null;
+  orientation?: number | null;
 
   constructor() {}
 }

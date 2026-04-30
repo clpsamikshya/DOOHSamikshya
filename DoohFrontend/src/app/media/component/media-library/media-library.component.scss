@@ -40,6 +40,62 @@
   cursor: pointer;
 }
 
+.ml-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    flex-wrap: nowrap;
+
+    p-button {
+        flex-shrink: 0;
+    }
+
+    .search-wrapper {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        position: relative;
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            color: var(--text-color-secondary);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        input.search-input {
+            flex: 1;
+            width: 100% !important;
+            min-width: 0;
+            height: 2.5rem;
+            padding-left: 2.25rem;
+            box-sizing: border-box;
+        }
+    }
+
+    p-dropdown {
+        flex-shrink: 0;
+        width: 160px;
+
+        ::ng-deep .p-dropdown {
+            width: 100%;
+            height: 2.5rem;
+
+            .p-dropdown-label {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+
+    p-button ::ng-deep .p-button {
+        height: 2.5rem;
+    }
+}
+
 .ml-filename {
   font-size: 13px;
   color: var(--color-text-secondary);

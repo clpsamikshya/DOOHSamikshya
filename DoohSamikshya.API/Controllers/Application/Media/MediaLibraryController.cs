@@ -1,8 +1,10 @@
 ﻿using DoohSamikshya.API.Controllers.Shared;
 using DoohSamikshya.Interface.Application.Media;
 using DoohSamikshya.Interface.Shared;
+using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Application.Media;
 using DoohSamikshya.Model.Shared;
+using DoohSamikshya.Model.Shared.Enum;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoohSamikshya.API.Controllers.Application.Media
@@ -12,11 +14,17 @@ namespace DoohSamikshya.API.Controllers.Application.Media
         IMediaService ms) : SharedController
     {
         [HttpGet]
-        public async Task<IActionResult> GetMediaLibrary()
+        public async Task<IActionResult> GetMediaLibrary([FromQuery] string? search, [FromQuery] bool? IsVideo)
         {
             try
             {
-                var response = await mls.GetMediaLibrary();
+                var filter = new MediaFilter
+                {
+                    Search = search,
+                    IsVideo = IsVideo
+                    
+                };
+                var response = await mls.GetMediaLibrary(filter);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -24,6 +32,8 @@ namespace DoohSamikshya.API.Controllers.Application.Media
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
+
+
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]

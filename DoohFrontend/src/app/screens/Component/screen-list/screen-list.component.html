@@ -2,10 +2,7 @@
 <p-confirmDialog />
 
 <div class="page-header">
-    <h1 class="page-title">
-        <!-- <i class="pi pi-box"></i>  -->
-        <!-- Screens -->
-    </h1>
+    <h1 class="page-title"></h1>
     <div class="page-actions">
         <p-button
             icon="pi pi-plus"
@@ -13,80 +10,137 @@
             [rounded]="true"
             size="small"
             label="Add Screen"
-            class="p-button-sm p-button-primary"
             (onClick)="addedit.onShow()"
         />
     </div>
 </div>
 
 <div class="table-card">
-<p-table
-    [value]="screens"
-    [paginator]="true"
-    [rows]="10"
-    [rowsPerPageOptions]="[5, 10, 20]"
-    [loading]="isLoading"
-    responsiveLayout="scroll"
-    class="p-datatable-sm"
->
-    <!-- HEADER -->
-    <ng-template pTemplate="header">
-        <tr>
-            <th pSortableColumn="name">Name</th>
-            <th>Location</th>
-            <th>Resolution</th>
-            <th>Tags</th>
-            <th pSortableColumn="orientation">Orientation</th>
-            <th pSortableColumn="status">Status</th>
-            <th>Actions</th>
-        </tr>
-    </ng-template>
 
-    <!-- BODY -->
-    <ng-template pTemplate="body" let-screen>
-        <tr>
-            <!-- <td>{{ screen.id }}</td> -->
+   <!-- FILTER BAR -->
+<div class="filter-bar">
+    <div class="search-wrapper">
+        <i class="pi pi-search search-icon"></i>
+        <input
+            pInputText
+            type="text"
+            placeholder="Search"s
+            [(ngModel)]="filter.search"
+            (keyup.enter)="applyFilter()"
+            class="search-input"
+        />
+    </div>
 
-            <td><strong>{{ screen.name }}</strong></td>
+    <p-dropdown
+        [options]="statusOptions"
+        [(ngModel)]="filter.status"
+        placeholder="All Status"
+        (onChange)="applyFilter()"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        class="status-filter"
+    />
 
-            <td>{{ screen.location }}</td>
+    <p-dropdown
+        [options]="orientationOptions"
+        [(ngModel)]="filter.orientation"
+        placeholder="All Orientation"
+        (onChange)="applyFilter()"
+        [showClear]="true"
+        optionLabel="label"
+        optionValue="value"
+        class="status-filter"
+    />
 
-            <td>{{ screen.resolution }}</td>
+    <p-button
+        icon="pi pi-search"
+        label="Search"
+        severity="primary"
+        (onClick)="applyFilter()"
+        size="small"
+    />
 
-            <td>
-                <ng-container *ngIf="screen.tag?.length; else noTags">
-                    <p-chip
-                        *ngFor="let t of screen.tag"
-                        [label]="t"
-                        class="mr-1"
-                    ></p-chip>
-                </ng-container>
-                <ng-template #noTags>—</ng-template>
-            </td>
+    <p-button
+        icon="pi pi-times"
+        label="Clear"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="clearFilter()"
+        size="small"
+    />
+</div>
+       
 
-            <td>
-                {{ screen.orientation === 1 ? 'Portrait' : 'Landscape' }}
-            </td>
+    <p-table
+        [value]="screens"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        [loading]="isLoading"
+        responsiveLayout="scroll"
+        class="p-datatable-sm"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name">Name</th>
+                <th>Location</th>
+                <th>Resolution</th>
+                <th>Tags</th>
+                <th pSortableColumn="orientation">Orientation</th>
+                <th pSortableColumn="status">Status</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
 
-            <td>
-                <span
-                    class="status"
-                    [ngClass]="screen.status === 1 ? 'active' : 'inactive'"
-                >
-                    {{ screen.status === 1 ? 'Active' : 'Inactive' }}
-                </span>
-            </td>
+        <ng-template pTemplate="body" let-screen>
+            <tr>
+                <td><strong>{{ screen.name }}</strong></td>
+                <td>{{ screen.location }}</td>
+                <td>{{ screen.resolution }}</td>
 
-            <!-- ACTIONS -->
-            <td class="action-cell">
-          <p-button icon="pi pi-pencil" severity="info"   [rounded]="true" [text]="true" (onClick)="addedit.onShow(screen)" />
-          <p-button icon="pi pi-trash"  severity="danger" [rounded]="true" [text]="true" (onClick)="deleteScreen(screen)" />
-          <p-button icon="pi pi-clock"  severity="secondary" [rounded]="true" [text]="true" (onClick)="opHours.onShow(screen)" />
-        </td>
+                <td>
+                    <ng-container *ngIf="screen.tag?.length; else noTags">
+                        <p-chip
+                            *ngFor="let t of screen.tag"
+                            [label]="t"
+                            class="mr-1"
+                        />
+                    </ng-container>
+                    <ng-template #noTags>—</ng-template>
+                </td>
 
-        </tr>
-    </ng-template>
-</p-table>
+                <td>{{ screen.orientation === 1 ? 'Portrait' : 'Landscape' }}</td>
+
+                <!-- STATUS CELL — screen variable is valid here -->
+                <td>
+                    <span class="status" [ngClass]="{
+                        'active':      screen.status === ScreenStatus.Active,
+                        'inactive':    screen.status === ScreenStatus.InActive,
+                        'maintenance': screen.status === ScreenStatus.UnderMaintenance
+                    }">
+                        {{ screen.status === ScreenStatus.Active ? 'Active'
+                         : screen.status === ScreenStatus.InActive ? 'Inactive'
+                         : 'Under Maintenance' }}
+                    </span>
+                </td>
+
+                <td class="action-cell">
+                    <p-button icon="pi pi-pencil" severity="info"      [rounded]="true" [text]="true" (onClick)="addedit.onShow(screen)" />
+                    <p-button icon="pi pi-trash"  severity="danger"    [rounded]="true" [text]="true" (onClick)="deleteScreen(screen)" />
+                    <p-button icon="pi pi-clock"  severity="secondary" [rounded]="true" [text]="true" (onClick)="opHours.onShow(screen)" />
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7" class="text-center py-4 text-color-secondary">
+                    No screens found.
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
 
 <add-edit-screen #addedit (onSave)="loadScreens()" />

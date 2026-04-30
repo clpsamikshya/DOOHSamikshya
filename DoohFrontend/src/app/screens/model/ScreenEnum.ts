@@ -14,9 +14,10 @@ export enum ScreenStatus{
     UnderMaintenance = 3
 }
 
-export enum ScreenOrientation{
-    Landscape = 1,
-    Portrait = 2,
-    Square = 3
+export enum ScreenOrientation {
+    Portrait  = 1,
+    Square    = 2,
+    Landscape = 3
+    
 }
 

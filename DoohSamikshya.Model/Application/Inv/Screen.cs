@@ -47,4 +47,12 @@ namespace DoohSamikshya.Model.Application.Inv
         public int? DeletedBy { get; set; }
         public List<ScreenOperatingHour> OperatingHour { get; set; } = new();
     }
+
+    public class ScreenFilter
+    {
+        public string? Search { get; set; }
+        public ScreenStatus? Status { get; set; }
+        public ScreenOrientation? Orientation { get; set; }
+    }
 }
+

@@ -14,7 +14,8 @@ export class ScreenService {
   getAll(filter: ScreenFilter): Observable<ApiResponse<Screens[]>> {
     const params = new HttpParams()
       .set('Search', filter.search ?? '')
-      .set('Status', filter.status?.toString() ?? '');
+      .set('Status', filter.status?.toString() ?? '')
+      .set('Orientation', filter.orientation?.toString() ?? '');
 
     return this.http.get<ApiResponse<Screens[]>>(this.apiUrl, { params });
   }

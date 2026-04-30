@@ -3,6 +3,7 @@ using DoohSamikshya.Interface.Application.Core;
 using DoohSamikshya.Interface.Application.Inv;
 using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Shared;
+using DoohSamikshya.Model.Shared.Enum;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -25,27 +26,12 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> GetScreen([FromQuery] string? name, [FromQuery] bool? isActive)
-        {
-            try
-            {
-                var response = await ss.GetScreen(name, isActive);
-                return Ok(ApiResponse.Success(response));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResponse.Fail(ex.Message));
-            }
-        }
-    
-
-        //[HttpPost("Upsert")]
-        //public async Task<IActionResult> Upsert([FromBody] List<Screen> screens)
+        //[HttpGet]
+        //public async Task<IActionResult> GetScreen([FromQuery] string? name, [FromQuery] bool? isActive)
         //{
         //    try
         //    {
-        //        var response = await ss.Upsert(screens);
+        //        var response = await ss.GetScreen(name, isActive);
         //        return Ok(ApiResponse.Success(response));
         //    }
         //    catch (Exception ex)
@@ -54,7 +40,28 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         //    }
         //}
 
-    
+        [HttpGet]
+        public async Task<IActionResult> GetScreen(
+    [FromQuery] string? search,
+    [FromQuery] ScreenStatus? status,
+    [FromQuery] ScreenOrientation? orientation)
+        {
+            try
+            {
+                var filter = new ScreenFilter
+                {
+                    Search = search,
+                    Status = status,
+                    Orientation = orientation
+                };
+                var response = await ss.GetScreen(filter);
+                return Ok(ApiResponse.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse.Fail(ex.Message));
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddScreens([FromBody] Screen screen)
@@ -103,26 +110,6 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
-
-        //[HttpDelete("Id")]
-        //public async Task<IActionResult> DeleteScreens([FromRoute] int Id,[FromQuery] bool cascade = true)
-        //{
-        //    try
-        //    {
-        //        var response = await ss.DeleteScreen(Id, cascade);
-        //        return Ok(ApiResponse.Success(response));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ApiResponse.Fail(ex.Message));
-        //    }
-
-        //}
-
-
-
-
-
 
     }
 }

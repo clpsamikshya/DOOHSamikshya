@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DoohSamikshya.Model.Shared.Enum;
+using Microsoft.AspNetCore.Http;
 
 namespace DoohSamikshya.Model.Application.Media
 {
@@ -15,5 +16,12 @@ namespace DoohSamikshya.Model.Application.Media
         public bool IsVideo { get; set; }
         public int TenantId { get; set; }
         public int CreatedBy { get; set; }
+    }
+
+    public class MediaFilter
+    {
+        public string? Search { get; set; }
+        public bool? IsVideo { get; set; }
+        
     }
 }

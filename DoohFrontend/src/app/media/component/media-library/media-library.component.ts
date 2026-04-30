@@ -1,113 +1,105 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/sharedImports';
-import { MediaLibrary } from '../../model/MediaLibrary';
+import { MediaFilter, MediaLibrary } from '../../model/MediaLibrary';
+import { AddMediaComponent } from '../add-media/add-media.component';
 
 @Component({
-  selector: 'app-media-library',
-  standalone: true,
-  imports: [sharedImports],
-  templateUrl: './media-library.component.html',
-  styleUrls: ['./media-library.component.scss']
+    selector: 'app-media-library',
+    standalone: true,
+    imports: [sharedImports, AddMediaComponent],
+    templateUrl: './media-library.component.html',
+    styleUrls: ['./media-library.component.scss']
 })
 export class MediaLibraryComponent extends AppComponent implements OnInit, OnDestroy {
+    private readonly destroy$ = new Subject<void>();
 
-  private readonly destroy$ = new Subject<void>();
+    @ViewChild('addMedia') addMedia!: AddMediaComponent;
 
-  mediaList: MediaLibrary[] = [];
-  selectedFile: File | null = null;
-  isUploading = false;
-  isLoading = false;
+    mediaList: MediaLibrary[] = [];
+    isLoading = false;
+    previewVisible = false;
+    previewMedia: MediaLibrary | null = null;
 
-  previewVisible = false;
-  previewMedia: MediaLibrary | null = null;
+    filter: MediaFilter = {
+        search: '',
+        isVideo: undefined,
+    };
 
-  constructor(injector: Injector) {
-    super(injector);
-  }
+    typeOptions = [
+        { label: 'Image', value: false },
+        { label: 'Video', value: true  },
+    ];
 
-  ngOnInit(): void {
-    this.loadMedia();
-  }
+    constructor(injector: Injector) {
+        super(injector);
+    }
 
-  loadMedia(): void {
-    this.isLoading = true;
-    this.mediaLibraryService
-      .getMediaLibrary()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          this.mediaList = res.data ?? [];
-          this.isLoading = false;
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.showMessage('Error', err.message, 'error');
-        }
-      });
-  }
+    ngOnInit(): void {
+        this.loadMedia();
+    }
 
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) this.selectedFile = file;
-  }
+    applyFilter(): void {
+        this.loadMedia();
+    }
 
-  onUpload(): void {
-    if (!this.selectedFile) return;
-    this.isUploading = true;
+    clearFilter(): void {
+        this.filter = { search: '', isVideo: undefined };
+        this.loadMedia();
+    }
 
-    this.mediaLibraryService
-      .uploadMedia(this.selectedFile)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.selectedFile = null;
-          this.isUploading = false;
-          this.loadMedia();
-        },
-        error: (err) => {
-          this.isUploading = false;
-          this.showMessage('Error', err.message, 'error');
-        }
-      });
-  }
-
-  onDelete(id: number): void {
-    this.confirmAction({
-      message: 'Are you sure you want to delete this media?',
-      header: 'Confirm Deletion',
-      accept: () => {
+    loadMedia(): void {
+        this.isLoading = true;
         this.mediaLibraryService
-          .deleteMedia(id)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe({
-            next: (res) => {
-              console.log('Delete response:', res);
-              this.showMessage('Success', 'Media deleted successfully', 'success');
-              this.loadMedia();
+            .getMediaLibrary(this.filter)   // fixed: this.filter
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res: any) => {
+                    this.mediaList = res.data ?? [];
+                    this.isLoading = false;
+                },
+                error: (err: any) => {
+                    this.isLoading = false;
+                    this.showMessage('Error', err.message, 'error');
+                }
+            });
+    }
+
+    onDelete(id: number): void {
+        this.confirmAction({
+            message: 'Are you sure you want to delete this media?',
+            header: 'Confirm Deletion',
+            accept: () => {
+                this.mediaLibraryService
+                    .deleteMedia(id)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: () => {
+                            this.showMessage('Success', 'Media deleted successfully', 'success');
+                            this.loadMedia();
+                        },
+                        error: (err: any) => {
+                            this.showMessage('Error', err.message, 'error');
+                        }
+                    });
             },
-            error: (err) => {
-              this.showMessage('Error', err.message, 'error');
-            }
-          });
-      },
-      reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
-    });
-  }
+            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
+        });
+    }
 
-  openPreview(media: MediaLibrary): void {
-    this.previewMedia = media;
-    this.previewVisible = true;
-  }
+    openPreview(media: MediaLibrary): void {
+        this.previewMedia = media;
+        this.previewVisible = true;
+    }
 
-  closePreview(): void {
-    this.previewVisible = false;
-    this.previewMedia = null;
-  }
+    closePreview(): void {
+        this.previewVisible = false;
+        this.previewMedia = null;
+    }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
 }
