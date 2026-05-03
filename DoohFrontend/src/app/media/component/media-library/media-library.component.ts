@@ -1,4 +1,10 @@
-import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+    Component,
+    Injector,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/sharedImports';
@@ -10,9 +16,12 @@ import { AddMediaComponent } from '../add-media/add-media.component';
     standalone: true,
     imports: [sharedImports, AddMediaComponent],
     templateUrl: './media-library.component.html',
-    styleUrls: ['./media-library.component.scss']
+    styleUrls: ['./media-library.component.scss'],
 })
-export class MediaLibraryComponent extends AppComponent implements OnInit, OnDestroy {
+export class MediaLibraryComponent
+    extends AppComponent
+    implements OnInit, OnDestroy
+{
     private readonly destroy$ = new Subject<void>();
 
     @ViewChild('addMedia') addMedia!: AddMediaComponent;
@@ -25,11 +34,13 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
     filter: MediaFilter = {
         search: '',
         isVideo: undefined,
+        //isDeleted: undefined
+        isDeleted: undefined,
     };
 
     typeOptions = [
-        { label: 'Image', value: false },
-        { label: 'Video', value: true  },
+        { label: 'Active Only', value: false },
+        { label: 'Include Deleted', value: true },
     ];
 
     constructor(injector: Injector) {
@@ -45,14 +56,14 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
     }
 
     clearFilter(): void {
-        this.filter = { search: '', isVideo: undefined };
+        this.filter = { search: '', isVideo: undefined, isDeleted: undefined };
         this.loadMedia();
     }
 
     loadMedia(): void {
         this.isLoading = true;
         this.mediaLibraryService
-            .getMediaLibrary(this.filter)   // fixed: this.filter
+            .getMediaLibrary(this.filter)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (res: any) => {
@@ -62,31 +73,31 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
                 error: (err: any) => {
                     this.isLoading = false;
                     this.showMessage('Error', err.message, 'error');
-                }
+                },
             });
     }
 
-    onDelete(id: number): void {
-        this.confirmAction({
-            message: 'Are you sure you want to delete this media?',
-            header: 'Confirm Deletion',
-            accept: () => {
-                this.mediaLibraryService
-                    .deleteMedia(id)
-                    .pipe(takeUntil(this.destroy$))
-                    .subscribe({
-                        next: () => {
-                            this.showMessage('Success', 'Media deleted successfully', 'success');
-                            this.loadMedia();
-                        },
-                        error: (err: any) => {
-                            this.showMessage('Error', err.message, 'error');
-                        }
-                    });
-            },
-            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
-        });
-    }
+    onDelete(media: MediaLibrary): void {
+       this.confirmAction({
+        message: 'Are you sure you want to delete this media?',
+        header: 'Confirm Deletion',
+        accept: () => {
+            this.mediaLibraryService
+                .deleteMedia(media.id) 
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this.showMessage('Success', 'Media deleted successfully', 'success');
+                        this.loadMedia();
+                    },
+                    error: (err: any) => {
+                        this.showMessage('Error', err.message, 'error');
+                    }
+                });
+        },
+        reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
+    });
+}
 
     openPreview(media: MediaLibrary): void {
         this.previewMedia = media;

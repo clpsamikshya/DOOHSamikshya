@@ -13,6 +13,8 @@ export class MediaLibraryService {
     const params = new HttpParams()
         .set('Search', filter.search ?? '')
         .set('Type', filter.isVideo?.toString() ?? '')
+        .set('IncludeDeleted', filter.isDeleted?.toString() ?? '')
+
 
     return this.http.get<ApiResponse<MediaLibrary[]>>(this.api, { params });
   }

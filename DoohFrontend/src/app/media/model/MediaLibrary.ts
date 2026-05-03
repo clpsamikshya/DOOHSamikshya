@@ -15,6 +15,7 @@ export interface MediaLibrary {
 export class MediaFilter {
   search?: string;
   isVideo?: boolean;
+  isDeleted?: boolean;
 
   constructor() {}
 }

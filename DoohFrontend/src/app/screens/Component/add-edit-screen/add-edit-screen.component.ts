@@ -20,12 +20,14 @@ import {
     ScreenOrientation,
     DayOfWeek,
 } from '../../model/ScreenEnum';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { AddEditOperatingHourComponent } from '../add-edit-operating-hour/add-edit-operating-hour.component';
 
 @Component({
     selector: 'add-edit-screen',
     standalone: true,
-    imports: [sharedImports],
+
+    imports: [sharedImports, AddEditOperatingHourComponent],
     templateUrl: './add-edit-screen.component.html',
     styleUrl: './add-edit-screen.component.scss',
 })
@@ -33,7 +35,7 @@ export class AddEditScreenComponent
     extends AppComponent
     implements OnInit, OnDestroy
 {
-    private destroy$ = new Subject<void>();
+    private readonly destroy$ = new Subject<void>();
 
     @Output() onSave = new EventEmitter<Screens>();
 
@@ -42,22 +44,20 @@ export class AddEditScreenComponent
     screen: Screens = new Screens();
 
     slotList: OperatingHourSlot[] = [];
-    slotCounter = 0;
-    draftSlot: OperatingHourSlot = this.emptyDraft();
 
-    statusOptions = [
+    readonly statusOptions = [
         { label: 'Active', value: ScreenStatus.Active },
         { label: 'Inactive', value: ScreenStatus.InActive },
         { label: 'Under Maintenance', value: ScreenStatus.UnderMaintenance },
     ];
 
-    orientationOptions = [
+    readonly orientationOptions = [
         { label: 'Portrait', value: ScreenOrientation.Portrait },
         { label: 'Square', value: ScreenOrientation.Square },
         { label: 'Landscape', value: ScreenOrientation.Landscape },
     ];
 
-    dayOptions = [
+    readonly dayOptions = [
         { label: 'Sunday', value: DayOfWeek.Sunday },
         { label: 'Monday', value: DayOfWeek.Monday },
         { label: 'Tuesday', value: DayOfWeek.Tuesday },
@@ -75,6 +75,7 @@ export class AddEditScreenComponent
 
     onShow(screen?: Screens): void {
         this.existingData = screen ?? null;
+        
         this.screen = {
             id: screen?.id ?? 0,
             tenantId: 1,
@@ -89,343 +90,185 @@ export class AddEditScreenComponent
             updatedBy: 1,
             operatingHour: screen?.operatingHour || [],
         };
-        this.slotList = [];
-        this.slotCounter = 0;
-        this.draftSlot = this.emptyDraft();
-        this.loadSlotsFromExistingData();
+
+        this.slotList = this.convertOperatingHoursToSlots(
+            screen?.operatingHour || []
+        );
+
         this.isShow = true;
     }
 
-    loadSlotsFromExistingData(): void {
-        const existingHours = this.existingData?.operatingHour || [];
-        const groupedData = new Map<string, OperatingHourSlot>();
+    private convertOperatingHoursToSlots(
+        hours: ScreenOperatingHour[]
+    ): OperatingHourSlot[] {
+        const groupedSlots = new Map<string, OperatingHourSlot>();
+        let slotCounter = 0;
 
-        for (const hour of existingHours) {
-            const key = `${hour.startTime}|${hour.endTime}|${hour.avgAudienceCount}`;
+        for (const hour of hours) {
+            const slotKey = this.generateSlotKey(
+                hour.startTime,
+                hour.endTime,
+                hour.avgAudienceCount
+            );
 
-            if (!groupedData.has(key)) {
-                groupedData.set(key, {
-                    id: 'slot_' + this.slotCounter++,
+            if (!groupedSlots.has(slotKey)) {
+                groupedSlots.set(slotKey, {
+                    id: `slot_${slotCounter++}`,
                     selectedDays: [],
-                    startTime: hour.startTime.substring(0, 5),
-                    endTime: hour.endTime.substring(0, 5),
+                    startTime: this.formatTimeForInput(hour.startTime),
+                    endTime: this.formatTimeForInput(hour.endTime),
                     avgAudienceCount: hour.avgAudienceCount,
                 });
             }
 
-            groupedData.get(key)!.selectedDays.push(hour.dayOfWeek);
+            groupedSlots.get(slotKey)!.selectedDays.push(hour.dayOfWeek);
         }
 
-        this.slotList = Array.from(groupedData.values());
+        return Array.from(groupedSlots.values());
     }
 
-    private emptyDraft(): OperatingHourSlot {
-        return {
-            id: '',
-            selectedDays: [],
-            startTime: '',
-            endTime: '',
-            avgAudienceCount: 0,
-        };
+    private generateSlotKey(
+        startTime: string,
+        endTime: string,
+        audienceCount: number
+    ): string {
+        return `${startTime}|${endTime}|${audienceCount}`;
     }
 
-    toggleDay(day: number): void {
-        const idx = this.draftSlot.selectedDays.indexOf(day);
-        idx === -1
-            ? this.draftSlot.selectedDays.push(day)
-            : this.draftSlot.selectedDays.splice(idx, 1);
+    private formatTimeForInput(timeString: string): string {
+        return timeString.substring(0, 5);
     }
 
-    confirmSlot(): void {
-        if (!this.draftSlot.selectedDays.length) {
-            this.showMessage('Validation', 'Select at least one day', 'warn');
-            return;
-        }
-        if (!this.draftSlot.startTime || !this.draftSlot.endTime) {
-            this.showMessage(
-                'Validation',
-                'Start and end time are required',
-                'warn',
-            );
-            return;
-        }
-        if (this.draftSlot.startTime >= this.draftSlot.endTime) {
-            this.showMessage(
-                'Validation',
-                'End time must be after start time',
-                'warn',
-            );
-            return;
-        }
-
-        this.slotList.push({
-            ...this.draftSlot,
-            id: 'slot_' + this.slotCounter++,
-        });
-
-        this.draftSlot = this.emptyDraft();
+    /**
+     * CRITICAL FIX: Explicit type annotation for event handler.
+     * This prevents the "Event vs OperatingHourSlot[]" error.
+     * 
+     * WHY: TypeScript infers $event as DOM Event by default.
+     * We tell it explicitly: this is OperatingHourSlot[].
+     */
+    onSlotsUpdated(updatedSlots: OperatingHourSlot[]): void {
+        this.slotList = updatedSlots;
     }
 
-    removeSlot(slot: OperatingHourSlot, dayValue?: number): void {
-        const removeLocally = () => {
-            if (dayValue !== undefined) {
-                // Remove only this day from the slot
-                slot.selectedDays = slot.selectedDays.filter(
-                    (d) => d !== dayValue,
-                );
-                // If no days left, remove the entire slot
-                if (!slot.selectedDays.length) {
-                    this.slotList = this.slotList.filter(
-                        (s) => s.id !== slot.id,
-                    );
-                }
-            } else {
-                this.slotList = this.slotList.filter((s) => s.id !== slot.id);
-            }
-        };
-
-        if (!this.existingData) {
-            removeLocally();
-            return;
-        }
-
-        const matchingHours = this.existingData.operatingHour.filter(
-            (oh) =>
-                (dayValue !== undefined
-                    ? oh.dayOfWeek === dayValue
-                    : slot.selectedDays.includes(oh.dayOfWeek)) &&
-                oh.startTime.startsWith(slot.startTime) &&
-                oh.endTime.startsWith(slot.endTime),
-        );
-
-        if (!matchingHours.length) {
-            removeLocally();
-            return;
-        }
-
-        const dayLabel =
-            dayValue !== undefined
-                ? this.dayOptions.find((d) => d.value === dayValue)?.label
-                : this.getSelectedDayLabels(slot);
-
-        this.confirmAction({
-            message: `Remove hours for ${dayLabel}?`,
-            header: 'Remove Operating Hours',
-            accept: () => {
-                forkJoin(
-                    matchingHours.map((oh) =>
-                        this.screenService.deleteOperatingHour(
-                            oh.id,
-                            this.existingData!.id,
-                        ),
-                    ),
-                )
-                    .pipe(takeUntil(this.destroy$))
-                    .subscribe({
-                        next: () => {
-                            this.showMessage(
-                                'Success',
-                                'Operating hours removed',
-                                'success',
-                            );
-                            removeLocally();
-                            this.existingData!.operatingHour =
-                                this.existingData!.operatingHour.filter(
-                                    (oh) =>
-                                        !matchingHours.some(
-                                            (m) => m.id === oh.id,
-                                        ),
-                                );
-                        },
-                        error: (err: any) => {
-                            this.showMessage(
-                                'Error',
-                                err?.message || 'Delete failed',
-                                'error',
-                            );
-                        },
-                    });
-            },
-        });
-    }
-
-    getSelectedDayLabels(slot: OperatingHourSlot): string {
-        if (!slot.selectedDays?.length) return 'No days selected';
-        return this.dayOptions
-            .filter((d) => slot.selectedDays.includes(d.value))
-            .map((d) => d.label)
-            .join(', ');
-    }
-
-    getSlotDayRows(
-        slot: OperatingHourSlot,
-    ): { label: string; value: number }[] {
-        return this.dayOptions.filter((d) =>
-            slot.selectedDays.includes(d.value),
+    private convertSlotsToOperatingHours(): ScreenOperatingHour[] {
+        return this.slotList.flatMap((slot) =>
+            slot.selectedDays.map((dayOfWeek) => {
+                const hour = new ScreenOperatingHour();
+                hour.dayOfWeek = dayOfWeek;
+                hour.startTime = this.formatTimeForDatabase(slot.startTime);
+                hour.endTime = this.formatTimeForDatabase(slot.endTime);
+                hour.avgAudienceCount = slot.avgAudienceCount;
+                hour.createdBy = 1;
+                hour.updatedBy = 1;
+                return hour;
+            })
         );
     }
 
-    isFirstDay(slot: OperatingHourSlot, day: string): boolean {
-        return this.getSlotDayRows(slot)[0].label === day;
+    private formatTimeForDatabase(timeString: string): string {
+        return `${timeString}:00`;
     }
 
-    trackBySlotId(index: number, slot: OperatingHourSlot): string {
-        return slot.id;
-    }
+    private validateScreenBasicDetails(): boolean {
+        const { name, location, resolution } = this.screen;
 
-    isSlotValid(): boolean {
-        if (!this.slotList.length) {
-            this.showMessage(
-                'Validation Error',
-                'Add at least one operating hour slot',
-                'warn',
-            );
+        if (!name?.trim()) {
+            this.showMessage('Validation', 'Screen name is required', 'warn');
             return false;
         }
 
-        const dayMap = new Map<number, { start: string; end: string }[]>();
+        if (!location?.trim()) {
+            this.showMessage('Validation', 'Location is required', 'warn');
+            return false;
+        }
 
-        for (const slot of this.slotList) {
-            if (!slot.selectedDays?.length) {
-                this.showMessage(
-                    'Validation Error',
-                    'Each slot must have at least one day',
-                    'warn',
-                );
-                return false;
-            }
-            if (!slot.startTime || !slot.endTime) {
-                this.showMessage(
-                    'Validation Error',
-                    'Start and End time required',
-                    'warn',
-                );
-                return false;
-            }
-            if (slot.startTime >= slot.endTime) {
-                this.showMessage(
-                    'Validation Error',
-                    'End time must be after start time',
-                    'warn',
-                );
-                return false;
-            }
-
-            for (const day of slot.selectedDays) {
-                if (!dayMap.has(day)) dayMap.set(day, []);
-
-                const existingTimes = dayMap.get(day)!;
-
-                for (const time of existingTimes) {
-                    if (
-                        slot.startTime < time.end &&
-                        slot.endTime > time.start
-                    ) {
-                        this.showMessage(
-                            'Validation Error',
-                            'Time overlap detected',
-                            'warn',
-                        );
-                        return false;
-                    }
-                }
-
-                existingTimes.push({
-                    start: slot.startTime,
-                    end: slot.endTime,
-                });
-            }
+        if (!resolution?.trim()) {
+            this.showMessage('Validation', 'Resolution is required', 'warn');
+            return false;
         }
 
         return true;
     }
 
-    buildOperatingHours(): ScreenOperatingHour[] {
-        return this.slotList.flatMap((slot) =>
-            slot.selectedDays.map((day) => {
-                const item = new ScreenOperatingHour();
-                item.dayOfWeek = day;
-                item.startTime = `${slot.startTime}:00`;
-                item.endTime = `${slot.endTime}:00`;
-                item.avgAudienceCount = slot.avgAudienceCount;
-                item.createdBy = 1;
-                item.updatedBy = 1;
-                return item;
-            }),
-        );
+    private validateOperatingHours(): boolean {
+        if (this.slotList.length === 0) {
+            this.showMessage(
+                'Validation',
+                'Add at least one operating hour slot',
+                'warn'
+            );
+            return false;
+        }
+
+        return true;
     }
 
     onSubmit(): void {
-        const { name, location, resolution } = this.screen;
-        if (!name || !location || !resolution) {
-            this.showMessage(
-                'Warning',
-                'Please fill all required fields',
-                'warn',
-            );
-            return;
-        }
-        if (!this.isSlotValid()) return;
+        if (!this.validateScreenBasicDetails()) return;
+        if (!this.validateOperatingHours()) return;
 
-        this.screen.operatingHour = this.buildOperatingHours();
+        this.screen.operatingHour = this.convertSlotsToOperatingHours();
+
         this.existingData ? this.updateScreen() : this.createScreen();
     }
 
-    createScreen(): void {
+    private createScreen(): void {
         this.screenService
             .add(this.screen as ScreenInsert)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (res: any) => {
+                next: (response: any) => {
                     this.showMessage(
                         'Success',
                         'Screen created successfully',
-                        'success',
+                        'success'
                     );
-                    this.isShow = false;
-                    this.onSave.emit(res?.data);
+                    this.closeDialog();
+                    this.onSave.emit(response?.data);
                 },
-                error: (err: any) => {
+                error: (error: any) => {
                     this.showMessage(
                         'Error',
-                        err?.message || 'Error occurred',
-                        'error',
+                        error?.message || 'Failed to create screen',
+                        'error'
                     );
                 },
             });
     }
 
-    updateScreen(): void {
+    private updateScreen(): void {
         this.screenService
             .update(this.screen as ScreenUpdate)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (res: any) => {
+                next: (response: any) => {
                     this.showMessage(
                         'Success',
                         'Screen updated successfully',
-                        'success',
+                        'success'
                     );
-                    this.isShow = false;
-                    this.onSave.emit(res?.data);
+                    this.closeDialog();
+                    this.onSave.emit(response?.data);
                 },
-                error: (err: any) => {
+                error: (error: any) => {
                     this.showMessage(
                         'Error',
-                        err?.message || 'Error occurred',
-                        'error',
+                        error?.message || 'Failed to update screen',
+                        'error'
                     );
                 },
             });
     }
 
     onCancel(): void {
+        this.closeDialog();
+    }
+
+    private closeDialog(): void {
         this.isShow = false;
         this.existingData = null;
         this.screen = new Screens();
         this.slotList = [];
-        this.slotCounter = 0;
-        this.draftSlot = this.emptyDraft();
     }
 
     ngOnDestroy(): void {

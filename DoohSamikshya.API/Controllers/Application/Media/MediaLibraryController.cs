@@ -14,15 +14,16 @@ namespace DoohSamikshya.API.Controllers.Application.Media
         IMediaService ms) : SharedController
     {
         [HttpGet]
-        public async Task<IActionResult> GetMediaLibrary([FromQuery] string? search, [FromQuery] bool? IsVideo)
+        public async Task<IActionResult> GetMediaLibrary([FromQuery] string? search, [FromQuery] bool? IsVideo, [FromQuery] bool? IncludeDeleted)
         {
             try
             {
                 var filter = new MediaFilter
                 {
                     Search = search,
-                    IsVideo = IsVideo
-                    
+                    IsVideo = IsVideo,
+                    IncludeDeleted = IncludeDeleted
+
                 };
                 var response = await mls.GetMediaLibrary(filter);
                 return Ok(ApiResponse.Success(response));

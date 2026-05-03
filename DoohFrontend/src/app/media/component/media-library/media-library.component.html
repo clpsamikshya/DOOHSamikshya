@@ -26,15 +26,15 @@
             />
         </div>
 
-        <!-- <p-dropdown
+        <p-dropdown
             [options]="typeOptions"
-            [(ngModel)]="filter.isVideo"
-            placeholder="All Types"
+            [(ngModel)]="filter.isDeleted"
+            placeholder="Filter Deleted"
             (onChange)="applyFilter()"
             [showClear]="true"
             optionLabel="label"
             optionValue="value"
-        /> -->
+        />
 
         <p-button
             icon="pi pi-search"
@@ -78,7 +78,7 @@
             </ng-template>
 
             <ng-template pTemplate="body" let-media>
-                <tr>
+                <tr [class.deleted-row]="media.isDeleted">
                     <td>
                         <img
                             *ngIf="!media.isVideo"
@@ -108,12 +108,16 @@
                     <td class="ml-text-muted">{{ media.duration ? media.duration + 's' : '—' }}</td>
                     <td class="ml-actions-col">
                         <p-button
+                            *ngIf="!media.isDeleted"
                             icon="pi pi-trash"
                             severity="danger"
                             [text]="true"
                             size="small"
-                            (onClick)="onDelete(media.id)"
+                            (onClick)="onDelete(media)"
                         />
+                        <span *ngIf="media.isDeleted" class="deleted-badge">
+                            Deleted
+                        </span>
                     </td>
                 </tr>
             </ng-template>

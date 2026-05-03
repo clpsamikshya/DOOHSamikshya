@@ -51,6 +51,11 @@
         flex-shrink: 0;
     }
 
+    .deleted-row {
+    opacity: 0.5;
+    background-color: #f9f9f9;
+}
+
     .search-wrapper {
         flex: 1;
         min-width: 200px;

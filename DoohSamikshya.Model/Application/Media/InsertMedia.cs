@@ -22,6 +22,10 @@ namespace DoohSamikshya.Model.Application.Media
     {
         public string? Search { get; set; }
         public bool? IsVideo { get; set; }
-        
+        //public bool? IsDeleted { get; set; }
+        public bool? IncludeDeleted { get; set; }
+
+
+
     }
 }
