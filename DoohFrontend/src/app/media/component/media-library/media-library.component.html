@@ -3,17 +3,9 @@
 
 <div class="ml-wrap">
 
-    <!-- Header / Filter Bar -->
-    <div class="ml-header">
-        <p-button
-            icon="pi pi-plus"
-            label="Upload Media"
-            severity="success"
-            [rounded]="true"
-            size="small"
-            (onClick)="addMedia.onShow()"
-        /><br>
+ <div class="ml-header">
 
+    <div class="left-actions">
         <div class="search-wrapper">
             <i class="pi pi-search search-icon"></i>
             <input
@@ -30,10 +22,7 @@
             [options]="typeOptions"
             [(ngModel)]="filter.isDeleted"
             placeholder="Filter Deleted"
-            (onChange)="applyFilter()"
             [showClear]="true"
-            optionLabel="label"
-            optionValue="value"
         />
 
         <p-button
@@ -53,6 +42,19 @@
             (onClick)="clearFilter()"
         />
     </div>
+
+    <div class="right-actions">
+        <p-button
+            icon="pi pi-plus"
+            label="Upload Media"
+            severity="success"
+            [rounded]="true"
+            size="small"
+            (onClick)="addMedia.onShow()"
+        />
+    </div>
+
+</div>
 
     <!-- Table Card -->
     <div class="ml-table-card">

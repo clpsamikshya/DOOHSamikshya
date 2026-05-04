@@ -1,3 +1,21 @@
+.ml-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.left-actions,
+.right-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.page-actions {
+    margin-left: auto;
+}
+
 .ml-wrap {
   padding: 1.5rem 0;
 }

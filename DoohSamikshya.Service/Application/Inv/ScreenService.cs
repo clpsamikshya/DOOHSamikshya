@@ -8,13 +8,7 @@ namespace DoohSamikshya.Service.Application.Inv
 {
     public class ScreenService(IDataAccessService da) : IScreenService
     {
-        public async Task<List<Screen>?> GetScreenById(int id)
-        {
-            string json = JsonConvert.SerializeObject(new { Id = id });
-            string result = await da.RetrievalProcedure("inv.SpScreenByIdSel", json);
-            return JsonConvert.DeserializeObject<List<Screen>>(result);
-        }
-
+     
         public async Task<List<Screen>?> GetScreen(ScreenFilter filter)
         {
             string json = JsonConvert.SerializeObject(new
@@ -59,7 +53,7 @@ namespace DoohSamikshya.Service.Application.Inv
         {
             try
             {
-                string json = JsonConvert.SerializeObject(new { Id = id, TenantId = 1, DeletedBy = 1 });
+                string json = JsonConvert.SerializeObject(new { ScreenId = id, TenantId = 1, DeletedBy = 1 });
                 string result = await da.ActionProcedure("inv.SpScreenDel", json);
                 return JsonConvert.DeserializeObject<Screen>(result);
             }

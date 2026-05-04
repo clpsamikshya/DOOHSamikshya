@@ -107,7 +107,7 @@ export class ScreenListComponent
             });
     }
 
-    deleteScreen(screen: Screens): void {
+     deleteScreen(screen: Screens): void {
         this.confirmAction({
             message: `Are you sure you want to delete screen ${screen.name}?`,
             header: 'Confirm Deletion',

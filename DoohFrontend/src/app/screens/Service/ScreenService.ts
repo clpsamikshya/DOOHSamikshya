@@ -29,6 +29,7 @@ export class ScreenService {
   }
 
   delete(id: number): Observable<ApiResponse<Screens>>{
+     const params = new HttpParams().set('ScreenId', id.toString());
     return this.http.delete<ApiResponse<Screens>>(`${this.apiUrl}/${id}`);
 }
 

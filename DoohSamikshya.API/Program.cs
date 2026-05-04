@@ -1,8 +1,6 @@
 using DoohSamikshya.DataAccess;
-using DoohSamikshya.Interface.Application.Core;
 using DoohSamikshya.Interface.Application.Inv;
 using DoohSamikshya.Interface.Application.Media;
-using DoohSamikshya.Service.Application.Core;
 using DoohSamikshya.Service.Application.Inv;
 using DoohSamikshya.Service.Application.Media;
 using DoohSamikshya.Service.Shared;
@@ -19,7 +17,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataAccessService, DataAccessService>()
                 .AddScoped<IScreenService, ScreenService>()
-                .AddScoped<ITenantService, TenantService>()
                 .AddScoped<IMediaLibraryService, MediaLibraryService>();
 builder.Services.AddScoped<IMediaService>(provider =>
 {
