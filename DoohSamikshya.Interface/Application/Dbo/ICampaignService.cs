@@ -7,7 +7,7 @@ namespace DoohSamikshya.Interface.Application.Dbo
     public interface ICampaignService
     {
         Task<CampaignResponse?> GetCampaign(CampaignFilter filter);
-        Task<List<Campaign>> AddCampaign(Campaign campaign);
+        Task<Campaign> AddCampaign(Campaign campaign);
         Task<List<Campaign>?> UpdateCampaignStatus(Campaign campaign);
         Task<Campaign> DeleteCampaign(int Id);
     }

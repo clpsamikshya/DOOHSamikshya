@@ -8,22 +8,13 @@ namespace DoohSamikshya.Service.Application.Dbo
 {
     public class CampaignService(IDataAccessService da) : ICampaignService
     {
-        public async Task<List<Campaign>> AddCampaign(Campaign campaign)
+        public async Task<Campaign> AddCampaign(Campaign campaign)
         {
             try
             {
-                var param = new
-                {
-                    campaign.TenantId,
-                    campaign.Name,
-                    campaign.Remarks,
-                    campaign.Status,
-                    campaign.CreatedBy,
-
-                };
-                string json = JsonConvert.SerializeObject(param);
+                string json = JsonConvert.SerializeObject(campaign);
                 string result = await da.ActionProcedure("dbo.SpCampaignIns", json);
-                return JsonConvert.DeserializeObject<List<Campaign>>(result);
+                return JsonConvert.DeserializeObject<Campaign>(result);
             }
             catch (SqlException ex)
             {

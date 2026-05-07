@@ -2,6 +2,7 @@
 using DoohSamikshya.Model.Shared.Enum;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +13,11 @@ namespace DoohSamikshya.Model.Application.Dbo
     {
           public int Id { get; set; }
           public int TenantId { get; set; }
+
+         [Required]
           public string Name { get; set; }
           public CampaignStatus Status { get; set; } = CampaignStatus.New;
-          public string Remarks { get; set; }
+          public string? Remarks { get; set; }
          public bool IsDeleted { get; set; } = false;
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

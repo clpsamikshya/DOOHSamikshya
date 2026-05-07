@@ -6,6 +6,8 @@ using DoohSamikshya.Service.Application.Media;
 using DoohSamikshya.Service.Shared;
 using DoohSamikshya.Interface.Shared;
 using DoohSamikshya.Service.Shared;
+using DoohSamikshya.Interface.Application.Dbo;
+using DoohSamikshya.Service.Application.Dbo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataAccessService, DataAccessService>()
                 .AddScoped<IScreenService, ScreenService>()
-                .AddScoped<IMediaLibraryService, MediaLibraryService>();
+                .AddScoped<IMediaLibraryService, MediaLibraryService>()
+                .AddScoped<ICampaignService, CampaignService>()
+                .AddScoped<ICampaignMediaService, CampaignMediaService>();
 builder.Services.AddScoped<IMediaService>(provider =>
 {
     var env = provider.GetRequiredService<IWebHostEnvironment>();

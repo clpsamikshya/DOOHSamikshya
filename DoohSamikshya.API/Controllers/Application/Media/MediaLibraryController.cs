@@ -1,10 +1,8 @@
 ﻿using DoohSamikshya.API.Controllers.Shared;
 using DoohSamikshya.Interface.Application.Media;
 using DoohSamikshya.Interface.Shared;
-using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Application.Media;
 using DoohSamikshya.Model.Shared;
-using DoohSamikshya.Model.Shared.Enum;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoohSamikshya.API.Controllers.Application.Media
