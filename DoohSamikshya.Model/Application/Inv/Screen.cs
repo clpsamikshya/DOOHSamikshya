@@ -53,6 +53,14 @@ namespace DoohSamikshya.Model.Application.Inv
         public string? Search { get; set; }
         public ScreenStatus? Status { get; set; }
         public ScreenOrientation? Orientation { get; set; }
+        public int Offset { get; set; } = 0;     
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class ScreenResponse
+    {
+        public int TotalRows { get; set; }  
+        public List<Screen>? Data { get; set; }
     }
 }
 

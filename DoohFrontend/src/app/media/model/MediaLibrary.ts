@@ -12,12 +12,17 @@ export interface MediaLibrary {
   createdBy: number;
 }
 
-export class MediaFilter {
+export interface MediaFilter {
   search?: string;
   isVideo?: boolean;
-  isDeleted?: boolean;
+  deleteMode?: 'active' | 'include' | 'deleted';
+  offset?: number; 
+  pageSize?: number;
+}
 
-  constructor() {}
+export interface MediaLibraryResponse {
+  totalRows: number;
+  data: MediaLibrary[];
 }
 
 export interface ApiResponse<T> {

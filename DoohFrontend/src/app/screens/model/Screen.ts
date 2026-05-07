@@ -101,12 +101,17 @@ export interface OperatingHourSlot {
   avgAudienceCount: number;
 }
 
-export class ScreenFilter {
+export interface ScreenFilter {
   search?: string;
-  status?: number | null;
-  orientation?: number | null;
+  status?: ScreenStatus | null;
+  orientation?: ScreenOrientation | null;
+  offset?: number;
+  pageSize?: number;
+}
 
-  constructor() {}
+export interface ScreenResponse {
+  totalRows: number;
+  data: Screens[];
 }
 
 export class ScreenInsert {

@@ -28,19 +28,23 @@ export class MediaLibraryComponent
 
     mediaList: MediaLibrary[] = [];
     isLoading = false;
+    totalRecords = 0;
+    pageSize = 10;
     previewVisible = false;
     previewMedia: MediaLibrary | null = null;
 
     filter: MediaFilter = {
         search: '',
         isVideo: undefined,
-        //isDeleted: undefined
-        isDeleted: undefined,
+        deleteMode: 'active',
+        offset: 0,
+        pageSize: 10
     };
 
     typeOptions = [
-        { label: 'Active Only', value: false },
-        { label: 'Include Deleted', value: true },
+        { label: 'Active Only', value: 'active' },
+        { label: 'Include Deleted', value: 'include' },
+        { label: 'Deleted Only', value: 'deleted' },
     ];
 
     constructor(injector: Injector) {
@@ -52,11 +56,27 @@ export class MediaLibraryComponent
     }
 
     applyFilter(): void {
+        this.filter = { ...this.filter, offset: 0 };
         this.loadMedia();
     }
 
     clearFilter(): void {
-        this.filter = { search: '', isVideo: undefined, isDeleted: undefined };
+        this.filter = {
+            search: '',
+            isVideo: undefined,
+            deleteMode: 'active',
+            offset: 0,
+            pageSize: this.pageSize
+        };
+        this.loadMedia();
+    }
+
+    onPageChange(event: any): void {
+        this.filter = {
+            ...this.filter,
+            offset: event.first,
+            pageSize: event.rows
+        };
         this.loadMedia();
     }
 
@@ -67,8 +87,9 @@ export class MediaLibraryComponent
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (res: any) => {
-                    this.mediaList = res.data ?? [];
-                    this.isLoading = false;
+                    this.mediaList    = res.data?.data      ?? [];
+                    this.totalRecords = res.data?.totalRows ?? 0;
+                    this.isLoading    = false;
                 },
                 error: (err: any) => {
                     this.isLoading = false;
@@ -78,26 +99,26 @@ export class MediaLibraryComponent
     }
 
     onDelete(media: MediaLibrary): void {
-       this.confirmAction({
-        message: 'Are you sure you want to delete this media?',
-        header: 'Confirm Deletion',
-        accept: () => {
-            this.mediaLibraryService
-                .deleteMedia(media.id) 
-                .pipe(takeUntil(this.destroy$))
-                .subscribe({
-                    next: () => {
-                        this.showMessage('Success', 'Media deleted successfully', 'success');
-                        this.loadMedia();
-                    },
-                    error: (err: any) => {
-                        this.showMessage('Error', err.message, 'error');
-                    }
-                });
-        },
-        reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
-    });
-}
+        this.confirmAction({
+            message: 'Are you sure you want to delete this media?',
+            header: 'Confirm Deletion',
+            accept: () => {
+                this.mediaLibraryService
+                    .deleteMedia(media.id)
+                    .pipe(takeUntil(this.destroy$))
+                    .subscribe({
+                        next: () => {
+                            this.showMessage('Success', 'Media deleted successfully', 'success');
+                            this.loadMedia();
+                        },
+                        error: (err: any) => {
+                            this.showMessage('Error', err.message, 'error');
+                        }
+                    });
+            },
+            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
+        });
+    }
 
     openPreview(media: MediaLibrary): void {
         this.previewMedia = media;

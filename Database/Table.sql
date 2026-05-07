@@ -7,7 +7,7 @@ CREATE TABLE [core].[User](
 
 CREATE TABLE [core].[Tenant] (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    Name NVARCHAR(75) NOT NULL,
+    [Name] NVARCHAR(75) NOT NULL,
     TenancyCode NVARCHAR(50) NOT NULL UNIQUE,
     Country NVARCHAR(50) NULL,
     City NVARCHAR(50) NULL,
@@ -30,8 +30,8 @@ CREATE TABLE [core].[Tenant] (
 CREATE TABLE [inv].[Screen] (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     TenantId INT NOT NULL,
-    Name NVARCHAR(30) NOT NULL,
-    Location NVARCHAR(200) NOT NULL,
+    [Name] NVARCHAR(30) NOT NULL,
+    [Location] NVARCHAR(200) NOT NULL,
     Resolution NVARCHAR(20) NOT NULL DEFAULT '1920x1080',
     Tag NVARCHAR(70) NULL,
     Orientation INT NOT NULL DEFAULT 1,
@@ -56,7 +56,7 @@ CREATE TABLE [inv].[ScreenOperatingHour] (
     ScreenId INT NOT NULL,
     StartTime TIME(0) NOT NULL,
     EndTime TIME(0) NOT NULL,
-    DayOfWeek INT NOT NULL DEFAULT 1,
+    [DayOfWeek] INT NOT NULL DEFAULT 1,
     AvgAudienceCount INT NOT NULL DEFAULT 0,
 
     IsDeleted BIT NOT NULL DEFAULT 0,
@@ -76,8 +76,8 @@ CREATE TABLE [inv].[ScreenOperatingHour] (
 CREATE TABLE [dbo].[MediaLibrary] (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     TenantId INT NOT NULL,
-    Name NVARCHAR(50) NOT NULL,
-    Url NVARCHAR(500) NOT NULL,
+    [Name] NVARCHAR(50) NOT NULL,
+    [Url] NVARCHAR(500) NOT NULL,
     Resolution NVARCHAR(50) DEFAULT '1920x1080',
     Extension NVARCHAR(15) NOT NULL,
     Duration INT NULL,
@@ -98,7 +98,9 @@ CREATE TABLE [dbo].[Campaign] (
 	Id INT IDENTITY(1,1) PRIMARY KEY,
 	TenantId INT NOT NULL,
 	[Name] NVARCHAR(50) NOT NULL,
+	DurationInDays INT NOT NULL,
 	[Status] INT NOT NULL DEFAULT 1,
+	Remarks NVARCHAR(250) NULL,
 
 	CreatedAt DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
 	CreatedBy INT NOT NULL,
@@ -120,33 +122,38 @@ CREATE TABLE [dbo].[CampaignDate] (
 	CONSTRAINT FK_CampaignDate_CampaignId FOREIGN KEY(CampaignId) REFERENCES dbo.Campaign(Id)
 );
 
-CREATE TABLE [dbo].[CampaignScreen] ]
+CREATE TABLE [dbo].[CampaignScreen] 
 (
 	Id INT IDENTITY(1,1) PRIMARY KEY,
-	CampaignDateId INT NOT NULL,
+	CampaignId INT NOT NULL,
 	ScreenId INT NOT NULL,
 
-	CONSTRAINT FK_CampaignScreen_CampaignDateId FOREIGN KEY(CampaignDateId) REFERENCES dbo.CampaignDate(Id),
+	CONSTRAINT FK_CampaignScreen_CampaignId FOREIGN KEY(CampaignId) REFERENCES dbo.Campaign(Id),
 	CONSTRAINT FK_CampaignScreen_ScreenId FOREIGN KEY(ScreenId) REFERENCES inv.Screen(Id)
 );
 
 CREATE TABLE [dbo].[CampaignMedia] (
 	Id INT IDENTITY(1,1) PRIMARY KEY,
-	CampaignDateId INT NOT NULL,
+	CampaignId INT NOT NULL,
+	ScreenId INT NOT NULL,
 	MediaId INT NOT NULL,
+
+    [PlayDate] Date NOT NULL,
 	PlayOrder INT NOT NULL,
 	
-	CreatedAt DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
 	CreatedBy INT NOT NULL,
-	UpdatedAt DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+	CreatedAt DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+
 	UpdatedBy INT NOT NULL,
+	UpdatedAt DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+	
 	IsDeleted BIT DEFAULT 0,
 	DeletedAt DATETIMEOFFSET NULL,
 	DeletedBy INT NULL ,
 
-	CONSTRAINT FK_CampaignMedia_CampaignDateId FOREIGN KEY(CampaignDateId) REFERENCES dbo.CampaignDate(Id),
+	CONSTRAINT FK_CampaignMedia_CampaignId FOREIGN KEY(CampaignId) REFERENCES dbo.Campaign(Id),
 	CONSTRAINT FK_CampaignMedia_MediaId FOREIGN KEY(MediaId) REFERENCES dbo.MediaLibrary(Id),
-	--CONSTRAINT FK_CampaignMedia_ScreenId FOREIGN KEY(ScreenId) REFERENCES inv.Screen(Id),
+	CONSTRAINT FK_CampaignMedia_ScreenId FOREIGN KEY(ScreenId) REFERENCES inv.Screen(Id),
 	CONSTRAINT FK_CampaignMedia_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES core.[User](Id),
 	CONSTRAINT FK_CampaignMedia_UpdatedBy FOREIGN KEY(UpdatedBy) REFERENCES core.[User](Id),
 	CONSTRAINT FK_CampaignMedia_DeletedBy FOREIGN KEY (DeletedBy) REFERENCES core.[User](Id)
@@ -165,3 +172,5 @@ CREATE TABLE [report].[ProofOfPlay] (
     CONSTRAINT FK_ProofOfPlay_Media FOREIGN KEY (MediaId) REFERENCES [dbo].[MediaLibrary](Id),
     CONSTRAINT FK_ProofOfPlay_Campaign FOREIGN KEY (CampaignId) REFERENCES [dbo].[Campaign](Id)
 );
+
+

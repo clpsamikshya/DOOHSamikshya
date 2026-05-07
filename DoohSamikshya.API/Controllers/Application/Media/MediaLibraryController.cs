@@ -13,17 +13,25 @@ namespace DoohSamikshya.API.Controllers.Application.Media
         IMediaLibraryService mls,
         IMediaService ms) : SharedController
     {
-        [HttpGet]
-        public async Task<IActionResult> GetMediaLibrary([FromQuery] string? search, [FromQuery] bool? IsVideo, [FromQuery] bool? IncludeDeleted)
+          [HttpGet]
+        public async Task<IActionResult> GetMediaLibrary(
+     [FromQuery] string? search,
+     [FromQuery] bool? isVideo,
+     [FromQuery] bool? includeDeleted,
+     [FromQuery] bool? deletedOnly,
+     [FromQuery] int offset = 0,   
+     [FromQuery] int pageSize = 10)
         {
             try
             {
                 var filter = new MediaFilter
                 {
                     Search = search,
-                    IsVideo = IsVideo,
-                    IncludeDeleted = IncludeDeleted
-
+                    IsVideo = isVideo,
+                    IncludeDeleted = includeDeleted,
+                    DeletedOnly = deletedOnly,
+                    Offset = offset,     
+                    PageSize = pageSize
                 };
                 var response = await mls.GetMediaLibrary(filter);
                 return Ok(ApiResponse.Success(response));
@@ -33,7 +41,6 @@ namespace DoohSamikshya.API.Controllers.Application.Media
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
         }
-
 
 
         [HttpPost("upload")]
@@ -67,11 +74,7 @@ namespace DoohSamikshya.API.Controllers.Application.Media
             {
                 return BadRequest(ApiResponse.Fail(ex.Message));
             }
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"[ERROR] {ex}");
-            //    return StatusCode(500, ApiResponse.Fail(ex.Message));
-            //}
+       
         }
 
         [HttpDelete("{id}")]

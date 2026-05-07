@@ -31,7 +31,9 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         public async Task<IActionResult> GetScreen(
     [FromQuery] string? search,
     [FromQuery] ScreenStatus? status,
-    [FromQuery] ScreenOrientation? orientation)
+    [FromQuery] ScreenOrientation? orientation,
+    [FromQuery] int offset = 0,        
+    [FromQuery] int pageSize = 10)
         {
             try
             {
@@ -39,7 +41,9 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
                 {
                     Search = search,
                     Status = status,
-                    Orientation = orientation
+                    Orientation = orientation,
+                    Offset = offset,
+                    PageSize = pageSize
                 };
                 var response = await ss.GetScreen(filter);
                 return Ok(ApiResponse.Success(response));

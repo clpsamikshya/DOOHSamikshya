@@ -26,115 +26,127 @@ import { ScreenStatus, ScreenOrientation } from '../../model/ScreenEnum';
     templateUrl: './screen-list.component.html',
     styleUrl: './screen-list.component.scss',
 })
-export class ScreenListComponent
-    extends AppComponent
-    implements OnInit, OnDestroy
-{
-    private readonly destroy$ = new Subject<void>();
-    protected readonly ScreenStatus = ScreenStatus;
-    protected readonly ScreenOrientation = ScreenOrientation;
 
-    isLoading: boolean = false;
-    screens: Screens[] = [];
+export class ScreenListComponent extends AppComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  protected readonly ScreenStatus = ScreenStatus;
+  protected readonly ScreenOrientation = ScreenOrientation;
 
-    filter: ScreenFilter = {
-        search: '',
-        status: null,
-        orientation: null,
-    };
+  isLoading    = false;
+  screens      : Screens[] = [];
+  totalRecords = 0;
+  pageSize     = 10;
 
-    @ViewChild(AddEditScreenComponent)
-    addEditScreenComponent!: AddEditScreenComponent;
+  filter: ScreenFilter = {
+    search      : '',
+    status      : null,
+    orientation : null,
+    offset      : 0,
+    pageSize    : 10
+  };
 
-    constructor(
-        injector: Injector,
-        private route: ActivatedRoute,
-    ) {
-        super(injector);
-    }
+  @ViewChild(AddEditScreenComponent) addEditScreenComponent!: AddEditScreenComponent;
 
-    statusOptions = [
-        { label: 'Active', value: ScreenStatus.Active },
-        { label: 'Inactive', value: ScreenStatus.InActive },
-        { label: 'Under Maintenance', value: ScreenStatus.UnderMaintenance },
-    ];
+  constructor(injector: Injector, private route: ActivatedRoute) {
+    super(injector);
+  }
 
-    orientationOptions = [
+  statusOptions = [
+    { label: 'Active',            value: ScreenStatus.Active },
+    { label: 'Inactive',          value: ScreenStatus.InActive },
+    { label: 'Under Maintenance', value: ScreenStatus.UnderMaintenance },
+  ];
+
+  orientationOptions = [
     { label: 'Portrait',  value: ScreenOrientation.Portrait  },
-    { label: 'Square',    value: ScreenOrientation.Square    }, 
-    { label: 'Landscape', value: ScreenOrientation.Landscape }, 
-     
-];
+    { label: 'Square',    value: ScreenOrientation.Square    },
+    { label: 'Landscape', value: ScreenOrientation.Landscape },
+  ];
 
-    ngOnInit(): void {
-        this.route.queryParams
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((params) => {
-                this.filter = {
-                    search: params['search'] ?? '',
-                    status: null,
-                };
-                this.loadScreens();
-            });
-    }
-
-    openAdd(): void {
-        console.log('button clicked');
-        console.log('addedit ref:', this.addEditScreenComponent);
-        this.addEditScreenComponent.onShow();
-    }
-
-    applyFilter(): void {
+  ngOnInit(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.filter = {
+          ...this.filter,
+          search  : params['search'] ?? '',
+          offset  : 0,
+          pageSize: this.pageSize
+        };
         this.loadScreens();
-    }
+      });
+  }
 
-    clearFilter(): void {
-        this.filter = { search: '', status: null };
-        this.loadScreens();
-    }
+  applyFilter(): void {
+    this.filter = { ...this.filter, offset: 0 }; // ✅ reset to first page
+    this.loadScreens();
+  }
 
-    loadScreens(): void {
+  clearFilter(): void {
+    this.filter = {
+      search      : '',
+      status      : null,
+      orientation : null,
+      offset      : 0,
+      pageSize    : this.pageSize
+    };
+    this.loadScreens();
+  }
+
+  // ✅ PrimeNG fires this with event.first = row index, event.rows = pageSize
+  onPageChange(event: any): void {
+    this.filter = {
+      ...this.filter,
+      offset  : event.first,       // ✅ event.first IS the offset directly
+      pageSize: event.rows
+    };
+    this.loadScreens();
+  }
+
+  loadScreens(): void {
+    this.isLoading = true;
+    this.screenService
+      .getAll(this.filter)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+
+             console.log('Full response:', res);           // ✅ add this
+    console.log('res.data:', res.data);           // ✅ add this
+    console.log('res.data.data:', res.data?.data);
+          this.screens      = res.data?.data      ?? [];
+          this.totalRecords = res.data?.totalRows ?? 0; // ✅ matches SP output
+          this.isLoading    = false;
+        },
+        error: (err: any) => {
+          this.isLoading = false;
+          this.showMessage('Error', err.message, 'error');
+        }
+      });
+  }
+
+  deleteScreen(screen: Screens): void {
+    this.confirmAction({
+      message : `Are you sure you want to delete screen ${screen.name}?`,
+      header  : 'Confirm Deletion',
+      accept  : () => {
         this.screenService
-            .getAll(this.filter)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    this.screens = res.data ?? [];
-                },
-                error: (err) => {
-                    this.showMessage('Error', err.message, 'error');
-                },
-            });
-    }
-
-     deleteScreen(screen: Screens): void {
-        this.confirmAction({
-            message: `Are you sure you want to delete screen ${screen.name}?`,
-            header: 'Confirm Deletion',
-            accept: () => {
-                this.screenService
-                    .delete(screen.id!)
-                    .pipe(takeUntil(this.destroy$))
-                    .subscribe({
-                        next: () => {
-                            this.showMessage(
-                                'Success',
-                                'Screen deleted successfully',
-                                'success',
-                            );
-                            this.loadScreens();
-                        },
-                        error: (err: Error) =>
-                            this.showMessage('Error', err.message, 'error'),
-                    });
+          .delete(screen.id!)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next  : () => {
+              this.showMessage('Success', 'Screen deleted successfully', 'success');
+              this.loadScreens();
             },
-            reject: () =>
-                this.showMessage('Info', 'Screen deletion cancelled', 'info'),
-        });
-    }
+            error : (err: Error) => this.showMessage('Error', err.message, 'error'),
+          });
+      },
+      reject: () => this.showMessage('Info', 'Screen deletion cancelled', 'info'),
+    });
+  }
 
-    ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

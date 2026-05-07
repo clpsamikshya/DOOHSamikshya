@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiResponse, MediaFilter, MediaLibrary } from '../model/MediaLibrary';
+import { ApiResponse, MediaFilter, MediaLibrary, MediaLibraryResponse } from '../model/MediaLibrary';
 
 @Injectable({ providedIn: 'root' })
 export class MediaLibraryService {
@@ -9,15 +9,24 @@ export class MediaLibraryService {
 
   constructor(private http: HttpClient) {}
 
-  getMediaLibrary(filter: MediaFilter): Observable<ApiResponse<MediaLibrary[]>> {
-    const params = new HttpParams()
-        .set('Search', filter.search ?? '')
-        .set('Type', filter.isVideo?.toString() ?? '')
-        .set('IncludeDeleted', filter.isDeleted?.toString() ?? '')
+getMediaLibrary(filter: MediaFilter): Observable<ApiResponse<MediaLibraryResponse>> {
+  let params = new HttpParams()
+    .set('search', filter.search ?? '')
+    .set('offset', filter.offset ?? 0)
+    .set('pageSize', filter.pageSize ?? 10);
 
-
-    return this.http.get<ApiResponse<MediaLibrary[]>>(this.api, { params });
+  if (filter.isVideo !== undefined) {
+    params = params.set('isVideo', String(filter.isVideo));
   }
+
+  if (filter.deleteMode === 'deleted') {
+    params = params.set('deletedOnly', 'true');
+  } else if (filter.deleteMode === 'include') {
+    params = params.set('includeDeleted', 'true');
+  }
+
+  return this.http.get<ApiResponse<MediaLibraryResponse>>(this.api, { params });
+}
 
 
   uploadMedia(file: File): Observable<ApiResponse<MediaLibrary[]>> {

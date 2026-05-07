@@ -8,17 +8,25 @@ namespace DoohSamikshya.Service.Application.Inv
 {
     public class ScreenService(IDataAccessService da) : IScreenService
     {
-     
-        public async Task<List<Screen>?> GetScreen(ScreenFilter filter)
+        public async Task<ScreenResponse?> GetScreen(ScreenFilter filter)
         {
             string json = JsonConvert.SerializeObject(new
             {
-                filter.Search,
-                filter.Status,
-                filter.Orientation
+                Offset = filter.Offset,
+                PageSize = filter.PageSize,
+                Filter = new
+                {
+                    TenantId = 1,
+                    Search = filter.Search ?? "",
+                    Status = filter.Status.HasValue ? (int?)filter.Status.Value : null,
+                    Orientation = filter.Orientation.HasValue ? (int?)filter.Orientation.Value : null
+                }
             });
+
             string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
-            return JsonConvert.DeserializeObject<List<Screen>>(result);
+
+
+            return JsonConvert.DeserializeObject<ScreenResponse>(result);
         }
 
         public async Task<List<Screen>?> AddScreen(Screen screen)

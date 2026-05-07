@@ -19,6 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controllers\Application\Dbo\" />
 		<Folder Include="wwwroot\" />
 	</ItemGroup>
 

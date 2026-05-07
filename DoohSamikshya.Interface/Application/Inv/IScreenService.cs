@@ -4,7 +4,9 @@ namespace DoohSamikshya.Interface.Application.Inv
 {
     public interface IScreenService
     {
-        Task<List<Screen>?> GetScreen(ScreenFilter filter);
+        //Task<List<Screen>?> GetScreen(ScreenFilter filter);
+
+        Task<ScreenResponse?> GetScreen(ScreenFilter filter);
         Task<List<Screen>?> AddScreen(Screen screen);
         Task<List<Screen>?> UpdateScreen(Screen screen);
         Task<List<Screen>?> DropDown();

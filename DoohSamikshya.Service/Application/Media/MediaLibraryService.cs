@@ -44,18 +44,36 @@ namespace DoohSamikshya.Service.Application.Media
            return JsonConvert.DeserializeObject<MediaLibrary>(result);
         }
 
-        public async Task<List<MediaLibrary>?> GetMediaLibrary(MediaFilter filter)
-        {
-            string json = JsonConvert.SerializeObject(new 
-            { 
-                TenantId = 1, 
-                Search = filter.Search,
-                IsVideo = filter.IsVideo,
-                IncludeDeleted = filter.IncludeDeleted
+        //public async Task<List<MediaLibrary>?> GetMediaLibrary(MediaFilter filter)
+        //{
+        //    string json = JsonConvert.SerializeObject(new 
+        //    { 
+        //        TenantId = 1, 
+        //        Search = filter.Search,
+        //        IsVideo = filter.IsVideo,
+        //        IncludeDeleted = filter.IncludeDeleted
 
+        //    });
+        //    string result = await da.RetrievalProcedure("[dbo].[SpMediaLibrarySel]", json);
+        //    return JsonConvert.DeserializeObject<List<MediaLibrary>>(result);
+        //}
+
+        public async Task<MediaLibraryResponse?> GetMediaLibrary(MediaFilter filter)
+        {
+            string json = JsonConvert.SerializeObject(new
+            {
+                Offset = filter.Offset,
+                PageSize = filter.PageSize,
+                Filter = new
+                {
+                    Search = filter.Search ?? "",
+                    Type = filter.IsVideo.HasValue ? (filter.IsVideo.Value ? 1 : 0) : (int?)null,
+                    IncludeDeleted = filter.IncludeDeleted ?? false,
+                    DeletedOnly = filter.DeletedOnly ?? false
+                }
             });
             string result = await da.RetrievalProcedure("[dbo].[SpMediaLibrarySel]", json);
-            return JsonConvert.DeserializeObject<List<MediaLibrary>>(result);
+            return JsonConvert.DeserializeObject<MediaLibraryResponse>(result);
         }
     }
 }
