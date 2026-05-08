@@ -1,52 +1,58 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
 import { ScreenFilter, ScreenResponse, Screens } from '../model/Screen';
 import { ApiResponse } from '../../media/model/MediaLibrary';
 
 @Injectable({ providedIn: 'root' })
 export class ScreenService {
 
-  private apiUrl = 'https://localhost:7236/api/Screen';
+    private apiUrl = 'https://localhost:7236/api/Screen';
 
-  constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) {}
 
-  
-getAll(filter: ScreenFilter): Observable<ApiResponse<ScreenResponse>> {
-  let params = new HttpParams()
-    .set('search', filter.search ?? '')
-    .set('offset', filter.offset ?? 0)      // ✅ lowercase
-    .set('pageSize', filter.pageSize ?? 10); // ✅ lowercase
+    private handleError(err: any): Observable<never> {
+        const message = err.error?.message
+                     ?? err.error?.title
+                     ?? err.message
+                     ?? 'An unexpected error occurred';
+        return throwError(() => new Error(message));
+    }
 
-  if (filter.status !== undefined && filter.status !== null) {
-    params = params.set('status', filter.status.toString());
-  }
+    getAll(filter: ScreenFilter): Observable<ApiResponse<ScreenResponse>> {
+        let params = new HttpParams()
+            .set('search',   filter.search   ?? '')
+            .set('offset',   filter.offset   ?? 0)
+            .set('pageSize', filter.pageSize ?? 10);
 
-  if (filter.orientation !== undefined && filter.orientation !== null) {
-    params = params.set('orientation', filter.orientation.toString());
-  }
+        if (filter.status !== undefined && filter.status !== null)
+            params = params.set('status', filter.status.toString());
 
-  return this.http.get<ApiResponse<ScreenResponse>>(this.apiUrl, { params });
-}
+        if (filter.orientation !== undefined && filter.orientation !== null)
+            params = params.set('orientation', filter.orientation.toString());
 
+        return this.http.get<ApiResponse<ScreenResponse>>(this.apiUrl, { params })
+            .pipe(catchError(this.handleError));
+    }
 
-  
-  add(screens: any): Observable<ApiResponse<Screens>> {
-    return this.http.post<ApiResponse<Screens>>(this.apiUrl, screens);
-  }
+    add(screens: any): Observable<ApiResponse<Screens>> {
+        return this.http.post<ApiResponse<Screens>>(this.apiUrl, screens)
+            .pipe(catchError(this.handleError));
+    }
 
-  update(screens: any): Observable<ApiResponse<Screens>> {
-    return this.http.put<ApiResponse<Screens>>(this.apiUrl, screens);
-  }
+    update(screens: any): Observable<ApiResponse<Screens>> {
+        return this.http.put<ApiResponse<Screens>>(this.apiUrl, screens)
+            .pipe(catchError(this.handleError));
+    }
 
-  delete(id: number): Observable<ApiResponse<Screens>>{
-     const params = new HttpParams().set('ScreenId', id.toString());
-    return this.http.delete<ApiResponse<Screens>>(`${this.apiUrl}/${id}`);
-}
+    delete(id: number): Observable<ApiResponse<Screens>> {
+        return this.http.delete<ApiResponse<Screens>>(`${this.apiUrl}/${id}?cascadeDelete=true`)
+            .pipe(catchError(this.handleError));
+    }
 
-deleteOperatingHour(id: number, screenId: number): Observable<ApiResponse<Screens>> {
-    return this.http.delete<ApiResponse<Screens>>(
-        `${this.apiUrl}/operating-hour/${id}?screenId=${screenId}`
-    );
-}
+    deleteOperatingHour(id: number, screenId: number): Observable<ApiResponse<Screens>> {
+        return this.http.delete<ApiResponse<Screens>>(
+            `${this.apiUrl}/operating-hour/${id}?screenId=${screenId}`
+        ).pipe(catchError(this.handleError));
+    }
 }

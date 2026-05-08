@@ -17,6 +17,7 @@ namespace DoohSamikshya.Model.Application.Dbo
          [Required]
           public string Name { get; set; }
           public CampaignStatus Status { get; set; } = CampaignStatus.New;
+          public int DurationInDays { get; set; }
           public string? Remarks { get; set; }
          public bool IsDeleted { get; set; } = false;
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

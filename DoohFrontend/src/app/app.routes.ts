@@ -4,6 +4,7 @@ import { ScreenListComponent } from './screens/Component/screen-list/screen-list
 import { MediaLibraryComponent } from './media/component/media-library/media-library.component';
 import { DashboardComponent } from './shared/component/dashboard/dashboard.component';
 import { LayoutComponent } from './shared/component/layout/layout.component';
+import { CampaignListComponent } from './campaign/Component/campaign-list/campaign-list.component';
 
 export const routes: Routes = [
   {
@@ -14,6 +15,7 @@ export const routes: Routes = [
       { path: 'dashboard',   component: DashboardComponent },
       { path: 'screen-name', component: ScreenListComponent },
       { path: 'media-library', component: MediaLibraryComponent },
+      { path: 'campaigns-list', component: CampaignListComponent },
     ]
   }
 ];

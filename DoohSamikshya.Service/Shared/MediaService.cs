@@ -188,34 +188,3 @@ namespace DoohSamikshya.Service.Shared
    
 
 
-//using DoohSamikshya.Interface.Application.Media;
-//using DoohSamikshya.Interface.Shared;
-//using DoohSamikshya.Model.Application.Media;
-//using DoohSamikshya.Model.Shared;
-
-
-//namespace DoohSamikshya.Service.Shared
-//{
-//    public class MediaService(string webRootPath) : IMediaService
-//    {
-//        public async Task<MediaUploadResult> UploadAsync(MediaUploadParam param)
-//        {
-//            var extension = Path.GetExtension(param.File.FileName).ToLower();
-//            var folder = param.IsVideo ? "Media/Videos" : "Media/Images";
-//            var fileName = $"{Guid.NewGuid()}{extension}";
-//            var savePath = Path.Combine(webRootPath, folder, fileName);
-
-//            Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
-
-//            using var stream = new FileStream(savePath, FileMode.Create);
-//            await param.File.CopyToAsync(stream);
-
-//            return new MediaUploadResult
-//            {
-//                FileName = fileName,
-//                Url = $"/{folder}/{fileName}"
-//            };
-//        }
-//    }
-//}
-

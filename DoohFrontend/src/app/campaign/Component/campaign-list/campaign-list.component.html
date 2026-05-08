@@ -1,0 +1,163 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- HEADER -->
+<div class="page-header">
+    <div class="page-actions">
+        <p-button
+            icon="pi pi-plus"
+            label="Add Campaign"
+            severity="success"
+            [rounded]="true"
+            size="small"
+        ></p-button>
+    </div>
+</div>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+
+        <!-- SEARCH -->
+        <div class="search-wrapper">
+            <i class="pi pi-search search-icon"></i>
+
+            <input
+                pInputText
+                type="text"
+                placeholder="Search Campaign"
+                class="search-input"
+                [(ngModel)]="filter.search"
+                (keyup.enter)="applyFilter()"
+            />
+        </div>
+
+        <!-- STATUS -->
+        <p-dropdown
+            [options]="statusOptions"
+            [(ngModel)]="filter.status"
+            placeholder="All Status"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            (onChange)="applyFilter()"
+            class="status-filter"
+        ></p-dropdown>
+
+        <!-- SEARCH BUTTON -->
+        <p-button
+            icon="pi pi-search"
+            label="Search"
+            severity="primary"
+            size="small"
+            (onClick)="applyFilter()"
+        ></p-button>
+
+        <!-- CLEAR BUTTON -->
+        <p-button
+            icon="pi pi-times"
+            label="Clear"
+            severity="secondary"
+            [outlined]="true"
+            size="small"
+            (onClick)="clearFilter()"
+        ></p-button>
+
+    </div>
+
+    <!-- TABLE -->
+    <p-table
+        [value]="campaigns"
+        [lazy]="true"
+        (onLazyLoad)="onPageChange($event)"
+        [paginator]="true"
+        [rows]="pageSize"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[5,10,20]"
+        [loading]="isLoading"
+        responsiveLayout="scroll"
+        class="p-datatable-sm"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} campaigns"
+    >
+
+        <!-- HEADER -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Remarks</th>
+                <!-- <th>Screens</th> -->
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <!-- BODY -->
+        <ng-template pTemplate="body" let-campaign>
+            <tr>
+
+                <td>
+                    <strong>{{ campaign.name }}</strong>
+                </td>
+
+                <td>
+                    {{ campaign.durationInDays }} Days
+                </td>
+
+                <td>
+                    <span class="status"
+                          [ngClass]="campaign.status === 1 ? 'active' : 'inactive'">
+                        {{ campaign.status === 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+
+                <td>
+                    {{ campaign.remarks || '—' }}
+                </td>
+
+                <td>
+                    <p-chip
+                        *ngFor="let s of campaign.screen"
+                        [label]="s.screenName">
+                    </p-chip>
+
+                    <span *ngIf="!campaign.screen?.length">—</span>
+                </td>
+
+                <td class="action-cell">
+
+                    <p-button
+                        icon="pi pi-pencil"
+                        [text]="true"
+                        severity="info"
+                        [rounded]="true"
+                    ></p-button>
+
+                    <p-button
+                        icon="pi pi-trash"
+                        [text]="true"
+                        severity="danger"
+                        [rounded]="true"
+                        (onClick)="deleteCampaign(campaign)"
+                    ></p-button>
+
+                </td>
+
+            </tr>
+        </ng-template>
+
+        <!-- EMPTY -->
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6" class="text-center py-4 text-color-secondary">
+                    No campaigns found.
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+
+</div>

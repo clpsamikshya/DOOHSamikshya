@@ -21,7 +21,7 @@ export class LayoutComponent implements OnInit {
   manageNav = [ 
     { key: 'screens',   label: 'Screens',   route: '/screen-name', badge: null },
     { key: 'media',   label: 'Media',   route: '/media-library', badge: null }, 
-    { key: 'campaigns', label: 'Campaigns', route: '/campaigns',   badge: null },
+    { key: 'campaigns', label: 'Campaigns', route: '/campaigns-list',   badge: null },
     // { key: 'Tenant', label: 'Tenant', route: '/tenant',   badge: null },
     // { key: 'reports',   label: 'Reports',   route: '/reports',     badge: null },
   ];
