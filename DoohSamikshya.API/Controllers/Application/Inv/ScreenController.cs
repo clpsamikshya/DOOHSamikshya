@@ -86,12 +86,26 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         }
 
 
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteScreen([FromRoute] int id)
+        //{
+        //    try
+        //    {
+        //        var result = await ss.DeleteScreen(id);
+        //        return Ok(ApiResponse.Success(result));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ApiResponse.Fail(ex.Message));
+        //    }
+        //}
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteScreen([FromRoute] int id)
+        public async Task<IActionResult> DeleteScreen([FromRoute] int id, [FromQuery] bool cascadeDelete = true)
         {
             try
             {
-                var result = await ss.DeleteScreen(id);
+                var result = await ss.DeleteScreen(id, cascadeDelete);
                 return Ok(ApiResponse.Success(result));
             }
             catch (Exception ex)

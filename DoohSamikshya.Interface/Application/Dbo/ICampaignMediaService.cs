@@ -9,9 +9,10 @@ namespace DoohSamikshya.Interface.Application.Dbo
 {
     public interface ICampaignMediaService
     {
-        Task<CampaignMediaResponse?> GetCampaignMedia(CampaignMediaFilter filter);
-        Task<CampaignMedia> AddCampaignMedia(CampaignMedia campaignMedia);
-        Task<CampaignMedia?> UpdateCampaignMedia(CampaignMedia campaignMedia);
-        Task<CampaignMedia> DeleteCampaignMedia(int id);
+        Task<CampaignMediaResponse> AddCampaignMedia(CampaignMediaRequest request);
+        Task<CampaignMedia> DeleteCampaignMedia(int id, int deletedBy);
+        //Task<CampaignMediaResponse?> GetCampaignMedia(CampaignMediaFilter filter);
+        Task<CampaignMediaList?> GetCampaignMedia(CampaignMediaFilter filter);
+        Task<CampaignMediaResponse?> UpdateCampaignMedia(CampaignMediaRequest request);
     }
 }

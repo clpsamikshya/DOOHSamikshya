@@ -11,7 +11,6 @@
 >
     <ng-template pTemplate="content">
         <div class="upload-body">
-
             <!-- Drop / Select area -->
             <div class="upload-zone" (click)="fileInput.click()">
                 <input
@@ -19,7 +18,7 @@
                     type="file"
                     accept="image/jpeg,image/png,image/gif,video/mp4,video/webm,video/mov"
                     (change)="onFileSelected($event)"
-                    style="display:none"
+                    style="display: none"
                 />
 
                 <ng-container *ngIf="!selectedFile">
@@ -37,8 +36,28 @@
                         alt="preview"
                     />
                     <div *ngIf="isVideo()" class="video-preview-placeholder">
-                        <i class="pi pi-video" style="font-size:2.5rem"></i>
-                        <p>{{ selectedFile.name }}</p>
+                        <video
+                            *ngIf="previewUrl"
+                            [src]="previewUrl"
+                            controls
+                            muted
+                            style="
+                                width: 100%;
+                                max-height: 200px;
+                                border-radius: 6px;
+                                object-fit: contain;
+                                background: #000;
+                            "
+                        ></video>
+                        <p
+                            style="
+                                margin-top: 0.5rem;
+                                font-size: 0.82rem;
+                                color: #666;
+                            "
+                        >
+                            {{ selectedFile?.name }}
+                        </p>
                     </div>
                 </ng-container>
             </div>
@@ -55,7 +74,6 @@
                     (onClick)="selectedFile = null; previewUrl = null"
                 />
             </div>
-
         </div>
     </ng-template>
 

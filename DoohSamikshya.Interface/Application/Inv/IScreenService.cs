@@ -10,7 +10,8 @@ namespace DoohSamikshya.Interface.Application.Inv
         Task<List<Screen>?> AddScreen(Screen screen);
         Task<List<Screen>?> UpdateScreen(Screen screen);
         Task<List<Screen>?> DropDown();
-        Task<Screen?> DeleteScreen(int id);                                        
+        // Task<Screen?> DeleteScreen(int id);                                        
+        Task<Screen?> DeleteScreen(int id, bool cascadeDelete);
         Task<string> DeleteOperatingHour(int id, int screenId, int deletedBy);     
     }
 }

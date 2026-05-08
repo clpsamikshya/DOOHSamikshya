@@ -2,7 +2,7 @@
 using DoohSamikshya.Model.Shared;
 using Microsoft.AspNetCore.Http;
 using SixLabors.ImageSharp;
-using Xabe.FFmpeg; 
+
 
 namespace DoohSamikshya.Service.Shared
 {
@@ -119,21 +119,63 @@ namespace DoohSamikshya.Service.Shared
         }
 
         private static async Task<(string resolution, int? duration)>
-            ExtractVideoMetadataAsync(string filePath)
+    ExtractVideoMetadataAsync(string filePath)
         {
             try
             {
-                // FFmpeg executables auto-downloaded by Xabe.FFmpeg on first run
-                var mediaInfo = await FFmpeg.GetMediaInfo(filePath);
-                var video = mediaInfo.VideoStreams.FirstOrDefault();
+                const string ffprobePath = @"C:\Users\khati\AppData\Local\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1.1-full_build\bin\ffprobe.exe";
 
-                if (video == null)
-                    return ("1920x1080", (int)mediaInfo.Duration.TotalSeconds);
+                // Extract duration
+                var durationProcess = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = ffprobePath,
+                        Arguments = $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+                durationProcess.Start();
+                string durationOutput = await durationProcess.StandardOutput.ReadToEndAsync();
+                await durationProcess.WaitForExitAsync();
 
-                return (
-                    $"{video.Width}x{video.Height}",
-                    (int)mediaInfo.Duration.TotalSeconds
-                );
+                int? duration = null;
+                if (double.TryParse(durationOutput.Trim(),
+                        System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out double seconds))
+                {
+                    duration = (int)Math.Ceiling(seconds);
+                }
+
+                // Extract resolution
+                var resolutionProcess = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = ffprobePath,
+                        Arguments = $"-v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"{filePath}\"",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+                resolutionProcess.Start();
+                string resolutionOutput = await resolutionProcess.StandardOutput.ReadToEndAsync();
+                await resolutionProcess.WaitForExitAsync();
+
+                string resolution = "1920x1080"; // default
+                var parts = resolutionOutput.Trim().Split(',');
+                if (parts.Length == 2 && int.TryParse(parts[0], out int width) && int.TryParse(parts[1], out int height))
+                {
+                    resolution = $"{width}x{height}";
+                }
+
+                return (resolution, duration);
             }
             catch (Exception ex)
             {
@@ -142,8 +184,8 @@ namespace DoohSamikshya.Service.Shared
             }
         }
     }
-}
-
+        }
+   
 
 
 //using DoohSamikshya.Interface.Application.Media;

@@ -42,7 +42,7 @@ namespace DoohSamikshya.Model.Application.Inv
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
         public int? CreatedBy { get; set; }
-        public int UpdatedBy { get; set; }
+        public int? UpdatedBy { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }
         public int? DeletedBy { get; set; }
         public List<ScreenOperatingHour> OperatingHour { get; set; } = new();

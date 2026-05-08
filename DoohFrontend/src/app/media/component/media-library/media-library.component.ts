@@ -125,10 +125,20 @@ export class MediaLibraryComponent
         this.previewVisible = true;
     }
 
+    // closePreview(): void {
+    //     this.previewVisible = false;
+    //     this.previewMedia = null;
+    // }
+
     closePreview(): void {
-        this.previewVisible = false;
-        this.previewMedia = null;
+    const videoEl = document.querySelector('p-dialog video') as HTMLVideoElement;
+    if (videoEl) {
+        videoEl.pause();
+        videoEl.currentTime = 0;
     }
+    this.previewVisible = false;
+    this.previewMedia = null;
+}
 
     ngOnDestroy(): void {
         this.destroy$.next();

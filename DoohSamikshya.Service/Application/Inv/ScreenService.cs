@@ -57,11 +57,28 @@ namespace DoohSamikshya.Service.Application.Inv
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        public async Task<Screen?> DeleteScreen(int id)
+        //public async Task<Screen?> DeleteScreen(int id)
+        //{
+        //    try
+        //    {
+        //        string json = JsonConvert.SerializeObject(new { ScreenId = id, TenantId = 1, DeletedBy = 1 });
+        //        string result = await da.ActionProcedure("inv.SpScreenDel", json);
+        //        return JsonConvert.DeserializeObject<Screen>(result);
+        //    }
+        //    catch (SqlException ex) { throw new Exception(ex.Message); }
+        //}
+
+        public async Task<Screen?> DeleteScreen(int id, bool cascadeDelete)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(new { ScreenId = id, TenantId = 1, DeletedBy = 1 });
+                string json = JsonConvert.SerializeObject(new
+                {
+                    ScreenId = id,
+                    TenantId = 1,
+                    DeletedBy = 1,
+                    CascadeDelete = cascadeDelete
+                });
                 string result = await da.ActionProcedure("inv.SpScreenDel", json);
                 return JsonConvert.DeserializeObject<Screen>(result);
             }
