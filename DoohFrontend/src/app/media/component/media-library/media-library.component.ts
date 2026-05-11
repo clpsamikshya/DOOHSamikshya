@@ -38,7 +38,7 @@ export class MediaLibraryComponent
         isVideo: undefined,
         deleteMode: 'active',
         offset: 0,
-        pageSize: 10
+        pageSize: 10,
     };
 
     typeOptions = [
@@ -47,6 +47,11 @@ export class MediaLibraryComponent
         { label: 'Deleted Only', value: 'deleted' },
     ];
 
+    mediaTypeOptions = [
+        { label: 'All Types', value: undefined },
+        { label: 'Image', value: false },
+        { label: 'Video', value: true },
+    ];
     constructor(injector: Injector) {
         super(injector);
     }
@@ -66,7 +71,7 @@ export class MediaLibraryComponent
             isVideo: undefined,
             deleteMode: 'active',
             offset: 0,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
         };
         this.loadMedia();
     }
@@ -75,7 +80,7 @@ export class MediaLibraryComponent
         this.filter = {
             ...this.filter,
             offset: event.first,
-            pageSize: event.rows
+            pageSize: event.rows,
         };
         this.loadMedia();
     }
@@ -87,9 +92,9 @@ export class MediaLibraryComponent
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (res: any) => {
-                    this.mediaList    = res.data?.data      ?? [];
+                    this.mediaList = res.data?.data ?? [];
                     this.totalRecords = res.data?.totalRows ?? 0;
-                    this.isLoading    = false;
+                    this.isLoading = false;
                 },
                 error: (err: any) => {
                     this.isLoading = false;
@@ -108,15 +113,20 @@ export class MediaLibraryComponent
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: () => {
-                            this.showMessage('Success', 'Media deleted successfully', 'success');
+                            this.showMessage(
+                                'Success',
+                                'Media deleted successfully',
+                                'success',
+                            );
                             this.loadMedia();
                         },
                         error: (err: any) => {
                             this.showMessage('Error', err.message, 'error');
-                        }
+                        },
                     });
             },
-            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info')
+            reject: () =>
+                this.showMessage('Info', 'Deletion cancelled', 'info'),
         });
     }
 
@@ -131,14 +141,16 @@ export class MediaLibraryComponent
     // }
 
     closePreview(): void {
-    const videoEl = document.querySelector('p-dialog video') as HTMLVideoElement;
-    if (videoEl) {
-        videoEl.pause();
-        videoEl.currentTime = 0;
+        const videoEl = document.querySelector(
+            'p-dialog video',
+        ) as HTMLVideoElement;
+        if (videoEl) {
+            videoEl.pause();
+            videoEl.currentTime = 0;
+        }
+        this.previewVisible = false;
+        this.previewMedia = null;
     }
-    this.previewVisible = false;
-    this.previewMedia = null;
-}
 
     ngOnDestroy(): void {
         this.destroy$.next();

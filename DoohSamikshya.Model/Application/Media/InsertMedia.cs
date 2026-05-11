@@ -22,9 +22,10 @@ namespace DoohSamikshya.Model.Application.Media
     {
         public string? Search { get; set; }
         public bool? IsVideo { get; set; }
+        public bool? ActiveOnly { get; set; }
         public bool? IncludeDeleted { get; set; }
         public bool? DeletedOnly { get; set; }
-        public int Offset { get; set; } = 0;  
+        public int Offset { get; set; } = 0;
         public int PageSize { get; set; } = 10;
     }
 

@@ -16,6 +16,48 @@
         }
     }
 }
+.operating-hours-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.hour-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: var(--surface-50);
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
+
+    .hour-day,
+    .hour-time,
+    .hour-audience {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i {
+            color: var(--primary-color);
+        }
+    }
+
+    .hour-day {
+        min-width: 120px;
+        font-weight: 500;
+    }
+
+    .hour-time {
+        min-width: 140px;
+    }
+
+    .hour-audience {
+        min-width: 100px;
+        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+    }
+}
 
 .no-hours-placeholder {
     display: flex;

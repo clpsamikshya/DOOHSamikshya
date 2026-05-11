@@ -9,7 +9,10 @@ namespace DoohSamikshya.Model.Application.Dbo
     public class CampaignScreen
     {
         public int Id { get; set; }
+        public string? ScreenName { get; set; }
         public int CampaignId { get; set; }
         public int ScreenId { get; set; }
+
+        public bool IsDeleted { get; set; }
     }
 }

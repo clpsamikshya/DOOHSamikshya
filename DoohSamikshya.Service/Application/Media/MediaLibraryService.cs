@@ -146,7 +146,8 @@ namespace DoohSamikshya.Service.Application.Media
                     Filter = new
                     {
                         Search = filter.Search ?? "",
-                        Type = filter.IsVideo.HasValue ? (filter.IsVideo.Value ? 1 : 0) : (int?)null,
+                        IsVideo = filter.IsVideo,
+                        ActiveOnly = filter.ActiveOnly ?? false,
                         IncludeDeleted = filter.IncludeDeleted ?? false,
                         DeletedOnly = filter.DeletedOnly ?? false
                     }

@@ -20,12 +20,22 @@
                 [(ngModel)]="filter.deleteMode"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Active Only"
+                placeholder="Active"
                 [showClear]="true"
                 (onChange)="applyFilter()"
             >
                 <!-- optional: auto-apply on change -->
             </p-dropdown>
+
+            <p-dropdown
+                [options]="mediaTypeOptions"
+                [(ngModel)]="filter.isVideo"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All Types"
+                [showClear]="true"
+                (onChange)="applyFilter()"
+            />
 
             <p-button
                 icon="pi pi-search"

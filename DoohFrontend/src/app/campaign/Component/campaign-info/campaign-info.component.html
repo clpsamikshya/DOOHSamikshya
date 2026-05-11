@@ -7,12 +7,7 @@
     [style]="{ width: '650px' }"
     (onHide)="close()"
 >
-    <!-- LOADING -->
-    <div *ngIf="isLoading" class="loading-wrap">
-        <p-message severity="info" text="Loading campaign details..."></p-message>
-    </div>
-
-    <div class="campaign-info" *ngIf="!isLoading && campaign">
+    <div class="campaign-info" *ngIf="campaign">
 
         <!-- BASIC INFO -->
         <div class="section">
@@ -44,13 +39,15 @@
         <div class="section">
             <div class="section-title">Date Ranges</div>
             <div *ngIf="campaign.dateRanges?.length; else noDates">
-                <div class="date-item"
-                    *ngFor="let d of campaign.dateRanges; let i = index">
+                <div
+                    class="date-item"
+                    *ngFor="let d of campaign.dateRanges; let i = index"
+                >
                     <span class="date-index">{{ i + 1 }}</span>
                     <span>
-                        {{ d.startDateTime | date:'dd MMM yyyy, HH:mm' }}
+                        {{ d.startDateTime | date: 'dd MMM yyyy, HH:mm' }}
                         &rarr;
-                        {{ d.endDateTime | date:'dd MMM yyyy, HH:mm' }}
+                        {{ d.endDateTime | date: 'dd MMM yyyy, HH:mm' }}
                     </span>
                 </div>
             </div>
@@ -61,11 +58,15 @@
 
         <!-- SCREENS -->
         <div class="section">
-            <div class="section-title">Assigned Screens</div>
-            <div class="screen-list" *ngIf="campaign.screen?.length; else noScreens">
-                <div class="screen-chip" *ngFor="let s of campaign.screen">
-                    <i class="pi pi-desktop"></i>
-                    <span>{{ s.screenName || '—' }}</span>
+            <div class="section-title">Screens</div>
+            <div *ngIf="campaign.screen?.length; else noScreens">
+                <div class="screen-item" *ngFor="let screen of campaign.screen">
+                    <span class="screen-name">{{ screen.screenName }}</span>
+                    <p-tag
+                        *ngIf="screen.isDeleted"
+                        value="Deleted"
+                        severity="danger"
+                    />
                 </div>
             </div>
             <ng-template #noScreens>

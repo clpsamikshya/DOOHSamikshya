@@ -16,13 +16,12 @@ export class ScreenInfoComponent extends AppComponent implements OnDestroy {
 
     isShow = false;
     isLoading = false;
-    screen: any = null;
+    screen: any = null;  // KEEP AS 'any'
 
     constructor(injector: Injector) {
         super(injector);
     }
 
-    // ✅ KEEP THIS NAME (DO NOT CHANGE IN HTML)
     show(id: number): void {
         if (!id) return;
 
@@ -60,6 +59,10 @@ export class ScreenInfoComponent extends AppComponent implements OnDestroy {
                     this.showMessage('Error', err.message, 'error');
                 }
             });
+    }
+    getDayName(dayOfWeek: number): string {
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        return days[dayOfWeek] || 'Unknown';
     }
 
     close(): void {

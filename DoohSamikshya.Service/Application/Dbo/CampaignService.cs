@@ -49,7 +49,7 @@ namespace DoohSamikshya.Service.Application.Dbo
                     {
                         Search = filter.Search ?? "",
                         Status = filter.Status.HasValue ? (int?)filter.Status.Value : null,
-                        CampaignId = filter.CampaignId  // ← add this
+                        CampaignId = filter.CampaignId  
                     }
                 });
                 string result = await da.RetrievalProcedure("dbo.SpCampaignSel", json);

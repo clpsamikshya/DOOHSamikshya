@@ -105,3 +105,19 @@
         font-size: 0.8rem;
     }
 }
+
+.screen-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--surface-border);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .screen-name {
+        flex: 1;
+    }
+}

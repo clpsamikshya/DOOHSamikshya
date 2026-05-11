@@ -67,52 +67,49 @@
         </div>
 
         <!-- =====================================================
-             DEVICE INFORMATION
-        ====================================================== -->
-        <div class="section">
-            <div class="section-title">
-                Device Information
+     OPERATING HOURS
+====================================================== -->
+<div class="section" *ngIf="screen.operatingHour && screen.operatingHour.length > 0">
+    <div class="section-title">
+        Operating Hours
+    </div>
+
+    <div class="operating-hours-list">
+        <div *ngFor="let hour of screen.operatingHour" class="hour-item">
+            <div class="hour-day">
+                <i class="pi pi-calendar"></i>
+                <span>{{ getDayName(hour.dayOfWeek) }}</span>
             </div>
-
-            <div class="info-grid">
-
-                <div class="info-item">
-                    <label>Device Id</label>
-                    <span>{{ screen.deviceId }}</span>
-                </div>
-
-                <div class="info-item">
-                    <label>IP Address</label>
-                    <span>{{ screen.ipAddress }}</span>
-                </div>
-
-                <div class="info-item">
-                    <label>MAC Address</label>
-                    <span>{{ screen.macAddress }}</span>
-                </div>
-
-                <div class="info-item">
-                    <label>Last Active</label>
-                    <span>{{ screen.lastActiveAt | date:'medium' }}</span>
-                </div>
-
+            <div class="hour-time">
+                <i class="pi pi-clock"></i>
+                <span>{{ hour.startTime | slice:0:5 }} - {{ hour.endTime | slice:0:5 }}</span>
             </div>
+            <div class="hour-audience">
+                <i class="pi pi-users"></i>
+                <span>{{ hour.avgAudienceCount }} avg</span>
+            </div>
+            <p-tag 
+                *ngIf="hour.isDeleted" 
+                severity="danger" 
+                value="Deleted"
+                styleClass="ml-2"
+            />
         </div>
+    </div>
+</div>
 
-        <!-- =====================================================
-             REMARKS
-        ====================================================== -->
-        <div class="section" *ngIf="screen.remarks">
+<div class="section" *ngIf="!screen.operatingHour || screen.operatingHour.length === 0">
+    <div class="section-title">
+        Operating Hours
+    </div>
+    <p-message
+        severity="info"
+        text="No operating hours configured."
+        styleClass="w-full"
+    ></p-message>
+</div>
 
-            <div class="section-title">
-                Remarks
-            </div>
-
-            <div class="remarks-box">
-                {{ screen.remarks }}
-            </div>
-
-        </div>
+c
 
     </div>
 

@@ -33,6 +33,7 @@ namespace DoohSamikshya.Model.Application.Dbo
     public class CampaignFilter
     {
         public string? Search { get; set; }
+       
         public CampaignStatus? Status { get; set; }
         public int? CampaignId { get; set; }  
         public int Offset { get; set; } = 0;
