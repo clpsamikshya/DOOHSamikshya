@@ -1,6 +1,3 @@
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-
 <!-- HEADER -->
 <div class="page-header">
     <div class="page-actions">
@@ -87,7 +84,6 @@
                 <th>Duration</th>
                 <th>Status</th>
                 <th>Remarks</th>
-                <!-- <th>Screens</th> -->
                 <th>Actions</th>
             </tr>
         </ng-template>
@@ -135,7 +131,7 @@
                     {{ campaign.remarks || '—' }}
                 </td>
 
-                <td>
+                <!-- <td>
                     <p-chip
                         *ngFor="let s of campaign.screen"
                         [label]="s.screenName"
@@ -143,28 +139,29 @@
                     </p-chip>
 
                     <span *ngIf="!campaign.screen?.length">—</span>
-                </td>
+                </td> -->
 
                 <td class="action-cell">
-                    <!-- <p-button
-                        icon="pi pi-eye"
-                        [text]="true"
-                        severity="info"
-                        [rounded]="true"
-                        (onClick)="openCampaignInfo(campaign)"
-                        pTooltip="View Details"
-                        tooltipPosition="top"
-                    ></p-button> -->
+                    <div class="action-wrapper">
+                        <p-button
+                            icon="pi pi-eye"
+                            [text]="true"
+                            severity="info"
+                            [rounded]="true"
+                            (onClick)="openCampaignInfo(campaign)"
+                        ></p-button>
 
-                    <p-button
-                        icon="pi pi-trash"
-                        [text]="true"
-                        severity="danger"
-                        [rounded]="true"
-                        (onClick)="deleteCampaign(campaign)"
-                        pTooltip="Delete"
-                        tooltipPosition="top"
-                    ></p-button>
+                        <p-button
+                            icon="pi pi-trash"
+                            [text]="true"
+                            severity="danger"
+                            [rounded]="true"
+                            (onClick)="
+                                deleteCampaign(campaign);
+                                $event.stopPropagation()
+                            "
+                        ></p-button>
+                    </div>
                 </td>
             </tr>
         </ng-template>
@@ -180,3 +177,4 @@
     </p-table>
 </div>
 <add-edit-campaign #addedit (onSave)="loadCampaigns()" />
+<campaign-info #campaignInfo />

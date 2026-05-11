@@ -1,0 +1,86 @@
+<p-dialog
+    [(visible)]="isShow"
+    header="Campaign Details"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '650px' }"
+    (onHide)="close()"
+>
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="loading-wrap">
+        <p-message severity="info" text="Loading campaign details..."></p-message>
+    </div>
+
+    <div class="campaign-info" *ngIf="!isLoading && campaign">
+
+        <!-- BASIC INFO -->
+        <div class="section">
+            <div class="section-title">Basic Information</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Name</label>
+                    <span>{{ campaign.name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Status</label>
+                    <p-tag
+                        [value]="getStatusLabel(campaign.status)"
+                        [severity]="getStatusSeverity(campaign.status)"
+                    />
+                </div>
+                <div class="info-item">
+                    <label>Duration</label>
+                    <span>{{ campaign.durationInDays }} day(s)</span>
+                </div>
+                <div class="info-item">
+                    <label>Remarks</label>
+                    <span>{{ campaign.remarks || '—' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATE RANGES -->
+        <div class="section">
+            <div class="section-title">Date Ranges</div>
+            <div *ngIf="campaign.dateRanges?.length; else noDates">
+                <div class="date-item"
+                    *ngFor="let d of campaign.dateRanges; let i = index">
+                    <span class="date-index">{{ i + 1 }}</span>
+                    <span>
+                        {{ d.startDateTime | date:'dd MMM yyyy, HH:mm' }}
+                        &rarr;
+                        {{ d.endDateTime | date:'dd MMM yyyy, HH:mm' }}
+                    </span>
+                </div>
+            </div>
+            <ng-template #noDates>
+                <span class="empty-text">No date ranges found.</span>
+            </ng-template>
+        </div>
+
+        <!-- SCREENS -->
+        <div class="section">
+            <div class="section-title">Assigned Screens</div>
+            <div class="screen-list" *ngIf="campaign.screen?.length; else noScreens">
+                <div class="screen-chip" *ngFor="let s of campaign.screen">
+                    <i class="pi pi-desktop"></i>
+                    <span>{{ s.screenName || '—' }}</span>
+                </div>
+            </div>
+            <ng-template #noScreens>
+                <span class="empty-text">No screens assigned.</span>
+            </ng-template>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button
+            label="Close"
+            icon="pi pi-times"
+            severity="secondary"
+            (onClick)="close()"
+        />
+    </ng-template>
+</p-dialog>

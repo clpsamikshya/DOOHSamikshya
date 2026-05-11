@@ -1,295 +1,389 @@
-<p-toast></p-toast>
-<p-confirmDialog></p-confirmDialog>
-
-<!-- BACKDROP -->
-<div class="modal-backdrop" *ngIf="isActive" (click)="onCancel()"></div>
-
-<!-- MODAL -->
-<div class="modal" *ngIf="isActive" (click)="$event.stopPropagation()">
-
-  <div class="modal-header">
-    <h2>Add Campaign</h2>
-  </div>
-
-  <div class="modal-body">
+<p-dialog
+    [(visible)]="isActive"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '900px' }"
+    [maximizable]="false"
+    header="Add Campaign"
+    styleClass="add-campaign-dialog"
+    (onHide)="onCancel()"
+>
     <p-stepper [linear]="true" [(activeStep)]="activeStep">
+        <!-- STEP 1 -->
+        <p-stepperPanel header="Basic Info">
+            <ng-template pTemplate="content">
+                <div class="step-content">
+                    <div class="field">
+                        <label>Campaign Name <span class="req">*</span></label>
+                        <input
+                            pInputText
+                            [(ngModel)]="campaign.name"
+                            placeholder="Enter campaign name"
+                            class="w-full"
+                        />
+                    </div>
+                    <div class="field">
+                        <label>Status</label>
+                        <p-dropdown
+                            [options]="statusOptions"
+                            [(ngModel)]="campaign.status"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select status"
+                            class="w-full"
+                        />
+                    </div>
+                    <div class="field">
+                        <label>Remarks</label>
+                        <input
+                            pInputText
+                            [(ngModel)]="campaign.remarks"
+                            placeholder="Optional remarks"
+                            class="w-full"
+                        />
+                    </div>
+                    <div class="footer">
+                        <button
+                            pButton
+                            label="Back"
+                            (click)="goBack()"
+                        ></button>
 
-      <!-- STEP 1 -->
-      <p-stepperPanel header="Basic Info">
-        <ng-template pTemplate="content">
-          <div class="step-content">
+                        <span class="spacer"></span>
 
-            <div class="field">
-              <label>Campaign Name <span class="req">*</span></label>
-              <input pInputText [(ngModel)]="campaign.name"
-                placeholder="Enter campaign name" class="w-full" />
-            </div>
-
-            <div class="field">
-              <label>Status</label>
-              <p-dropdown
-                [options]="statusOptions"
-                [(ngModel)]="campaign.status"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select status"
-                class="w-full"
-              />
-            </div>
-
-            <div class="field">
-              <label>Remarks</label>
-              <input pInputText [(ngModel)]="campaign.remarks"
-                placeholder="Optional remarks" class="w-full" />
-            </div>
-
-            <div class="footer">
-              <span></span>
-              <button pButton label="Next" icon="pi pi-arrow-right"
-                iconPos="right" class="p-button-sm" (click)="goNext()">
-              </button>
-            </div>
-
-          </div>
-        </ng-template>
-      </p-stepperPanel>
-
-      <!-- STEP 2 -->
-      <p-stepperPanel header="Dates">
-        <ng-template pTemplate="content">
-          <div class="step-content">
-
-            <div *ngFor="let dateRange of campaign.dateRanges; let i = index; trackBy: trackByIndex"
-              class="date-row">
-
-              <div class="field">
-                <label>Start Date & Time <span class="req">*</span></label>
-                <p-calendar
-                  [(ngModel)]="dateRange.startDateTime"
-                  [name]="'startDate_' + i"
-                  [showTime]="true"
-                  [showSeconds]="false"
-                  dateFormat="dd/mm/yy"
-                  hourFormat="24"
-                  placeholder="dd/mm/yyyy HH:mm"
-                  [minDate]="tomorrow"
-                  [showIcon]="true"
-                  appendTo="body"
-                  styleClass="w-full"
-                  (onSelect)="onDateChange()"
-                />
-              </div>
-
-              <div class="field">
-                <label>End Date & Time <span class="req">*</span></label>
-                <p-calendar
-                  [(ngModel)]="dateRange.endDateTime"
-                  [name]="'endDate_' + i"
-                  [showTime]="true"
-                  [showSeconds]="false"
-                  dateFormat="dd/mm/yy"
-                  hourFormat="24"
-                  placeholder="dd/mm/yyyy HH:mm"
-                  [minDate]="dateRange.startDateTime || tomorrow"
-                  [showIcon]="true"
-                  appendTo="body"
-                  styleClass="w-full"
-                  (onSelect)="onDateChange()"
-                />
-              </div>
-
-              <div class="duration-pill"
-                *ngIf="dateRange.startDateTime && dateRange.endDateTime">
-                <i class="pi pi-clock"></i>
-                {{ getDurationDays(dateRange) }} day(s)
-              </div>
-
-              <button *ngIf="campaign.dateRanges.length > 1"
-                pButton icon="pi pi-trash"
-                class="p-button-sm p-button-danger p-button-text trash-btn"
-                (click)="removeDateRange(i)">
-              </button>
-            </div>
-
-            <p-message *ngIf="hasDateOverlap" severity="error"
-              text="Date ranges must not overlap." styleClass="w-full mt-2" />
-
-            <div class="total-duration" *ngIf="totalDurationDays > 0">
-              <i class="pi pi-calendar-plus"></i>
-              Total Duration: <strong>{{ totalDurationDays }} day(s)</strong>
-            </div>
-
-            <button pButton label="Add Date Range" icon="pi pi-plus"
-              class="p-button-sm p-button-outlined p-button-secondary add-btn"
-              (click)="addDateRange()">
-            </button>
-
-            <div class="footer">
-              <button pButton label="Back" icon="pi pi-arrow-left"
-                class="p-button-sm p-button-secondary p-button-outlined"
-                (click)="goBack()"></button>
-              <button pButton label="Next" icon="pi pi-arrow-right"
-                iconPos="right" class="p-button-sm" (click)="goNext()">
-              </button>
-            </div>
-
-          </div>
-        </ng-template>
-      </p-stepperPanel>
-
-      <!-- STEP 3 -->
-      <p-stepperPanel header="Screens">
-        <ng-template pTemplate="content">
-          <div class="step-content">
-
-            <div class="screen-toolbar">
-              <span class="p-input-icon-left screen-search">
-                <i class="pi pi-search"></i>
-                <input pInputText placeholder="Search screens..."
-                  [(ngModel)]="screenSearch"
-                  (ngModelChange)="filterScreens()" class="w-full" />
-              </span>
-              <span class="selected-badge" *ngIf="campaign.screenIds.length > 0">
-                {{ campaign.screenIds.length }} selected
-              </span>
-            </div>
-
-            <div class="screen-table-wrap">
-              <p-table [value]="filteredScreens" [scrollable]="true"
-                scrollHeight="240px"
-                styleClass="screen-select-table p-datatable-sm p-datatable-striped"
-                [loading]="screensLoading">
-
-                <ng-template pTemplate="header">
-                  <tr>
-                    <th style="width: 3rem">
-                      <p-checkbox [binary]="true"
-                        [ngModel]="allScreensSelected"
-                        (ngModelChange)="toggleAllScreens($event)"
-                        ngDefaultControl />
-                    </th>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Resolution</th>
-                    <th>Status</th>
-                    <th style="width: 4rem"></th>
-                  </tr>
-                </ng-template>
-
-                <ng-template pTemplate="body" let-screen>
-                  <tr [ngClass]="{
-                      'row-selected': isScreenSelected(screen.id),
-                      'row-inactive': screen.status !== 1
-                    }"
-                    (click)="toggleScreen(screen)" style="cursor: pointer">
-                    <td>
-                      <p-checkbox [binary]="true"
-                        [ngModel]="isScreenSelected(screen.id)"
-                        [name]="'sc_' + screen.id"
-                        (ngModelChange)="toggleScreen(screen)"
-                        [disabled]="screen.status !== 1"
-                        ngDefaultControl
-                        (click)="$event.stopPropagation()" />
-                    </td>
-                    <td>{{ screen.name }}</td>
-                    <td>{{ screen.location }}</td>
-                    <td>{{ screen.resolution }}</td>
-                    <td>
-                      <p-tag
-                        [value]="screen.status === 1 ? 'Active' : 'Inactive'"
-                        [severity]="screen.status === 1 ? 'success' : 'danger'" />
-                    </td>
-                    <td>
-                      <button pButton icon="pi pi-search"
-                        class="p-button-sm p-button-text"
-                        pTooltip="View details" tooltipPosition="top"
-                        (click)="openScreenInfo(screen); $event.stopPropagation()">
-                      </button>
-                    </td>
-                  </tr>
-                </ng-template>
-
-                <ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td colspan="6" class="empty">No screens available.</td>
-                  </tr>
-                </ng-template>
-              </p-table>
-            </div>
-
-            <div class="footer">
-              <button pButton label="Back" icon="pi pi-arrow-left"
-                class="p-button-sm p-button-secondary p-button-outlined"
-                (click)="goBack()"></button>
-              <button pButton label="Next" icon="pi pi-arrow-right"
-                iconPos="right" class="p-button-sm" (click)="goNext()">
-              </button>
-            </div>
-
-          </div>
-        </ng-template>
-      </p-stepperPanel>
-
-      <!-- STEP 4 -->
-      <p-stepperPanel header="Confirm">
-        <ng-template pTemplate="content">
-          <div class="step-content">
-
-            <div class="summary">
-              <div class="row">
-                <span class="key">Name</span>
-                <span class="val">{{ campaign.name }}</span>
-              </div>
-              <div class="row" *ngIf="campaign.remarks">
-                <span class="key">Remarks</span>
-                <span class="val">{{ campaign.remarks }}</span>
-              </div>
-              <div class="row">
-                <span class="key">Duration</span>
-                <span class="val">{{ totalDurationDays }} day(s)</span>
-              </div>
-              <div class="row">
-                <span class="key">Dates</span>
-                <div class="list">
-                  <span *ngFor="let d of campaign.dateRanges">
-                    {{ d.startDateTime | date:'dd/MM/yyyy HH:mm' }} →
-                    {{ d.endDateTime | date:'dd/MM/yyyy HH:mm' }}
-                  </span>
+                        <button
+                            pButton
+                            label="Next"
+                            icon="pi pi-arrow-right"
+                            (click)="goNext()"
+                        ></button>
+                        <button
+                            pButton
+                            label="Cancel"
+                            (click)="onCancel()"
+                        ></button>
+                    </div>
                 </div>
-              </div>
-              <div class="row">
-                <span class="key">Screens</span>
-                <div class="list">
-                  <span *ngFor="let id of campaign.screenIds">
-                    {{ getScreenName(id) }}
-                  </span>
+            </ng-template>
+        </p-stepperPanel>
+
+        <!-- STEP 2 -->
+        <p-stepperPanel header="Dates">
+            <ng-template pTemplate="content">
+                <div class="step-content">
+                    <div
+                        *ngFor="
+                            let dateRange of campaign.dateRanges;
+                            let i = index;
+                            trackBy: trackByIndex
+                        "
+                        class="date-row"
+                    >
+                        <div class="field">
+                            <label
+                                >Start Date & Time
+                                <span class="req">*</span></label
+                            >
+                            <p-calendar
+                                [(ngModel)]="dateRange.startDateTime"
+                                [name]="'startDate_' + i"
+                                [showTime]="true"
+                                [showSeconds]="false"
+                                dateFormat="dd/mm/yy"
+                                hourFormat="24"
+                                placeholder="dd/mm/yyyy HH:mm"
+                                [minDate]="tomorrow"
+                                [showIcon]="true"
+                                appendTo="body"
+                                styleClass="w-full"
+                                (onSelect)="onDateChange()"
+                            />
+                        </div>
+                        <div class="field">
+                            <label
+                                >End Date & Time
+                                <span class="req">*</span></label
+                            >
+                            <p-calendar
+                                [(ngModel)]="dateRange.endDateTime"
+                                [name]="'endDate_' + i"
+                                [showTime]="true"
+                                [showSeconds]="false"
+                                dateFormat="dd/mm/yy"
+                                hourFormat="24"
+                                placeholder="dd/mm/yyyy HH:mm"
+                                [minDate]="dateRange.startDateTime || tomorrow"
+                                [showIcon]="true"
+                                appendTo="body"
+                                styleClass="w-full"
+                                (onSelect)="onDateChange()"
+                            />
+                        </div>
+                        <div
+                            class="duration-pill"
+                            *ngIf="
+                                dateRange.startDateTime && dateRange.endDateTime
+                            "
+                        >
+                            <i class="pi pi-clock"></i>
+                            {{ getDurationDays(dateRange) }} day(s)
+                        </div>
+                        <button
+                            *ngIf="campaign.dateRanges.length > 1"
+                            pButton
+                            icon="pi pi-trash"
+                            class="p-button-sm p-button-danger p-button-text trash-btn"
+                            (click)="removeDateRange(i)"
+                        ></button>
+                    </div>
+
+                    <p-message
+                        *ngIf="hasDateOverlap"
+                        severity="error"
+                        text="Date ranges must not overlap."
+                        styleClass="w-full mt-2"
+                    />
+
+                    <div class="total-duration" *ngIf="totalDurationDays > 0">
+                        <i class="pi pi-calendar-plus"></i>
+                        Total Duration:
+                        <strong>{{ totalDurationDays }} day(s)</strong>
+                    </div>
+
+                    <button
+                        pButton
+                        label="Add Date Range"
+                        icon="pi pi-plus"
+                        class="p-button-sm p-button-outlined p-button-secondary add-btn"
+                        (click)="addDateRange()"
+                    ></button>
+
+                    <div class="footer">
+                        <button
+                            pButton
+                            label="Back"
+                            (click)="goBack()"
+                        ></button>
+
+                        <span class="spacer"></span>
+
+                        <button
+                            pButton
+                            label="Next"
+                            icon="pi pi-arrow-right"
+                            (click)="goNext()"
+                        ></button>
+                        <button
+                            pButton
+                            label="Cancel"
+                            (click)="onCancel()"
+                        ></button>
+                    </div>
                 </div>
-              </div>
-            </div>
+            </ng-template>
+        </p-stepperPanel>
 
-            <div class="footer">
-              <button pButton label="Back" icon="pi pi-arrow-left"
-                class="p-button-sm p-button-secondary p-button-outlined"
-                (click)="goBack()"></button>
-              <button pButton label="Save Campaign" icon="pi pi-save"
-                class="p-button-sm p-button-success"
-                [loading]="isSubmitting"
-                (click)="onSubmit()"></button>
-            </div>
+        <!-- STEP 3 -->
+        <p-stepperPanel header="Screens">
+            <ng-template pTemplate="content">
+                <div class="step-content">
+                    <div class="screen-toolbar">
+                        <span class="p-input-icon-left screen-search">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                placeholder="Search screens..."
+                                [(ngModel)]="screenSearch"
+                                (ngModelChange)="filterScreens()"
+                                class="w-full"
+                            />
+                        </span>
+                        <span
+                            class="selected-badge"
+                            *ngIf="campaign.screenIds.length > 0"
+                        >
+                            {{ campaign.screenIds.length }} selected
+                        </span>
+                    </div>
 
-          </div>
-        </ng-template>
-      </p-stepperPanel>
+                    <div class="screen-table-wrap">
+                        <p-table
+                            [value]="filteredScreens"
+                            [scrollable]="true"
+                            scrollHeight="240px"
+                            styleClass="screen-select-table p-datatable-sm p-datatable-striped"
+                            [loading]="screensLoading"
+                        >
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem">
+                                        <p-checkbox
+                                            [binary]="true"
+                                            [ngModel]="allScreensSelected"
+                                            (ngModelChange)="
+                                                toggleAllScreens($event)
+                                            "
+                                            ngDefaultControl
+                                        />
+                                    </th>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Resolution</th>
+                                    <th>Status</th>
+                                    <th style="width: 4rem"></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-screen>
+                                <tr
+                                    [ngClass]="{
+                                        'row-selected': isScreenSelected(
+                                            screen.id
+                                        ),
+                                        'row-inactive': screen.status !== 1,
+                                    }"
+                                    (click)="toggleScreen(screen)"
+                                    style="cursor: pointer"
+                                >
+                                    <td>
+                                        <p-checkbox
+                                            [binary]="true"
+                                            [ngModel]="
+                                                isScreenSelected(screen.id)
+                                            "
+                                            [name]="'sc_' + screen.id"
+                                            (ngModelChange)="
+                                                toggleScreen(screen)
+                                            "
+                                            [disabled]="screen.status !== 1"
+                                            ngDefaultControl
+                                            (click)="$event.stopPropagation()"
+                                        />
+                                    </td>
+                                    <td>{{ screen.name }}</td>
+                                    <td>{{ screen.location }}</td>
+                                    <td>{{ screen.resolution }}</td>
+                                    <td>
+                                        <p-tag
+                                            [value]="
+                                                screen.status === 1
+                                                    ? 'Active'
+                                                    : 'Inactive'
+                                            "
+                                            [severity]="
+                                                screen.status === 1
+                                                    ? 'success'
+                                                    : 'danger'
+                                            "
+                                        />
+                                    </td>
+                                    <td>
+                                        <button
+                                            pButton
+                                            icon="pi pi-search"
+                                            class="p-button-sm p-button-text"
+                                            pTooltip="View details"
+                                            tooltipPosition="top"
+                                            (click)="
+                                                openScreenInfo(screen);
+                                                $event.stopPropagation()
+                                            "
+                                        ></button>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6" class="empty">
+                                        No screens available.
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    <div class="footer">
+                        <button
+                            pButton
+                            label="Back"
+                            (click)="goBack()"
+                        ></button>
 
+                        <span class="spacer"></span>
+
+                        <button
+                            pButton
+                            label="Next"
+                            icon="pi pi-arrow-right"
+                            (click)="goNext()"
+                        ></button>
+                        <button
+                            pButton
+                            label="Cancel"
+                            (click)="onCancel()"
+                        ></button>
+                    </div>
+                </div>
+            </ng-template>
+        </p-stepperPanel>
+
+        <!-- STEP 4 -->
+        <p-stepperPanel header="Confirm">
+            <ng-template pTemplate="content">
+                <div class="step-content">
+                    <div class="summary">
+                        <div class="row">
+                            <span class="key">Name</span>
+                            <span class="val">{{ campaign.name }}</span>
+                        </div>
+                        <div class="row" *ngIf="campaign.remarks">
+                            <span class="key">Remarks</span>
+                            <span class="val">{{ campaign.remarks }}</span>
+                        </div>
+                        <div class="row">
+                            <span class="key">Duration</span>
+                            <span class="val"
+                                >{{ totalDurationDays }} day(s)</span
+                            >
+                        </div>
+                        <div class="row">
+                            <span class="key">Dates</span>
+                            <div class="list">
+                                <span *ngFor="let d of campaign.dateRanges">
+                                    {{
+                                        d.startDateTime
+                                            | date: 'dd/MM/yyyy HH:mm'
+                                    }}
+                                    →
+                                    {{
+                                        d.endDateTime | date: 'dd/MM/yyyy HH:mm'
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <span class="key">Screens</span>
+                            <div class="list">
+                                <span *ngFor="let id of campaign.screenIds">
+                                    {{ getScreenName(id) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <button
+                            pButton
+                            label="Save Campaign"
+                            icon="pi pi-save"
+                            class="p-button-sm p-button-success"
+                            [loading]="isSubmitting"
+                            (click)="onSubmit()"
+                        ></button>
+                    </div>
+                </div>
+            </ng-template>
+        </p-stepperPanel>
     </p-stepper>
-  </div>
-
-  <div class="modal-footer">
-    <button pButton label="Cancel" icon="pi pi-times"
-      class="p-button-sm p-button-secondary p-button-text"
-      (click)="onCancel()"></button>
-  </div>
-
-</div>
+</p-dialog>
 
 <screen-info #screenInfo />

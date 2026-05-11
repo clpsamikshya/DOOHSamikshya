@@ -9,13 +9,18 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
     public class CampaignContoller(ICampaignService cs) : SharedController
     {
         [HttpGet]
-        public async Task<IActionResult> GetCampaign([FromQuery] string? Search, [FromQuery] int OffSet = 0, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetCampaign(
+    [FromQuery] string? Search,
+    [FromQuery] int? CampaignId,   
+    [FromQuery] int OffSet = 0,
+    [FromQuery] int PageSize = 10)
         {
             try
             {
                 var filter = new CampaignFilter
                 {
                     Search = Search,
+                    CampaignId = CampaignId,   
                     Offset = OffSet,
                     PageSize = PageSize
                 };

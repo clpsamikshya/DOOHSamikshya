@@ -58,10 +58,6 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
 
   ngOnInit(): void {}
 
-  // =========================================================
-  // OPEN
-  // =========================================================
-
   onShow(data?: Campaign): void {
     this.activeStep = 0;
     this.isSubmitting = false;
@@ -81,10 +77,6 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
     this.isActive = true;
     this.loadScreens();
   }
-
-  // =========================================================
-  // SCREENS
-  // =========================================================
 
   loadScreens(): void {
     this.screensLoading = true;
@@ -142,11 +134,6 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
   getScreenName(id: number): string {
     return this.screens.find((s) => s.id === id)?.name ?? String(id);
   }
-
-  // =========================================================
-  // DATES
-  // =========================================================
-
   addDateRange(): void {
     this.campaign.dateRanges.push(new CampaignDate());
   }
@@ -192,11 +179,15 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
     return this.campaign.dateRanges.reduce((sum, d) => sum + this.getDurationDays(d), 0);
   }
 
-  // =========================================================
-  // NAVIGATION
-  // =========================================================
-
   goNext(): void {
+
+    if (
+      this.campaign.status === null ||
+      this.campaign.status === undefined
+    ) {
+      this.showMessage('Error', 'Please select campaign status', 'error');
+      return;
+    }
     if (this.activeStep === 0) {
       if (!this.campaign.name?.trim()) {
         this.showMessage('Error', 'Campaign name is required', 'error');
@@ -231,10 +222,6 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
   goBack(): void {
     this.activeStep--;
   }
-
-  // =========================================================
-  // SAVE
-  // =========================================================
 
   onSubmit(): void {
     this.confirmAction({

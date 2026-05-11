@@ -12,17 +12,19 @@ import { Campaign, CampaignFilter } from '../../Model/Campaign';
 import { ActivatedRoute } from '@angular/router';
 import { CampaignStatus  } from '../../Model/CampaignEnum';
 import { AddCampaignComponent } from '../add-campaign/add-campaign.component';
+import { CampaignInfoComponent } from '../campaign-info/campaign-info.component';
 
 
 @Component({
     selector: 'campaign-list',
     standalone: true,
-    imports: [...sharedImports, AddCampaignComponent],
+    imports: [...sharedImports, AddCampaignComponent, CampaignInfoComponent],
     templateUrl: './campaign-list.component.html',
     styleUrl: './campaign-list.component.scss'
 })
 export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
     @ViewChild('addedit') addedit!: AddCampaignComponent;
+     @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
 
     private readonly destroy$ = new Subject<void>();
     CampaignStatus = CampaignStatus;
@@ -99,6 +101,10 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     this.addedit?.onShow();
 }
 
+openCampaignInfo(campaign: Campaign): void {
+    this.campaignInfo?.show(campaign);
+}
+
     loadCampaigns(): void {
 
         this.isLoading = true;
@@ -109,9 +115,6 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
             .subscribe({
 
                 next: (res) => {
-
-                    console.log('Campaign Response:', res);
-
                     this.campaigns =
                         res.data?.data ?? [];
 
@@ -135,53 +138,36 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     }
 
     deleteCampaign(campaign: Campaign): void {
+    this.confirmationService.close(); 
 
-        this.confirmAction({
+    this.confirmAction({
+        message: `Are you sure you want to delete campaign ${campaign.name}?`,
+        header: 'Confirm Deletion',
 
-            message:
-                `Are you sure you want to delete campaign ${campaign.name}?`,
+        accept: () => {
+            this.campaignService.deleteCampaign(campaign.id)
+                .pipe(takeUntil(this.destroy$))
+                .subscribe({
+                    next: () => {
+                        this.showMessage('Success', 'Campaign deleted successfully', 'success');
+                        this.loadCampaigns();
+                    },
+                    error: (err: Error) => {
+                        this.showMessage('Error', err.message, 'error');
+                    }
+                });
+        },
 
-            header: 'Confirm Deletion',
+        reject: () => {
+            this.showMessage('Info', 'Campaign deletion cancelled', 'info');
+        }
+    });
+}
 
-            accept: () => {
-
-                this.campaignService
-                    .deleteCampaign(campaign.id)
-                    .pipe(takeUntil(this.destroy$))
-                    .subscribe({
-
-                        next: () => {
-
-                            this.showMessage(
-                                'Success',
-                                'Campaign deleted successfully',
-                                'success'
-                            );
-
-                            this.loadCampaigns();
-                        },
-
-                        error: (err: Error) => {
-
-                            this.showMessage(
-                                'Error',
-                                err.message,
-                                'error'
-                            );
-                        }
-                    });
-            },
-
-            reject: () => {
-
-                this.showMessage(
-                    'Info',
-                    'Campaign deletion cancelled',
-                    'info'
-                );
-            }
-        });
-    }
+onCanclel(): void {
+    this.addedit?.onCancel();
+    
+}
 
     ngOnDestroy(): void {
 

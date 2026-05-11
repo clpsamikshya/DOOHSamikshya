@@ -39,26 +39,27 @@ namespace DoohSamikshya.Service.Application.Dbo
 
         public async Task<CampaignResponse?> GetCampaign(CampaignFilter filter)
         {
-            try {
+            try
+            {
                 string json = JsonConvert.SerializeObject(new
                 {
-                    offset = filter.Offset,
+                    Offset = filter.Offset,
                     PageSize = filter.PageSize,
                     Filter = new
                     {
                         Search = filter.Search ?? "",
                         Status = filter.Status.HasValue ? (int?)filter.Status.Value : null,
-
+                        CampaignId = filter.CampaignId  // ← add this
                     }
                 });
                 string result = await da.RetrievalProcedure("dbo.SpCampaignSel", json);
                 return JsonConvert.DeserializeObject<CampaignResponse>(result);
             }
-            catch(SqlException ex)
+            catch (SqlException ex)
             {
                 throw new Exception(ex.Message);
             }
-          }
+        }
 
         public async Task<List<Campaign>?> UpdateCampaignStatus(Campaign campaign)
         {

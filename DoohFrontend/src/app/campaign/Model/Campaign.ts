@@ -32,12 +32,14 @@ export class CampaignScreen {
     campaignId: number;
     screenId: number;
     screenName: string;
+    isDeleted?: boolean;
 
     constructor() {
         this.id = 0;
         this.campaignId = 0;
         this.screenId = 0;
         this.screenName = '';
+        this.isDeleted = false;
     }
 }
 
