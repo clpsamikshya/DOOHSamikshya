@@ -1,0 +1,303 @@
+/* =========================
+   BACKDROP
+========================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  background: #ffffff;
+  border-radius: 14px;
+  width: 900px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111827;
+  }
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  background: #f6f7fb;
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 0.75rem 1.75rem;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* =========================
+   STEPPER OVERRIDE
+========================= */
+
+:host ::ng-deep .p-stepper {
+  background: transparent;
+
+  .p-stepper-panels {
+    background: transparent;
+    padding: 0;
+  }
+}
+
+/* =========================
+   STEP CONTENT
+========================= */
+
+.step-content {
+  padding: 0.5rem 0;
+}
+
+/* =========================
+   FORM FIELDS
+========================= */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+
+    .req {
+      color: #ef4444;
+      margin-left: 3px;
+    }
+  }
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+}
+
+/* =========================
+   DATE ROWS
+========================= */
+
+.date-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 0.75rem;
+
+  .field {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
+
+.duration-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ecfeff;
+  color: #0f766e;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-bottom: 0.25rem;
+}
+
+.total-duration {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.add-btn {
+  margin-top: 0.5rem;
+}
+
+.trash-btn {
+  margin-bottom: 0.25rem;
+}
+
+/* =========================
+   SCREEN SELECTOR
+========================= */
+
+.screen-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 0.75rem;
+
+  .screen-search {
+    flex: 1;
+  }
+
+  .selected-badge {
+    background: #111827;
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+}
+
+.screen-table-wrap {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+:host ::ng-deep .screen-select-table {
+  .p-datatable-tbody > tr {
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: #f9fafb !important;
+    }
+
+    &.row-selected {
+      background: #eff6ff !important;
+    }
+
+    &.row-inactive {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}
+
+/* =========================
+   SUMMARY
+========================= */
+
+.summary {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+
+  .row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .key {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #6b7280;
+      width: 100px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-top: 2px;
+    }
+
+    .val {
+      font-size: 0.95rem;
+      color: #111827;
+      font-weight: 500;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+
+      span {
+        font-size: 0.9rem;
+        color: #111827;
+      }
+    }
+  }
+}
+
+/* =========================
+   FOOTER NAV
+========================= */
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .modal {
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .date-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .screen-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

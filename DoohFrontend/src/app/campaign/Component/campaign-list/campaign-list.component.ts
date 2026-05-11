@@ -1,30 +1,31 @@
-// campaign-list.component.ts
-
 import {
     Component,
     Injector,
     OnDestroy,
-    OnInit
+    OnInit,
+    ViewChild
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { sharedImports } from '../../../shared/sharedImports';
 import { AppComponent } from '../../../app.component';
 import { Campaign, CampaignFilter } from '../../Model/Campaign';
 import { ActivatedRoute } from '@angular/router';
+import { CampaignStatus  } from '../../Model/CampaignEnum';
+import { AddCampaignComponent } from '../add-campaign/add-campaign.component';
 
 
 @Component({
     selector: 'campaign-list',
     standalone: true,
-    imports: [sharedImports],
+    imports: [...sharedImports, AddCampaignComponent],
     templateUrl: './campaign-list.component.html',
     styleUrl: './campaign-list.component.scss'
 })
 export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
-
+    @ViewChild('addedit') addedit!: AddCampaignComponent;
 
     private readonly destroy$ = new Subject<void>();
-
+    CampaignStatus = CampaignStatus;
     isLoading = false;
 
     campaigns: Campaign[] = [];
@@ -44,10 +45,13 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
     super(injector);
   }
 
-    statusOptions = [
-        { label: 'Active', value: 1 },
-        { label: 'Inactive', value: 0 }
-    ];
+  statusOptions = [
+    { label: 'New', value: CampaignStatus.New },
+    { label: 'Active', value: CampaignStatus.Active },
+    { label: 'Completed', value: CampaignStatus.Completed },
+    { label: 'Paused', value: CampaignStatus.Paused },
+    { label: 'Cancelled', value: CampaignStatus.Cancelled }
+];
 
     ngOnInit(): void {
         this.loadCampaigns();
@@ -76,6 +80,10 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
         this.loadCampaigns();
     }
 
+    onSaveCampaign(): void {
+    this.loadCampaigns();
+}
+
     onPageChange(event: any): void {
 
         this.filter = {
@@ -86,6 +94,10 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
 
         this.loadCampaigns();
     }
+
+ openAddCampaign(): void {
+    this.addedit?.onShow();
+}
 
     loadCampaigns(): void {
 

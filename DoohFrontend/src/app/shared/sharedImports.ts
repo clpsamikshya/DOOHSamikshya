@@ -12,6 +12,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { OverlayModule } from 'primeng/overlay';
 import { ChipModule } from 'primeng/chip';
 import { TableModule } from 'primeng/table';
+import { StepperModule } from 'primeng/stepper';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ChipsModule } from 'primeng/chips';
@@ -19,6 +20,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
+import { CalendarModule } from 'primeng/calendar';
+import { MessageModule } from 'primeng/message';
 
 export const sharedImports = [
   CommonModule,
@@ -26,7 +29,9 @@ export const sharedImports = [
   TagModule,
   ButtonModule,
   DialogModule,
+  CalendarModule,
   ToastModule,
+  MessageModule,
   TableModule,
   ConfirmDialogModule,
   CardModule,
@@ -41,5 +46,6 @@ export const sharedImports = [
   TabViewModule,
   MultiSelectModule,
   CheckboxModule,
-  DividerModule
+  DividerModule,
+  StepperModule
 ];

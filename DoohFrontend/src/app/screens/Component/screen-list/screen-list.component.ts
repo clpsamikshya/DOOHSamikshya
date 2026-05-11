@@ -9,9 +9,8 @@ import { sharedImports } from '../../../shared/sharedImports';
 import { Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../app.component';
 import { ActivatedRoute } from '@angular/router';
-import { ScreenFilter, ScreenOperatingHour, Screens } from '../../model/Screen';
+import { ScreenFilter, Screens } from '../../model/Screen';
 import { AddEditScreenComponent } from '../add-edit-screen/add-edit-screen.component';
-import { ScreenOperatingHourComponent } from '../screen-operating-hour/screen-operating-hour.component';
 import { ScreenStatus, ScreenOrientation } from '../../model/ScreenEnum';
 
 @Component({
@@ -20,7 +19,7 @@ import { ScreenStatus, ScreenOrientation } from '../../model/ScreenEnum';
     imports: [
         sharedImports,
         AddEditScreenComponent,
-        ScreenOperatingHourComponent,
+        
     ],
 
     templateUrl: './screen-list.component.html',
