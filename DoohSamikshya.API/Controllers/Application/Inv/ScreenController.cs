@@ -12,13 +12,13 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
 
     public class ScreenController(IScreenService ss) : SharedController
     {
-       
+
         [HttpGet("ddl")]
-        public async Task<IActionResult> DropDown()
+        public async Task<IActionResult> DropDown([FromQuery] int? campaignId)
         {
             try
             {
-                var response = await ss.DropDown();
+                var response = await ss.DropDown(campaignId);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)

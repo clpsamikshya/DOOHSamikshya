@@ -20,14 +20,15 @@ export interface CampaignMedia {
 export interface CampaignMediaRequest {
     campaignId: number;
     screenId: number;
-    mediaId: number;
-    playDate: string;
-    startTime: string;
-    endTime: string;
-    duration?: number;
-    order?: number;
+    playDate: string | Date;
     createdBy?: number;
-    updatedBy?: number;
+
+    media: MediaItem[];
+}
+
+export interface MediaItem {
+    mediaId: number;
+    playOrder: number;
 }
 
 export interface CampaignMediaResponse {

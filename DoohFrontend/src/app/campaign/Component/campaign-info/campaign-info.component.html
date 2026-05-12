@@ -9,70 +9,95 @@
 >
     <div class="campaign-info" *ngIf="campaign">
 
-        <!-- BASIC INFO -->
-        <div class="section">
-            <div class="section-title">Basic Information</div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>Name</label>
-                    <span>{{ campaign.name }}</span>
-                </div>
-                <div class="info-item">
-                    <label>Status</label>
-                    <p-tag
-                        [value]="getStatusLabel(campaign.status)"
-                        [severity]="getStatusSeverity(campaign.status)"
-                    />
-                </div>
-                <div class="info-item">
-                    <label>Duration</label>
-                    <span>{{ campaign.durationInDays }} day(s)</span>
-                </div>
-                <div class="info-item">
-                    <label>Remarks</label>
-                    <span>{{ campaign.remarks || '—' }}</span>
-                </div>
-            </div>
-        </div>
+        <p-tabView>
 
-        <!-- DATE RANGES -->
-        <div class="section">
-            <div class="section-title">Date Ranges</div>
-            <div *ngIf="campaign.dateRanges?.length; else noDates">
-                <div
-                    class="date-item"
-                    *ngFor="let d of campaign.dateRanges; let i = index"
-                >
-                    <span class="date-index">{{ i + 1 }}</span>
-                    <span>
-                        {{ d.startDateTime | date: 'dd MMM yyyy, HH:mm' }}
-                        &rarr;
-                        {{ d.endDateTime | date: 'dd MMM yyyy, HH:mm' }}
-                    </span>
-                </div>
-            </div>
-            <ng-template #noDates>
-                <span class="empty-text">No date ranges found.</span>
-            </ng-template>
-        </div>
+            <!-- ================= BASIC TAB ================= -->
+            <p-tabPanel header="Details">
 
-        <!-- SCREENS -->
-        <div class="section">
-            <div class="section-title">Screens</div>
-            <div *ngIf="campaign.screen?.length; else noScreens">
-                <div class="screen-item" *ngFor="let screen of campaign.screen">
-                    <span class="screen-name">{{ screen.screenName }}</span>
-                    <p-tag
-                        *ngIf="screen.isDeleted"
-                        value="Deleted"
-                        severity="danger"
-                    />
+                <!-- BASIC INFO -->
+                <div class="section">
+                    <div class="section-title">Basic Information</div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Name</label>
+                            <span>{{ campaign.name }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Status</label>
+                            <p-tag
+                                [value]="getStatusLabel(campaign.status)"
+                                [severity]="getStatusSeverity(campaign.status)"
+                            />
+                        </div>
+
+                        <div class="info-item">
+                            <label>Duration</label>
+                            <span>{{ campaign.durationInDays }} day(s)</span>
+                        </div>
+
+                        <div class="info-item">
+                            <label>Remarks</label>
+                            <span>{{ campaign.remarks || '—' }}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <ng-template #noScreens>
-                <span class="empty-text">No screens assigned.</span>
-            </ng-template>
-        </div>
+
+                <!-- DATE RANGES -->
+                <div class="section">
+                    <div class="section-title">Date Ranges</div>
+
+                    <div *ngIf="campaign.dateRanges?.length; else noDates">
+                        <div class="date-item" *ngFor="let d of campaign.dateRanges; let i = index">
+                            <span class="date-index">{{ i + 1 }}</span>
+                            <span>
+                                {{ d.startDateTime | date: 'dd MMM yyyy, HH:mm' }}
+                                →
+                                {{ d.endDateTime | date: 'dd MMM yyyy, HH:mm' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <ng-template #noDates>
+                        <span class="empty-text">No date ranges found.</span>
+                    </ng-template>
+                </div>
+
+                <!-- SCREENS -->
+                <div class="section">
+                    <div class="section-title">Screens</div>
+
+                    <div *ngIf="campaign.screen?.length; else noScreens">
+                        <div class="screen-item" *ngFor="let screen of campaign.screen">
+                            <span class="screen-name">{{ screen.screenName }}</span>
+
+                            <p-tag
+                                *ngIf="screen.isDeleted"
+                                value="Deleted"
+                                severity="danger"
+                            />
+                        </div>
+                    </div>
+
+                    <ng-template #noScreens>
+                        <span class="empty-text">No screens assigned.</span>
+                    </ng-template>
+                </div>
+
+            </p-tabPanel>
+
+            <!-- ================= MEDIA TAB ================= -->
+            <p-tabPanel header="Media">
+
+                <campaign-media-info
+                    *ngIf="campaign?.id"
+                    [campaignId]="campaign.id"
+                ></campaign-media-info>
+
+            </p-tabPanel>
+
+        </p-tabView>
 
     </div>
 

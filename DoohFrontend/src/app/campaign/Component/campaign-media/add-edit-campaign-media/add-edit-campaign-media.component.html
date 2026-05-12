@@ -3,115 +3,112 @@
     [modal]="true"
     [closable]="true"
     [draggable]="false"
-    [style]="{ width: '600px' }"
+    [style]="{ width: '650px' }"
     [header]="existingData ? 'Edit Campaign Media' : 'Add Campaign Media'"
 >
-    <div class="flex flex-column gap-4">
-        <!-- Screen Selection -->
-        <div class="flex flex-column gap-2">
-            <label for="screen" class="font-semibold">Screen *</label>
-            <p-dropdown
-                id="screen"
-                [(ngModel)]="campaignMedia.screenId"
-                [options]="screenOptions"
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Select a screen"
-                [showClear]="true"
-                [filter]="true"
-                filterBy="name"
-            ></p-dropdown>
-        </div>
 
-        <!-- Media Selection -->
-        <div class="flex flex-column gap-2">
-            <label for="media" class="font-semibold">Media *</label>
-            <p-dropdown
-                id="media"
-                [(ngModel)]="campaignMedia.mediaId"
-                [options]="mediaOptions"
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Select media"
-                [showClear]="true"
-                [filter]="true"
-                filterBy="name"
-            ></p-dropdown>
-        </div>
+    <!-- ================= FORM SECTION ================= -->
+    <div class="section">
 
-        <!-- Play Date -->
-        <div class="flex flex-column gap-2">
-            <label for="playDate" class="font-semibold">Play Date *</label>
-            <input
-                id="playDate"
-                type="date"
-                pInputText
-                [(ngModel)]="campaignMedia.playDate"
-            />
-        </div>
+        <div class="section-title">Campaign Media Form</div>
 
-        <!-- Time Range -->
-        <div class="grid">
-            <div class="col-6">
-                <div class="flex flex-column gap-2">
-                    <label for="startTime" class="font-semibold">Start Time *</label>
-                    <input
-                        id="startTime"
-                        type="time"
-                        pInputText
-                        [(ngModel)]="campaignMedia.startTime"
-                    />
-                </div>
+        <div class="form-grid">
+
+            <!-- Screen -->
+            <div class="flex flex-column gap-2">
+                <label>Screen *</label>
+                <p-dropdown
+                    [(ngModel)]="campaignMedia.screenId"
+                    [options]="screenOptions"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Select screen"
+                    [showClear]="true"
+                    [filter]="true"
+                ></p-dropdown>
             </div>
-            <div class="col-6">
-                <div class="flex flex-column gap-2">
-                    <label for="endTime" class="font-semibold">End Time *</label>
-                    <input
-                        id="endTime"
-                        type="time"
-                        pInputText
-                        [(ngModel)]="campaignMedia.endTime"
-                    />
-                </div>
+
+            <!-- Media -->
+            <div class="flex flex-column gap-2">
+                <label>Media *</label>
+                <p-dropdown
+                    [(ngModel)]="campaignMedia.mediaId"
+                    [options]="mediaOptions"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Select media"
+                    [showClear]="true"
+                    [filter]="true"
+                ></p-dropdown>
             </div>
-        </div>
 
-        <!-- Duration -->
-        <div class="flex flex-column gap-2">
-            <label for="duration" class="font-semibold">Duration (seconds)</label>
-            <p-inputNumber
-                id="duration"
-                [(ngModel)]="campaignMedia.duration"
-                [min]="0"
-                [showButtons]="true"
-                suffix=" sec"
-            ></p-inputNumber>
-        </div>
+            <!-- Play Date -->
+            <div class="flex flex-column gap-2">
+                <label>Play Date *</label>
+                <input
+                    type="date"
+                    pInputText
+                    [(ngModel)]="campaignMedia.playDate"
+                />
+            </div>
 
-        <!-- Display Order -->
-        <div class="flex flex-column gap-2">
-            <label for="order" class="font-semibold">Display Order</label>
-            <p-inputNumber
-                id="order"
-                [(ngModel)]="campaignMedia.order"
-                [min]="1"
-                [showButtons]="true"
-            ></p-inputNumber>
+            <!-- Time -->
+            <div class="time-grid">
+
+                <div class="flex flex-column gap-2">
+                    <label>Start *</label>
+                    <input type="time" pInputText [(ngModel)]="campaignMedia.startTime" />
+                </div>
+
+                <div class="flex flex-column gap-2">
+                    <label>End *</label>
+                    <input type="time" pInputText [(ngModel)]="campaignMedia.endTime" />
+                </div>
+
+            </div>
+
+            <!-- Duration -->
+            <div class="flex flex-column gap-2">
+                <label>Duration</label>
+                <p-inputNumber [(ngModel)]="campaignMedia.duration" [min]="0"></p-inputNumber>
+            </div>
+
+            <!-- Order -->
+            <div class="flex flex-column gap-2">
+                <label>Order</label>
+                <p-inputNumber [(ngModel)]="campaignMedia.order" [min]="1"></p-inputNumber>
+            </div>
+
         </div>
     </div>
 
+    <!-- ================= EXISTING DATA SECTION ================= -->
+    <div class="section info-section">
+
+        <div class="section-title">Existing Campaign Media</div>
+
+        <campaign-media-info
+            *ngIf="campaignMedia.campaignId > 0"
+            [campaignId]="campaignMedia.campaignId">
+        </campaign-media-info>
+
+    </div>
+
+    <!-- ================= FOOTER ================= -->
     <ng-template pTemplate="footer">
         <div class="flex justify-content-end gap-2">
             <p-button
                 label="Cancel"
                 severity="secondary"
-                (onClick)="onCancel()"
-            ></p-button>
+                (onClick)="onCancel()">
+            </p-button>
+
             <p-button
                 label="Save"
                 severity="primary"
-                (onClick)="onSubmit()"
-            ></p-button>
+                (onClick)="onSubmit()">
+            </p-button>
         </div>
     </ng-template>
+
 </p-dialog>

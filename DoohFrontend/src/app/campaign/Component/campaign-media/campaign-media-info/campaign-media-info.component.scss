@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+/* Section wrapper */
+.info-wrapper {
+  padding: 0.75rem;
+}
+
+/* Title / header if you add later */
+.info-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: #444;
+}
+
+/* Table styling improvement */
+:host ::ng-deep .p-table {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+/* Header */
+:host ::ng-deep .p-table thead th {
+  background: #f5f6f8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  padding: 0.75rem;
+}
+
+/* Body rows */
+:host ::ng-deep .p-table tbody td {
+  font-size: 0.85rem;
+  padding: 0.65rem 0.75rem;
+}
+
+/* Row hover */
+:host ::ng-deep .p-table tbody tr:hover {
+  background: #f9fafb;
+  transition: 0.2s;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 1rem;
+  color: #888;
+  font-size: 0.85rem;
+}

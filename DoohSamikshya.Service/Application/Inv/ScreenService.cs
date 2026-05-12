@@ -96,9 +96,15 @@ namespace DoohSamikshya.Service.Application.Inv
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        public async Task<List<Screen>?> DropDown()
+        public async Task<List<Screen>?> DropDown(int? campaignId)
         {
-            string result = await da.RetrievalProcedure("[inv].[SpScreenDdlSel]", null);
+            var json = JsonConvert.SerializeObject(new
+            {
+                CampaignId = campaignId
+            });
+
+            string result = await da.RetrievalProcedure("[inv].[SpScreenDdlSel]", json);
+
             return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
     }

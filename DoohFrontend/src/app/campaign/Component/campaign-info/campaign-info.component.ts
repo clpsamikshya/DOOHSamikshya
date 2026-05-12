@@ -4,11 +4,12 @@ import { Campaign } from '../../Model/Campaign';
 import { CampaignStatus } from '../../Model/CampaignEnum';
 import { sharedImports } from '../../../shared/sharedImports';
 import { Subject, takeUntil } from 'rxjs';
+import { CampaignMediaInfoComponent } from '../campaign-media/campaign-media-info/campaign-media-info.component';
 
 @Component({
     selector: 'campaign-info',
     standalone: true,
-    imports: [...sharedImports],
+    imports: [...sharedImports, CampaignMediaInfoComponent],
     templateUrl: './campaign-info.component.html',
     styleUrl: './campaign-info.component.scss',
 })

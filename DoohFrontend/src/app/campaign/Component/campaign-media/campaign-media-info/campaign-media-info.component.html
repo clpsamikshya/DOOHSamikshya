@@ -1,1 +1,21 @@
-<p>campaign-media-info works!</p>
+<p *ngIf="!data?.length">No data found</p>
+
+<p-table *ngIf="data?.length" [value]="data">
+    <ng-template pTemplate="header">
+        <tr>
+            <th>Screen</th>
+            <th>Media</th>
+            <th>Play Order</th>
+            <th>Date</th>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+        <tr>
+            <td>{{ row.screenName }}</td>
+            <td>{{ row.mediaName }}</td>
+            <td>{{ row.playOrder }}</td>
+            <td>{{ row.playDate }}</td>
+        </tr>
+    </ng-template>
+</p-table>
