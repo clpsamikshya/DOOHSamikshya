@@ -40,6 +40,20 @@ namespace DoohSamikshya.API.Controllers.Application.Media
             }
         }
 
+        [HttpGet("ddl")]
+        public async Task<IActionResult> GetMediaLibraryDdl([FromQuery] int? campaignId)
+        {
+            try
+            {
+                var response = await mls.GetMediaLibraryDdl(campaignId);
+                return Ok(ApiResponse.Success(response));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse.Fail(ex.Message));
+            }
+        }
+
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { ApiResponse, MediaFilter, MediaLibrary, MediaLibraryResponse } from '../model/MediaLibrary';
+import { ApiResponse, DropdownItemMedia, MediaFilter, MediaLibrary, MediaLibraryResponse } from '../model/MediaLibrary';
 
 @Injectable({ providedIn: 'root' })
 export class MediaLibraryService {
@@ -32,6 +32,17 @@ export class MediaLibraryService {
             params = params.set('includeDeleted', 'true');
 
         return this.http.get<ApiResponse<MediaLibraryResponse>>(this.api, { params })
+            .pipe(catchError(this.handleError));
+    }
+
+    getMediaLibraryDdl(campaignId?: number): Observable<ApiResponse<DropdownItemMedia[]>> {
+        let params = new HttpParams();
+        
+        if (campaignId !== undefined && campaignId !== null) {
+            params = params.set('campaignId', campaignId);
+        }
+
+        return this.http.get<ApiResponse<DropdownItemMedia[]>>(`${this.api}/ddl`, { params })
             .pipe(catchError(this.handleError));
     }
 

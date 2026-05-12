@@ -144,6 +144,14 @@
                 <td class="action-cell">
                     <div class="action-wrapper">
                         <p-button
+                            icon="pi pi-images"
+                            [text]="true"
+                            severity="warning"
+                            [rounded]="true"
+                            pTooltip="Manage Campaign Media"
+                            (onClick)="openCampaignMedia(campaign)"
+                        ></p-button>
+                        <p-button
                             icon="pi pi-eye"
                             [text]="true"
                             severity="info"
@@ -178,3 +186,7 @@
 </div>
 <add-edit-campaign #addedit (onSave)="loadCampaigns()" />
 <campaign-info #campaignInfo />
+<add-edit-campaign-media
+    #campaignMedia
+    (onSave)="loadCampaigns()"
+></add-edit-campaign-media>

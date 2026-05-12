@@ -13,7 +13,7 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
     public class ScreenController(IScreenService ss) : SharedController
     {
        
-        [HttpGet("DD")]
+        [HttpGet("ddl")]
         public async Task<IActionResult> DropDown()
         {
             try

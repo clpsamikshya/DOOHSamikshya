@@ -7,5 +7,6 @@ namespace DoohSamikshya.Interface.Application.Media
         Task<List<MediaLibrary>> AddMediaLibrary(InsertMedia request);
         Task<MediaLibrary?> DeleteMediaLibrary(int id);
         Task<MediaLibraryResponse?> GetMediaLibrary(MediaFilter filter);
+        Task<List<DropdownItem>?> GetMediaLibraryDdl(int? campaignId = null);
     }
 }

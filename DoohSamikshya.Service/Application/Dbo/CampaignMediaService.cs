@@ -9,20 +9,6 @@ namespace DoohSamikshya.Service.Application.Dbo
 {
     public class CampaignMediaService(IDataAccessService da) : ICampaignMediaService
     {
-        //public async Task<CampaignMedia> AddCampaignMedia(CampaignMedia campaignMedia)
-        //{
-        //    try
-        //    {
-        //        string json = JsonConvert.SerializeObject(campaignMedia);
-        //        string result = await da.ActionProcedure("dbo.SpCampaignMediaIns", json);
-        //        return JsonConvert.DeserializeObject<CampaignMedia>(result);
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-
-        //}
 
         public async Task<CampaignMediaResponse> AddCampaignMedia(CampaignMediaRequest request)
         {

@@ -6,6 +6,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';           // ← add
 import { ConfirmDialogModule } from 'primeng/confirmdialog'; // ← add
 import { CampaignService } from './campaign/Service/CampaignService';
+import { CampaignMediaService } from './campaign/Service/CampaignMediaService';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ export class AppComponent {
   protected readonly messageService: MessageService;
   protected readonly confirmationService: ConfirmationService;
   protected readonly campaignService: CampaignService;
+  protected readonly campaignMediaService: CampaignMediaService;
 
   constructor(protected readonly injector: Injector) {
     this.mediaLibraryService  = injector.get(MediaLibraryService);
@@ -34,6 +36,7 @@ export class AppComponent {
     this.messageService       = injector.get(MessageService);
     this.confirmationService  = injector.get(ConfirmationService);
      this.campaignService  = injector.get(CampaignService);
+      this.campaignMediaService  = injector.get(CampaignMediaService);
   }
 
   protected showMessage(

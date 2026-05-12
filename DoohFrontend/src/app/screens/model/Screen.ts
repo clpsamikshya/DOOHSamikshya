@@ -54,6 +54,11 @@ export class Screens {
   }
 }
 
+export interface DropdownItemScreen {
+    id: number;
+    name: string;
+}
+
 export class ScreenOperatingHour {
   id: number;
   screenId: number;

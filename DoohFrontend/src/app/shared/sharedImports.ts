@@ -22,6 +22,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { CalendarModule } from 'primeng/calendar';
 import { MessageModule } from 'primeng/message';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 export const sharedImports = [
   CommonModule,
@@ -32,6 +33,7 @@ export const sharedImports = [
   CalendarModule,
   ToastModule,
   MessageModule,
+  InputNumberModule,
   TableModule,
   ConfirmDialogModule,
   CardModule,

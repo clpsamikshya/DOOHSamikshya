@@ -98,7 +98,7 @@ namespace DoohSamikshya.Service.Application.Inv
 
         public async Task<List<Screen>?> DropDown()
         {
-            string result = await da.RetrievalProcedure("inv.SpScreenDropDownSel", null);
+            string result = await da.RetrievalProcedure("[inv].[SpScreenDdlSel]", null);
             return JsonConvert.DeserializeObject<List<Screen>>(result);
         }
     }

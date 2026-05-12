@@ -13,18 +13,20 @@ import { ActivatedRoute } from '@angular/router';
 import { CampaignStatus  } from '../../Model/CampaignEnum';
 import { AddCampaignComponent } from '../add-campaign/add-campaign.component';
 import { CampaignInfoComponent } from '../campaign-info/campaign-info.component';
+import { AddEditCampaignMediaComponent } from '../campaign-media/add-edit-campaign-media/add-edit-campaign-media.component';
 
 
 @Component({
     selector: 'campaign-list',
     standalone: true,
-    imports: [...sharedImports, AddCampaignComponent, CampaignInfoComponent],
+    imports: [...sharedImports, AddCampaignComponent, CampaignInfoComponent, AddEditCampaignMediaComponent ],
     templateUrl: './campaign-list.component.html',
     styleUrl: './campaign-list.component.scss'
 })
 export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
     @ViewChild('addedit') addedit!: AddCampaignComponent;
      @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
+     @ViewChild('campaignMedia') campaignMedia!: AddEditCampaignMediaComponent;
 
     private readonly destroy$ = new Subject<void>();
     CampaignStatus = CampaignStatus;
@@ -96,6 +98,10 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
 
         this.loadCampaigns();
     }
+
+    openCampaignMedia(campaign: Campaign): void {
+    this.campaignMedia?.onShow(campaign.id);
+}
 
  openAddCampaign(): void {
     this.addedit?.onShow();

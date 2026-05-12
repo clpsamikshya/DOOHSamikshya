@@ -20,6 +20,11 @@ export interface MediaFilter {
   pageSize?: number;
 }
 
+export interface DropdownItemMedia {
+    id: number;
+    name: string;
+}
+
 export interface MediaLibraryResponse {
   totalRows: number;
   data: MediaLibrary[];

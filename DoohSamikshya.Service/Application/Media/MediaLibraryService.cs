@@ -87,7 +87,6 @@ namespace DoohSamikshya.Service.Application.Media
                     }
                 }
 
-                // 5. Auto-detect name from filename if not provided
                 string name = string.IsNullOrWhiteSpace(request.Name)
                     ? Path.GetFileNameWithoutExtension(request.File.FileName)
                     : request.Name;
@@ -128,6 +127,24 @@ namespace DoohSamikshya.Service.Application.Media
                 string json = JsonConvert.SerializeObject(payload);
                 string result = await da.ActionProcedure("[dbo].[SpMediaLibraryDel]", json);
                 return JsonConvert.DeserializeObject<MediaLibrary>(result);
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<DropdownItem>?> GetMediaLibraryDdl(int? campaignId = null)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(new
+                {
+                    CampaignId = campaignId
+                });
+
+                string result = await da.RetrievalProcedure("[dbo].[SpMediaLibraryDdlSel]", json);
+                return JsonConvert.DeserializeObject<List<DropdownItem>>(result);
             }
             catch (SqlException ex)
             {

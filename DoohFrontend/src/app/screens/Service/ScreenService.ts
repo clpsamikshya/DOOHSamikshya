@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { ScreenFilter, ScreenResponse, Screens } from '../model/Screen';
+import { DropdownItemScreen, ScreenFilter, ScreenResponse, Screens } from '../model/Screen';
 import { ApiResponse } from '../../media/model/MediaLibrary';
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +32,17 @@ export class ScreenService {
             params = params.set('orientation', filter.orientation.toString());
 
         return this.http.get<ApiResponse<ScreenResponse>>(this.apiUrl, { params })
+            .pipe(catchError(this.handleError));
+    }
+
+    getScreenDdl(campaignId?: number): Observable<ApiResponse<DropdownItemScreen[]>> {
+        let params = new HttpParams();
+        
+        if (campaignId !== undefined && campaignId !== null) {
+            params = params.set('campaignId', campaignId);
+        }
+
+        return this.http.get<ApiResponse<DropdownItemScreen[]>>(`${this.apiUrl}/ddl`, { params })
             .pipe(catchError(this.handleError));
     }
 
