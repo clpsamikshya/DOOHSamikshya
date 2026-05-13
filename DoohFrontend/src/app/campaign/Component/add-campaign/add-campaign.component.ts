@@ -51,8 +51,6 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
 
   constructor(injector: Injector) {
     super(injector);
-
-    // tomorrow date (used for limits)
     const d = new Date();
     d.setDate(d.getDate() + 1);
     this.tomorrow = d;
@@ -60,24 +58,18 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
 
   ngOnInit(): void {}
 
-  // open the form (add or edit)
   onShow(data?: Campaign): void {
     this.activeStep = 0;
     this.isSubmitting = false;
     this.hasDateOverlap = false;
     this.screenSearch = '';
 
-    // if editing, copy data, else create new
-    this.campaign = data
-      ? { ...data, screenIds: [...(data.screenIds ?? [])] }
-      : new Campaign();
+    this.campaign = data ? { ...data, screenIds: [...(data.screenIds ?? [])] } : new Campaign();
 
-    // make sure date exists
     if (!this.campaign.dateRanges?.length) {
       this.campaign.dateRanges = [new CampaignDate()];
     }
 
-    // make sure screen list exists
     if (!this.campaign.screenIds) {
       this.campaign.screenIds = [];
     }
@@ -86,10 +78,8 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
     this.loadScreens();
   }
 
-  // get all screens
   loadScreens(): void {
     this.screensLoading = true;
-
     this.screenService
       .getAll({} as any)
       .pipe(takeUntil(this.destroy$))
@@ -105,97 +95,72 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
       });
   }
 
-  // search screens by name
   filterScreens(): void {
     const search = this.screenSearch?.toLowerCase() || '';
-
     this.filteredScreens = this.screens.filter((s) =>
       s.name?.toLowerCase().includes(search)
     );
   }
 
-  // check if screen is selected
   isScreenSelected(id: number): boolean {
     return this.campaign.screenIds.includes(id);
   }
 
-  // select or unselect one screen
   toggleScreen(screen: any): void {
     if (screen.status !== 1) return;
-
     const exists = this.campaign.screenIds.includes(screen.id);
-
     if (exists) {
-      this.campaign.screenIds = this.campaign.screenIds.filter(
-        (x) => x !== screen.id
-      );
+      this.campaign.screenIds = this.campaign.screenIds.filter((x) => x !== screen.id);
     } else {
       this.campaign.screenIds.push(screen.id);
     }
   }
 
-  // select or unselect all screens
   toggleAllScreens(checked: boolean): void {
     this.campaign.screenIds = checked
       ? this.screens.filter((s) => s.status === 1).map((s) => s.id)
       : [];
   }
 
-  // check if all active screens are selected
   get allScreensSelected(): boolean {
     const active = this.screens.filter((s) => s.status === 1);
-
-    return (
-      active.length > 0 &&
-      active.every((s) => this.campaign.screenIds.includes(s.id))
-    );
+    return active.length > 0 && active.every((s) => this.campaign.screenIds.includes(s.id));
   }
 
-  // open screen details popup
   openScreenInfo(screen: any): void {
     this.screenInfo?.show(screen.id);
   }
 
-  // get screen name using id
   getScreenName(id: number): string {
     return this.screens.find((s) => s.id === id)?.name ?? String(id);
   }
-
-  // add a new date row
   addDateRange(): void {
     this.campaign.dateRanges.push(new CampaignDate());
   }
 
-  // remove a date row
   removeDateRange(index: number): void {
     this.campaign.dateRanges.splice(index, 1);
     this.checkOverlap();
   }
 
-  // when user changes date
   onDateChange(): void {
     this.checkOverlap();
   }
 
-  // check if dates overlap
   checkOverlap(): void {
     this.hasDateOverlap = false;
-
     const ranges = this.campaign.dateRanges;
 
     for (let i = 0; i < ranges.length; i++) {
       if (!ranges[i].startDateTime || !ranges[i].endDateTime) continue;
-
       const aStart = new Date(ranges[i].startDateTime!).getTime();
       const aEnd = new Date(ranges[i].endDateTime!).getTime();
 
       for (let j = i + 1; j < ranges.length; j++) {
         if (!ranges[j].startDateTime || !ranges[j].endDateTime) continue;
-
         const bStart = new Date(ranges[j].startDateTime!).getTime();
         const bEnd = new Date(ranges[j].endDateTime!).getTime();
 
-        // if they overlap, mark error
         if (aStart <= bEnd && aEnd >= bStart) {
           this.hasDateOverlap = true;
           return;
@@ -204,75 +169,64 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
     }
   }
 
-  // get days between two dates
   getDurationDays(d: CampaignDate): number {
     if (!d.startDateTime || !d.endDateTime) return 0;
-
-    const diff =
-      new Date(d.endDateTime).getTime() -
-      new Date(d.startDateTime).getTime();
-
+    const diff = new Date(d.endDateTime).getTime() - new Date(d.startDateTime).getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  // total days of campaign
   get totalDurationDays(): number {
-    return this.campaign.dateRanges.reduce(
-      (sum, d) => sum + this.getDurationDays(d),
-      0
-    );
+    return this.campaign.dateRanges.reduce((sum, d) => sum + this.getDurationDays(d), 0);
   }
 
-  // go to next step
   goNext(): void {
+
     if (
       this.campaign.status === null ||
       this.campaign.status === undefined
     ) {
-      this.showMessage('Error', 'Please select status', 'error');
+      this.showMessage('Error', 'Please select campaign status', 'error');
       return;
     }
-
-    if (this.activeStep === 0 && !this.campaign.name?.trim()) {
-      this.showMessage('Error', 'Enter campaign name', 'error');
-      return;
+    if (this.activeStep === 0) {
+      if (!this.campaign.name?.trim()) {
+        this.showMessage('Error', 'Campaign name is required', 'error');
+        return;
+      }
     }
 
     if (this.activeStep === 1) {
       const hasValid = this.campaign.dateRanges.some(
         (d) => d.startDateTime && d.endDateTime
       );
-
       if (!hasValid) {
-        this.showMessage('Error', 'Add a valid date', 'error');
+        this.showMessage('Error', 'At least one complete date range is required', 'error');
         return;
       }
-
       if (this.hasDateOverlap) {
-        this.showMessage('Error', 'Dates are overlapping', 'error');
+        this.showMessage('Error', 'Date ranges must not overlap', 'error');
         return;
       }
     }
 
-    if (this.activeStep === 2 && !this.campaign.screenIds.length) {
-      this.showMessage('Error', 'Select at least one screen', 'error');
-      return;
+    if (this.activeStep === 2) {
+      if (!this.campaign.screenIds.length) {
+        this.showMessage('Error', 'At least one screen must be selected', 'error');
+        return;
+      }
     }
 
     this.activeStep++;
   }
 
-  // go back step
   goBack(): void {
     this.activeStep--;
   }
 
-  // save campaign
   onSubmit(): void {
     this.confirmAction({
-      message: 'Do you want to save this campaign?',
-      header: 'Confirm',
-
+      message: 'Are you sure you want to save this campaign?',
+      header: 'Save Confirmation',
       accept: () => {
         this.isSubmitting = true;
 
@@ -284,7 +238,7 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
           .subscribe({
             next: (res) => {
               this.isSubmitting = false;
-              this.showMessage('Success', 'Saved successfully', 'success');
+              this.showMessage('Success', 'Campaign created successfully', 'success');
               this.onSave.emit(res.data);
               this.isActive = false;
             },
@@ -294,47 +248,36 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
             },
           });
       },
-
       reject: () => {
-        this.showMessage('Cancelled', 'Save cancelled', 'info');
+        this.showMessage('Cancelled', 'Campaign creation cancelled', 'info');
       },
     });
   }
 
-  // convert data for backend
   private toLocalISO(date: Date | null): any {
     if (!date) return null;
-
     const d = new Date(date);
     const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+}
 
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}
-T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
-  }
-
-  // build request for API
-  mapToCampaignInsert(campaign: Campaign): any {
+mapToCampaignInsert(campaign: Campaign): any {
     return {
-      tenantId: 1,
-      name: campaign.name,
-      status: 1,
-      remarks: campaign.remarks,
-      createdBy: 1,
-
-      date: campaign.dateRanges
-        .filter((d) => d.startDateTime && d.endDateTime)
-        .map((d) => ({
-          startDateTime: this.toLocalISO(d.startDateTime),
-          endDateTime: this.toLocalISO(d.endDateTime),
-        })),
-
-      screen: campaign.screenIds.map((id) => ({
-        screenId: id,
-      })),
+        tenantId: 1,
+        name: campaign.name,
+        status: campaign.status,
+        remarks: campaign.remarks,
+        createdBy: 1,
+        date: campaign.dateRanges
+            .filter((d) => d.startDateTime && d.endDateTime)
+            .map((d) => ({
+                startDateTime: this.toLocalISO(d.startDateTime),
+                endDateTime: this.toLocalISO(d.endDateTime),
+            })),
+        screen: campaign.screenIds.map((id) => ({ screenId: id })),
     };
-  }
+}
 
-  // close form
   onCancel(): void {
     this.isActive = false;
   }

@@ -17,11 +17,11 @@ namespace DoohSamikshya.Model.Application.Dbo
         public CampaignStatus Status { get; set; }
         public int DurationInDays { get; set; }
         public string? Remarks { get; set; }
-
+        public int CreatedBy { get; set; }
         public List<CampaignDate> Date { get; set; }
         public List<CampaignScreen> Screen { get; set; }
 
-        public List<CampaignMediaGroup> CampaignMedia { get; set; }
+        public List<CampaignMediaGroup>? CampaignMedia { get; set; }
     }
 
     public class CampaignFilter
