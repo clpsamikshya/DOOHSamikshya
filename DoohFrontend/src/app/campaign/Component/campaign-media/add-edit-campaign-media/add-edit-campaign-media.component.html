@@ -6,14 +6,10 @@
     [style]="{ width: '650px' }"
     [header]="existingData ? 'Edit Campaign Media' : 'Add Campaign Media'"
 >
-
     <!-- ================= FORM SECTION ================= -->
     <div class="section">
-
         <div class="section-title">Campaign Media Form</div>
-
         <div class="form-grid">
-
             <!-- Screen -->
             <div class="flex flex-column gap-2">
                 <label>Screen *</label>
@@ -27,7 +23,6 @@
                     [filter]="true"
                 ></p-dropdown>
             </div>
-
             <!-- Media -->
             <div class="flex flex-column gap-2">
                 <label>Media *</label>
@@ -41,7 +36,6 @@
                     [filter]="true"
                 ></p-dropdown>
             </div>
-
             <!-- Play Date -->
             <div class="flex flex-column gap-2">
                 <label>Play Date *</label>
@@ -51,47 +45,111 @@
                     [(ngModel)]="campaignMedia.playDate"
                 />
             </div>
-
             <!-- Time -->
             <div class="time-grid">
-
                 <div class="flex flex-column gap-2">
                     <label>Start *</label>
-                    <input type="time" pInputText [(ngModel)]="campaignMedia.startTime" />
+                    <input
+                        type="time"
+                        pInputText
+                        [(ngModel)]="campaignMedia.startTime"
+                    />
                 </div>
-
                 <div class="flex flex-column gap-2">
                     <label>End *</label>
-                    <input type="time" pInputText [(ngModel)]="campaignMedia.endTime" />
+                    <input
+                        type="time"
+                        pInputText
+                        [(ngModel)]="campaignMedia.endTime"
+                    />
                 </div>
-
             </div>
-
             <!-- Duration -->
             <div class="flex flex-column gap-2">
                 <label>Duration</label>
-                <p-inputNumber [(ngModel)]="campaignMedia.duration" [min]="0"></p-inputNumber>
+                <p-inputNumber
+                    [(ngModel)]="campaignMedia.duration"
+                    [min]="0"
+                ></p-inputNumber>
             </div>
-
             <!-- Order -->
             <div class="flex flex-column gap-2">
                 <label>Order</label>
-                <p-inputNumber [(ngModel)]="campaignMedia.order" [min]="1"></p-inputNumber>
+                <p-inputNumber
+                    [(ngModel)]="campaignMedia.order"
+                    [min]="1"
+                ></p-inputNumber>
             </div>
-
         </div>
     </div>
 
-    <!-- ================= EXISTING DATA SECTION ================= -->
-    <div class="section info-section">
-
+    <!-- ================= MEDIA INFO SECTION ================= -->
+    <div class="section" *ngIf="mediaInfoData.length > 0" (click)="$event.stopPropagation()">
         <div class="section-title">Existing Campaign Media</div>
-
-        <campaign-media-info
-            *ngIf="campaignMedia.campaignId > 0"
-            [campaignId]="campaignMedia.campaignId">
-        </campaign-media-info>
-
+        <p-table
+            [value]="mediaInfoData"
+            [scrollable]="true"
+            scrollHeight="250px"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Screen</th>
+                    <th>Media</th>
+                    <th>Play Date</th>
+                    <th>Play Order</th>
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-row>
+                <tr>
+                    <td>{{ row.screenName }}</td>
+                    <td>{{ row.mediaName }}</td>
+                    <td>{{ row.playDate | date: 'yyyy-MM-dd' }}</td>
+                    <!-- <td>
+                        <p-inputNumber
+                            [(ngModel)]="row.playOrder"
+                            [min]="1"
+                            [showButtons]="false"
+                            (onBlur)="onPlayOrderChange(row)">
+                        </p-inputNumber>
+                    </td> -->
+                    <td>
+                        <div class="flex align-items-center gap-2">
+                            <p-inputNumber
+                                [(ngModel)]="row.playOrder"
+                                [min]="1"
+                                [showButtons]="false"
+                            >
+                            </p-inputNumber>
+                            <p-button
+                                icon="pi pi-check"
+                                severity="success"
+                                [text]="true"
+                                (onClick)="
+                                    onPlayOrderChange(row);
+                                    $event.stopPropagation()
+                                "
+                            >
+                            </p-button>
+                        </div>
+                    </td>
+                    <td>
+                        <p-button
+                            icon="pi pi-trash"
+                            severity="danger"
+                            [text]="true"
+                            (onClick)="deleteMediaRow(row)"
+                        >
+                        </p-button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="5" class="text-center">No media found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </div>
 
     <!-- ================= FOOTER ================= -->
@@ -100,15 +158,11 @@
             <p-button
                 label="Cancel"
                 severity="secondary"
-                (onClick)="onCancel()">
+                (onClick)="onCancel()"
+            >
             </p-button>
-
-            <p-button
-                label="Save"
-                severity="primary"
-                (onClick)="onSubmit()">
+            <p-button label="Save" severity="primary" (onClick)="onSubmit()">
             </p-button>
         </div>
     </ng-template>
-
 </p-dialog>

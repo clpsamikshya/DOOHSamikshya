@@ -4,26 +4,21 @@
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
-    [style]="{ width: '650px' }"
+    [style]="{ width: '900px' }"
     (onHide)="close()"
 >
     <div class="campaign-info" *ngIf="campaign">
-
         <p-tabView>
-
             <!-- ================= BASIC TAB ================= -->
             <p-tabPanel header="Details">
-
                 <!-- BASIC INFO -->
                 <div class="section">
                     <div class="section-title">Basic Information</div>
-
                     <div class="info-grid">
                         <div class="info-item">
                             <label>Name</label>
                             <span>{{ campaign.name }}</span>
                         </div>
-
                         <div class="info-item">
                             <label>Status</label>
                             <p-tag
@@ -31,47 +26,49 @@
                                 [severity]="getStatusSeverity(campaign.status)"
                             />
                         </div>
-
                         <div class="info-item">
                             <label>Duration</label>
                             <span>{{ campaign.durationInDays }} day(s)</span>
                         </div>
-
                         <div class="info-item">
                             <label>Remarks</label>
                             <span>{{ campaign.remarks || '—' }}</span>
                         </div>
                     </div>
                 </div>
-
                 <!-- DATE RANGES -->
                 <div class="section">
                     <div class="section-title">Date Ranges</div>
-
                     <div *ngIf="campaign.dateRanges?.length; else noDates">
-                        <div class="date-item" *ngFor="let d of campaign.dateRanges; let i = index">
+                        <div
+                            class="date-item"
+                            *ngFor="let d of campaign.dateRanges; let i = index"
+                        >
                             <span class="date-index">{{ i + 1 }}</span>
                             <span>
-                                {{ d.startDateTime | date: 'dd MMM yyyy, HH:mm' }}
+                                {{
+                                    d.startDateTime | date: 'dd MMM yyyy, HH:mm'
+                                }}
                                 →
                                 {{ d.endDateTime | date: 'dd MMM yyyy, HH:mm' }}
                             </span>
                         </div>
                     </div>
-
                     <ng-template #noDates>
                         <span class="empty-text">No date ranges found.</span>
                     </ng-template>
                 </div>
-
                 <!-- SCREENS -->
                 <div class="section">
                     <div class="section-title">Screens</div>
-
                     <div *ngIf="campaign.screen?.length; else noScreens">
-                        <div class="screen-item" *ngFor="let screen of campaign.screen">
-                            <span class="screen-name">{{ screen.screenName }}</span>
-
+                        <div
+                            class="screen-item"
+                            *ngFor="let screen of campaign.screen"
+                        >
+                            <span class="screen-name">{{
+                                screen.screenName
+                            }}</span>
                             <p-tag
                                 *ngIf="screen.isDeleted"
                                 value="Deleted"
@@ -79,28 +76,150 @@
                             />
                         </div>
                     </div>
-
                     <ng-template #noScreens>
                         <span class="empty-text">No screens assigned.</span>
                     </ng-template>
                 </div>
-
             </p-tabPanel>
 
             <!-- ================= MEDIA TAB ================= -->
             <p-tabPanel header="Media">
+                <div *ngIf="campaign?.campaignMedia?.length; else noMedia">
+                    <div class="media-container">
+                        <div
+                            class="media-group"
+                            *ngFor="let mediaGroup of campaign?.campaignMedia"
+                        >
+                            <!-- HEADER -->
+                            <div class="media-group-header">
+                                <div class="media-group-info">
+                                    <i class="pi pi-desktop"></i>
 
-                <campaign-media-info
-                    *ngIf="campaign?.id"
-                    [campaignId]="campaign.id"
-                ></campaign-media-info>
+                                    <span class="screen-name">
+                                        {{ mediaGroup.screenName }}
+                                    </span>
 
+                                    <span class="separator">•</span>
+
+                                    <i class="pi pi-calendar"></i>
+
+                                    <span class="play-date">
+                                        {{
+                                            mediaGroup.playDate
+                                                | date: 'dd MMM yyyy'
+                                        }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- MEDIA LIST -->
+                            <div class="media-list">
+                                <div
+                                    class="media-item"
+                                    *ngFor="let media of mediaGroup.media"
+                                >
+                                    <!-- ORDER -->
+                                    <div class="media-order">
+                                        <span class="order-badge">
+                                            {{ media.playOrder }}
+                                        </span>
+                                    </div>
+
+                                    <!-- DETAILS -->
+                                    <div class="media-details">
+                                        <!-- 🔴 ADD PREVIEW HERE -->
+                                        <div
+                                            class="media-preview"
+                                            *ngIf="media.Url"
+                                        >
+                                            <img
+                                                *ngIf="!media.mediaType"
+                                                [src]="media.Url"
+                                                class="preview-img"
+                                            />
+
+                                            <video
+                                                *ngIf="media.mediaType"
+                                                [src]="media.Url"
+                                                controls
+                                                class="preview-video"
+                                            ></video>
+                                        </div>
+
+                                        <!-- fallback -->
+                                        <div
+                                            class="media-preview empty"
+                                            *ngIf="!media.Url"
+                                        >
+                                        <!-- <div
+                                            class="media-preview"
+                                            *ngIf="media.Url"
+                                            (click)="
+                                                openMedia(
+                                                    media.Url,
+                                                    media.mediaType
+                                                )
+                                            "
+                                        > -->
+                                            No preview available
+                                        </div>
+
+                                        <!-- NAME -->
+                                        <div class="media-name">
+                                            {{ media.mediaName }}
+                                        </div>
+
+                                        <!-- META -->
+                                        <div class="media-meta">
+                                            <p-tag
+                                                [value]="
+                                                    getMediaTypeLabel(
+                                                        media.mediaType
+                                                    )
+                                                "
+                                                [severity]="
+                                                    getMediaTypeSeverity(
+                                                        media.mediaType
+                                                    )
+                                                "
+                                                [style]="{
+                                                    'font-size': '0.75rem',
+                                                }"
+                                            />
+
+                                            <span class="meta-separator"
+                                                >•</span
+                                            >
+
+                                            <span class="meta-text">
+                                                Added
+                                                {{
+                                                    media.createdAt
+                                                        | date: 'dd MMM yyyy'
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noMedia>
+                    <div class="empty-state">
+                        <i
+                            class="pi pi-image"
+                            style="font-size: 3rem; color: #ccc"
+                        ></i>
+                        <p class="empty-text">
+                            No media assigned to this campaign.
+                        </p>
+                    </div>
+                </ng-template>
             </p-tabPanel>
-
         </p-tabView>
-
     </div>
-
     <ng-template pTemplate="footer">
         <p-button
             label="Close"

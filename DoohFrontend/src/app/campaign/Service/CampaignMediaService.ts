@@ -5,7 +5,6 @@ import {
     ApiResponse,
     CampaignMedia,
     CampaignMediaFilter,
-    CampaignMediaList,
     CampaignMediaRequest,
     CampaignMediaResponse,
 } from '../Model/CampaignMedia';
@@ -25,28 +24,30 @@ export class CampaignMediaService {
         return throwError(() => new Error(message));
     }
 
-    getCampaignMedia(
-        filter: CampaignMediaFilter,
-    ): Observable<ApiResponse<CampaignMediaList>> {
-        let params = new HttpParams()
-            .set('offset', filter.offset ?? 0)
-            .set('pageSize', filter.pageSize ?? 10);
+   getCampaignMedia(
+    filter: CampaignMediaFilter,
+): Observable<ApiResponse<CampaignMedia[]>> {
 
-        if (filter.campaignId !== undefined && filter.campaignId !== null) {
-            params = params.set('campaignId', filter.campaignId);
-        }
+    let params = new HttpParams()
+        .set('offset', filter.offset ?? 0)
+        .set('pageSize', filter.pageSize ?? 10);
 
-        if (filter.screenId !== undefined && filter.screenId !== null) {
-            params = params.set('screenId', filter.screenId);
-        }
-
-        if (filter.playDate) {
-            params = params.set('playDate', filter.playDate);
-        }
-        return this.http
-            .get<ApiResponse<CampaignMediaList>>(this.apiUrl, { params })
-            .pipe(catchError(this.handleError));
+    if (filter.campaignId != null) {
+        params = params.set('campaignId', filter.campaignId);
     }
+
+    if (filter.screenId != null) {
+        params = params.set('screenId', filter.screenId);
+    }
+
+    if (filter.playDate) {
+        params = params.set('playDate', filter.playDate);
+    }
+
+    return this.http
+        .get<ApiResponse<CampaignMedia[]>>(this.apiUrl, { params })
+        .pipe(catchError(this.handleError));
+}
 
     addCampaignMedia(
         request: CampaignMediaRequest,
@@ -60,7 +61,7 @@ export class CampaignMediaService {
         request: CampaignMediaRequest,
     ): Observable<ApiResponse<CampaignMediaResponse>> {
         return this.http
-            .post<ApiResponse<CampaignMediaResponse>>(`${this.apiUrl}`, request)
+            .put<ApiResponse<CampaignMediaResponse>>(`${this.apiUrl}`, request)
             .pipe(catchError(this.handleError));
     }
 

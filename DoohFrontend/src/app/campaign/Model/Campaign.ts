@@ -1,3 +1,5 @@
+
+
 export interface ApiResponse<T> {
     success: boolean;
     message: string;
@@ -55,14 +57,17 @@ export class Campaign {
     createdAt?: string;
     updatedAt?: string;
 
-    createdBy: number; 
+    createdBy: number;
     updatedBy: number;
 
     deletedAt?: string | null;
     deletedBy?: number | null;
 
-    dateRanges: CampaignDate[];  
+    dateRanges: CampaignDate[];
     screen: CampaignScreen[];
+
+    // SP response model
+    campaignMedia: CampaignMediaGroup[];
 
     screenIds: number[];
 
@@ -78,14 +83,17 @@ export class Campaign {
         this.createdAt = new Date().toISOString();
         this.updatedAt = new Date().toISOString();
 
-        this.createdBy = 1; 
+        this.createdBy = 1;
         this.updatedBy = 1;
 
         this.deletedAt = null;
         this.deletedBy = null;
 
-        this.dateRanges = []; 
+        this.dateRanges = [];
         this.screen = [];
+
+        this.campaignMedia = [];
+
         this.screenIds = [];
     }
 }
@@ -96,20 +104,25 @@ export interface CampaignResponse {
 }
 
 export class CampaignInsert {
-
     tenantId: number = 1;
+
     name: string = '';
     status: number = 1;
     remarks: string = '';
+
     createdBy: number = 1;
+
     date: { startDateTime: string; endDateTime: string }[] = [];
-    screen: { screenId: number }[] = []; 
+
+    screen: { screenId: number }[] = [];
 
     constructor() {
         this.tenantId = 0;
+
         this.name = '';
         this.status = 1;
         this.remarks = '';
+
         this.createdBy = 1;
 
         this.date = [];
@@ -119,23 +132,76 @@ export class CampaignInsert {
 
 export class CampaignUpdate {
     id: number;
+
     name: string;
     status: number;
     remarks: string;
 
     updatedBy: number;
 
-    dateRanges: CampaignDate[];  
+    dateRanges: CampaignDate[];
     screenIds: number[];
 
     constructor() {
         this.id = 0;
+
         this.name = '';
         this.status = 1;
         this.remarks = '';
+
         this.updatedBy = 1;
 
         this.dateRanges = [];
         this.screenIds = [];
+    }
+}
+
+export class CampaignMediaItem {
+    id: number;
+    mediaId: number;
+
+    mediaName: string;
+    mediaType: boolean;
+    Url:  string;
+    playOrder: number;
+
+    createdAt?: string;
+    createdBy?: number;
+
+    constructor() {
+        this.id = 0;
+        this.mediaId = 0;
+
+        this.mediaName = '';
+        this.mediaType = false;
+         this.Url = '';
+        this.playOrder = 1;
+
+        this.createdAt = '';
+        this.createdBy = 0;
+    }
+}
+
+export class CampaignMediaGroup {
+    screenId: number;
+    screenName: string;
+
+    playDate: string;
+
+    createdAt?: string;
+    createdBy?: number;
+
+    media: CampaignMediaItem[];
+
+    constructor() {
+        this.screenId = 0;
+        this.screenName = '';
+
+        this.playDate = '';
+
+        this.createdAt = '';
+        this.createdBy = 0;
+
+        this.media = [];
     }
 }

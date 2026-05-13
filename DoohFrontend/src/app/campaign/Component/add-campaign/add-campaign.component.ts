@@ -265,7 +265,7 @@ mapToCampaignInsert(campaign: Campaign): any {
     return {
         tenantId: 1,
         name: campaign.name,
-        status: campaign.status,
+        status: 1,
         remarks: campaign.remarks,
         createdBy: 1,
         date: campaign.dateRanges

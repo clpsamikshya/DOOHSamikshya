@@ -11,23 +11,17 @@ namespace DoohSamikshya.Model.Application.Dbo
 {
     public class Campaign
     {
-          public int Id { get; set; }
-          public int TenantId { get; set; }
+        public int Id { get; set; }
+        public int TenantId { get; set; }
+        public string Name { get; set; }
+        public CampaignStatus Status { get; set; }
+        public int DurationInDays { get; set; }
+        public string? Remarks { get; set; }
 
-         [Required]
-          public string Name { get; set; }
-          public CampaignStatus Status { get; set; } = CampaignStatus.New;
-          public int DurationInDays { get; set; }
-          public string? Remarks { get; set; }
-         public bool IsDeleted { get; set; } = false;
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
-        public int? CreatedBy { get; set; }
-        public int UpdatedBy { get; set; }
-        public int? DeletedBy { get; set; }
-        public List<CampaignDate> Date { get; set; } = new();
-        public List<CampaignScreen> Screen { get; set; } = new();
-        
+        public List<CampaignDate> Date { get; set; }
+        public List<CampaignScreen> Screen { get; set; }
+
+        public List<CampaignMediaGroup> CampaignMedia { get; set; }
     }
 
     public class CampaignFilter
@@ -44,5 +38,17 @@ namespace DoohSamikshya.Model.Application.Dbo
     {
         public int TotalRows { get; set; }
         public List<Campaign>? Data { get; set; }
+    }
+
+    public class CampaignMediaGroup
+    {
+        public int ScreenId { get; set; }
+        public string ScreenName { get; set; }
+
+        public DateTime? PlayDate { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public int CreatedBy { get; set; }
+
+        public List<MediaItem> Media { get; set; } = new();
     }
 }

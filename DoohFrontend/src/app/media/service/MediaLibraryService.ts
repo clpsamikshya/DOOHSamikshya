@@ -35,6 +35,10 @@ export class MediaLibraryService {
             .pipe(catchError(this.handleError));
     }
 
+    getMediaById(id: number): Observable<any> {
+  return this.http.get(`${this.api}/media/${id}`);
+}
+
     getMediaLibraryDdl(campaignId?: number): Observable<ApiResponse<DropdownItemMedia[]>> {
         let params = new HttpParams();
         
