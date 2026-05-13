@@ -1,16 +1,13 @@
-import {
-    Component,
-    Injector,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-import { sharedImports } from '../../../shared/sharedImports';
-import { AppComponent } from '../../../app.component';
-import { Campaign, CampaignFilter } from '../../Model/Campaign';
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
+
+import { AppComponent } from '../../../app.component';
+import { sharedImports } from '../../../shared/sharedImports';
+
+import { Campaign, CampaignFilter } from '../../Model/Campaign';
 import { CampaignStatus } from '../../Model/CampaignEnum';
+
 import { AddCampaignComponent } from '../add-campaign/add-campaign.component';
 import { CampaignInfoComponent } from '../campaign-info/campaign-info.component';
 import { AddEditCampaignMediaComponent } from '../campaign-media/add-edit-campaign-media/add-edit-campaign-media.component';
@@ -27,37 +24,16 @@ import { AddEditCampaignMediaComponent } from '../campaign-media/add-edit-campai
     templateUrl: './campaign-list.component.html',
     styleUrl: './campaign-list.component.scss',
 })
-export class CampaignListComponent
-    extends AppComponent
-    implements OnInit, OnDestroy
-{
-    @ViewChild('addedit') addedit!: AddCampaignComponent;
-    @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
-    @ViewChild('campaignMedia') campaignMedia!: AddEditCampaignMediaComponent;
+export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
 
-    private readonly destroy$ = new Subject<void>();
-    CampaignStatus = CampaignStatus;
-    isLoading = false;
+    private destroy$ = new Subject<void>();
 
     campaigns: Campaign[] = [];
-
-    totalRecords = 0;
+    isLoading = false;
     pageSize = 10;
+    totalRecords = 0;
 
-    filter: CampaignFilter = {
-        search: '',
-        status: null,
-        campaignId: null,
-        offset: 0,
-        pageSize: 10,
-    };
-
-    constructor(
-        injector: Injector,
-        private route: ActivatedRoute,
-    ) {
-        super(injector);
-    }
+    CampaignStatus = CampaignStatus;
 
     statusOptions = [
         { label: 'New', value: CampaignStatus.New },
@@ -67,16 +43,55 @@ export class CampaignListComponent
         { label: 'Cancelled', value: CampaignStatus.Cancelled },
     ];
 
-    ngOnInit(): void {
-        this.loadCampaigns();
+    filter: CampaignFilter = {
+        search: '',
+        status: null,
+        campaignId: null,
+        offset: 0,
+        pageSize: 10,
+    };
+
+    @ViewChild('addedit') addedit!: AddCampaignComponent;
+    @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
+    @ViewChild('campaignMedia') campaignMedia!: AddEditCampaignMediaComponent;
+
+    constructor(
+        injector: Injector,
+        private route: ActivatedRoute
+    ) {
+        super(injector);
     }
 
-    applyFilter(): void {
-        this.filter = {
-            ...this.filter,
-            offset: 0,
-        };
+    ngOnInit(): void {
+        this.route.queryParams
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(params => {
+                this.filter.search = params['q'] ?? '';
+                this.loadCampaigns();
+            });
+    }
 
+    /* ================= LOAD ================= */
+    loadCampaigns(): void {
+        this.isLoading = true;
+
+        this.campaignService.getCampaigns(this.filter)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (res) => {
+                    this.campaigns = res?.data?.data ?? [];
+                    this.totalRecords = res?.data?.totalRows ?? 0;
+                    this.isLoading = false;
+                },
+                error: (err) => {
+                    this.isLoading = false;
+                    this.showMessage('Error', err.message, 'error');
+                },
+            });
+    }
+
+    /* ================= FILTER ================= */
+    applyFilter(): void {
         this.loadCampaigns();
     }
 
@@ -88,28 +103,17 @@ export class CampaignListComponent
             offset: 0,
             pageSize: this.pageSize,
         };
-
         this.loadCampaigns();
     }
 
-    onSaveCampaign(): void {
-        this.loadCampaigns();
-    }
-
+    /* ================= PAGINATION ================= */
     onPageChange(event: any): void {
-        this.filter = {
-            ...this.filter,
-            offset: event.first,
-            pageSize: event.rows,
-        };
-
+        this.filter.offset = event.first;
+        this.filter.pageSize = event.rows;
         this.loadCampaigns();
     }
 
-    openCampaignMedia(campaign: Campaign): void {
-        this.campaignMedia?.onShow(campaign.id);
-    }
-
+    /* ================= ACTIONS ================= */
     openAddCampaign(): void {
         this.addedit?.onShow();
     }
@@ -118,61 +122,38 @@ export class CampaignListComponent
         this.campaignInfo?.show(campaign);
     }
 
-    loadCampaigns(): void {
-        this.isLoading = true;
-
-        this.campaignService
-            .getCampaigns(this.filter)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    this.campaigns = res.data?.data ?? [];
-
-                    this.totalRecords = res.data?.totalRows ?? 0;
-
-                    this.isLoading = false;
-                },
-
-                error: (err: Error) => {
-                    this.isLoading = false;
-
-                    this.showMessage('Error', err.message, 'error');
-                },
-            });
+    openCampaignMedia(campaign: Campaign): void {
+        this.campaignMedia?.onShow(campaign.id);
     }
 
+    onSaveCampaign(): void {
+        this.loadCampaigns();
+    }
+
+    /* ================= DELETE ================= */
     deleteCampaign(campaign: Campaign): void {
         this.confirmAction({
-            message: `Are you sure you want to delete campaign ${campaign.name}?`,
-            header: 'Confirm Deletion',
+            message: `Are you sure you want to delete ${campaign.name}?`,
+            header: 'Delete Confirmation',
 
             accept: () => {
-                this.campaignService
-                    .deleteCampaign(campaign.id)
+                this.campaignService.deleteCampaign(campaign.id)
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: () => {
-                            this.showMessage(
-                                'Success',
-                                'Campaign deleted successfully',
-                                'success',
-                            );
+                            this.showMessage('Success', 'Deleted successfully', 'success');
                             this.loadCampaigns();
                         },
-                        error: (err: Error) => {
+                        error: (err) => {
                             this.showMessage('Error', err.message, 'error');
                         },
                     });
             },
 
             reject: () => {
-                this.showMessage('Info', 'Campaign deletion cancelled', 'info');
+                this.showMessage('Info', 'Cancelled', 'info');
             },
         });
-    }
-
-    onCanclel(): void {
-        this.addedit?.onCancel();
     }
 
     ngOnDestroy(): void {

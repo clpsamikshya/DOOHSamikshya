@@ -94,21 +94,15 @@
                             <div class="media-group-header">
                                 <div class="media-group-info">
                                     <i class="pi pi-desktop"></i>
-
-                                    <span class="screen-name">
-                                        {{ mediaGroup.screenName }}
-                                    </span>
-
+                                    <span class="screen-name">{{
+                                        mediaGroup.screenName
+                                    }}</span>
                                     <span class="separator">•</span>
-
                                     <i class="pi pi-calendar"></i>
-
-                                    <span class="play-date">
-                                        {{
-                                            mediaGroup.playDate
-                                                | date: 'dd MMM yyyy'
-                                        }}
-                                    </span>
+                                    <span class="play-date">{{
+                                        mediaGroup.playDate
+                                            | date: 'dd MMM yyyy'
+                                    }}</span>
                                 </div>
                             </div>
 
@@ -120,24 +114,24 @@
                                 >
                                     <!-- ORDER -->
                                     <div class="media-order">
-                                        <span class="order-badge">
-                                            {{ media.playOrder }}
-                                        </span>
+                                        <span class="order-badge">{{
+                                            media.playOrder
+                                        }}</span>
                                     </div>
 
                                     <!-- DETAILS -->
                                     <div class="media-details">
-                                        <!-- 🔴 ADD PREVIEW HERE -->
+                                        <!-- PREVIEW -->
                                         <div
                                             class="media-preview"
-                                            *ngIf="media.Url"
+                                            *ngIf="media.Url; else noPreview"
                                         >
                                             <img
                                                 *ngIf="!media.mediaType"
                                                 [src]="media.Url"
                                                 class="preview-img"
+                                                alt="{{ media.mediaName }}"
                                             />
-
                                             <video
                                                 *ngIf="media.mediaType"
                                                 [src]="media.Url"
@@ -146,23 +140,11 @@
                                             ></video>
                                         </div>
 
-                                        <!-- fallback -->
-                                        <div
-                                            class="media-preview empty"
-                                            *ngIf="!media.Url"
-                                        >
-                                        <!-- <div
-                                            class="media-preview"
-                                            *ngIf="media.Url"
-                                            (click)="
-                                                openMedia(
-                                                    media.Url,
-                                                    media.mediaType
-                                                )
-                                            "
-                                        > -->
-                                            No preview available
-                                        </div>
+                                        <ng-template #noPreview>
+                                            <div class="media-preview empty">
+                                                No preview available
+                                            </div>
+                                        </ng-template>
 
                                         <!-- NAME -->
                                         <div class="media-name">
@@ -186,11 +168,9 @@
                                                     'font-size': '0.75rem',
                                                 }"
                                             />
-
                                             <span class="meta-separator"
                                                 >•</span
                                             >
-
                                             <span class="meta-text">
                                                 Added
                                                 {{

@@ -2,30 +2,26 @@ import { Component, Injector, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
 import { AppComponent } from '../../../app.component';
-
 import { sharedImports } from '../../../shared/sharedImports';
 
-import {
-    Campaign,
-    CampaignMediaGroup,
-    CampaignMediaItem,
-} from '../../Model/Campaign';
-
+import { Campaign, CampaignMediaGroup, CampaignMediaItem } from '../../Model/Campaign';
 import { CampaignStatus } from '../../Model/CampaignEnum';
 
-import { CampaignMediaInfoComponent } from '../campaign-media/campaign-media-info/campaign-media-info.component';
 
 @Component({
     selector: 'campaign-info',
     standalone: true,
-    imports: [...sharedImports, CampaignMediaInfoComponent],
+    imports: [...sharedImports],
     templateUrl: './campaign-info.component.html',
     styleUrl: './campaign-info.component.scss',
 })
 export class CampaignInfoComponent extends AppComponent implements OnDestroy {
+
     private destroy$ = new Subject<void>();
 
+    // ✅ FIX: match HTML
     isShow = false;
+
     isLoading = false;
 
     campaign: Campaign | null = null;
@@ -44,166 +40,127 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
         super(injector);
     }
 
+    /* ================= OPEN ================= */
     show(campaign: Campaign): void {
         this.campaign = campaign;
+
+        // FIX: keep HTML working
         this.isShow = true;
 
-        this.loadCampaign(campaign.id);
+        this.loadData(campaign.id);
     }
 
-    loadCampaign(id: number): void {
+    /* ================= LOAD ================= */
+    loadData(id: number): void {
         this.isLoading = true;
 
-        this.campaignService
-            .getCampaigns({
-                campaignId: id,
-                offset: 0,
-                pageSize: 1,
-                search: '',
-                status: null,
-            })
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    console.log('Full API response:', res);
+        this.campaignService.getCampaigns({
+            campaignId: id,
+            offset: 0,
+            pageSize: 1,
+            search: '',
+            status: null,
+        })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+            next: (res: any) => {
 
-                    const raw = res.data?.data?.[0] as any;
+                const data = res?.data?.data?.[0];
 
-                    console.log('Raw campaign:', raw);
-                    console.log('Raw screen data:', raw?.screen);
-                    console.log('Raw campaign media:', raw?.campaignMedia);
-
-                    if (raw) {
-                        this.campaign = {
-                            ...raw,
-
-                            dateRanges: raw.date ?? raw.dateRanges ?? [],
-
-                            screen: (raw.screen ?? []).map((s: any) => ({
-                                id: s.id ?? s.Id,
-                                campaignId: s.campaignId ?? s.CampaignId,
-                                screenId: s.screenId ?? s.ScreenId,
-                                screenName: s.screenName ?? s.ScreenName ?? '—',
-                                isDeleted: s.isDeleted ?? s.IsDeleted ?? false,
-                            })),
-
-                            campaignMedia: (
-                                raw.campaignMedia ??
-                                raw.CampaignMedia ??
-                                []
-                            ).map((cm: any) => {
-                                const mediaGroup = new CampaignMediaGroup();
-
-                                mediaGroup.screenId =
-                                    cm.screenId ?? cm.ScreenId;
-                                mediaGroup.screenName =
-                                    cm.screenName ?? cm.ScreenName ?? '—';
-                                mediaGroup.playDate =
-                                    cm.playDate ?? cm.PlayDate ?? '';
-
-                                mediaGroup.createdAt =
-                                    cm.createdAt ?? cm.CreatedAt ?? '';
-                                mediaGroup.createdBy =
-                                    cm.createdBy ?? cm.CreatedBy ?? 0;
-
-                                mediaGroup.media = (
-                                    cm.media ??
-                                    cm.Media ??
-                                    []
-                                ).map((m: any) => {
-                                    const media = new CampaignMediaItem();
-
-                                    media.id = m.id ?? m.Id;
-                                    media.mediaId = m.mediaId ?? m.MediaId;
-
-                                    media.mediaName =
-                                        m.mediaName ?? m.MediaName ?? '—';
-                                    media.mediaType =
-                                        m.mediaType ?? m.MediaType ?? false;
-
-                                    media.playOrder = Number(
-                                        m.playOrder ?? m.PlayOrder ?? 1,
-                                    );
-
-                                    media.createdAt =
-                                        m.createdAt ?? m.CreatedAt ?? '';
-                                    media.createdBy =
-                                        m.createdBy ?? m.CreatedBy ?? 0;
-
-                                    media.Url = m.url ?? '';
-
-                                    return media;
-                                });
-
-                                return mediaGroup;
-                            }),
-
-                            screenIds: (raw.screen ?? []).map(
-                                (s: any) => s.screenId ?? s.ScreenId,
-                            ),
-                        };
-                    }
-
+                if (!data) {
                     this.isLoading = false;
-                },
+                    return;
+                }
 
-                error: (err) => {
-                    this.isLoading = false;
+                this.campaign = {
+                    ...data,
 
-                    this.showMessage('Error', err.message, 'error');
-                },
-            });
+                    dateRanges: data?.date ?? [],
+
+                    screen: (data?.screen ?? []).map((s: any) => ({
+                        id: s?.id ?? s?.Id,
+                        campaignId: s?.campaignId ?? s?.CampaignId,
+                        screenId: s?.screenId ?? s?.ScreenId,
+                        screenName: s?.screenName ?? s?.ScreenName ?? '—',
+                        isDeleted: s?.isDeleted ?? false,
+                    })),
+
+                    campaignMedia: (data?.campaignMedia ?? []).map((cm: any) => {
+
+                        const group = new CampaignMediaGroup();
+
+                        group.screenId = cm?.screenId ?? cm?.ScreenId;
+                        group.screenName = cm?.screenName ?? cm?.ScreenName ?? '—';
+                        group.playDate = cm?.playDate ?? '';
+                        group.createdAt = cm?.createdAt ?? '';
+                        group.createdBy = cm?.createdBy ?? 0;
+
+                        group.media = (cm?.media ?? []).map((m: any) => {
+
+                            const item = new CampaignMediaItem();
+
+                            item.id = m?.id ?? m?.Id;
+                            item.mediaId = m?.mediaId ?? m?.MediaId;
+                            item.mediaName = m?.mediaName ?? '—';
+                            item.mediaType = m?.mediaType ?? false;
+                            item.playOrder = Number(m?.playOrder ?? 1);
+                            item.Url = m?.url ?? '';
+
+                            return item;
+                        });
+
+                        return group;
+                    }),
+
+                    screenIds: (data?.screen ?? []).map(
+                        (s: any) => s?.screenId ?? s?.ScreenId
+                    ),
+                } as Campaign;
+
+                this.isLoading = false;
+            },
+
+            error: (err) => {
+                this.isLoading = false;
+                this.showMessage('Error', err.message, 'error');
+            }
+        });
     }
-// openMedia(url: string, isVideo: boolean): void {
-//     if (isVideo) {
-//         window.open(url, '_blank');
-//     } else {
-//         window.open(url, '_blank');
-//     }
-// }
+
+    /* ================= FIXED METHODS (MATCH HTML) ================= */
+
+    getStatusSeverity(status: number) {
+        switch (status) {
+            case CampaignStatus.Active:
+                return 'success';
+            case CampaignStatus.Paused:
+                return 'warning';
+            case CampaignStatus.Cancelled:
+                return 'danger';
+            case CampaignStatus.Completed:
+                return 'info';
+            default:
+                return 'secondary';
+        }
+    }
+
+    // FIX: match template name
     getMediaTypeLabel(isVideo: boolean): string {
         return isVideo ? 'Video' : 'Image';
     }
 
+    // FIX: add missing method used in HTML
     getMediaTypeSeverity(isVideo: boolean): 'info' | 'success' {
         return isVideo ? 'info' : 'success';
     }
 
     getStatusLabel(status: number): string {
         return (
-            this.statusOptions.find((s) => s.value === status)?.label ??
-            'Unknown'
+            this.statusOptions.find(s => s.value === status)?.label ?? 'Unknown'
         );
     }
 
-    getStatusSeverity(
-        status: number,
-    ):
-        | 'success'
-        | 'info'
-        | 'warning'
-        | 'danger'
-        | 'secondary'
-        | 'contrast'
-        | undefined {
-        switch (status) {
-            case CampaignStatus.Active:
-                return 'success';
-
-            case CampaignStatus.Paused:
-                return 'warning';
-
-            case CampaignStatus.Cancelled:
-                return 'danger';
-
-            case CampaignStatus.Completed:
-                return 'info';
-
-            default:
-                return 'secondary';
-        }
-    }
-
+    /* ================= CLOSE ================= */
     close(): void {
         this.isShow = false;
         this.campaign = null;
