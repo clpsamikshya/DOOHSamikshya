@@ -1,9 +1,19 @@
-import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+    Component,
+    Injector,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/sharedImports';
-import { MediaFilter, MediaLibrary } from '../../model/MediaLibrary';
+import {
+    ApiResponse,
+    MediaFilter,
+    MediaLibrary,
+} from '../../model/MediaLibrary';
 import { AddMediaComponent } from '../add-media/add-media.component';
 
 @Component({
@@ -13,8 +23,10 @@ import { AddMediaComponent } from '../add-media/add-media.component';
     templateUrl: './media-library.component.html',
     styleUrls: ['./media-library.component.scss'],
 })
-export class MediaLibraryComponent extends AppComponent implements OnInit, OnDestroy {
-
+export class MediaLibraryComponent
+    extends AppComponent
+    implements OnInit, OnDestroy
+{
     @ViewChild('addMedia') addMedia!: AddMediaComponent;
 
     private destroy$ = new Subject<void>();
@@ -58,7 +70,8 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
     loadMedia(showLoader = true): void {
         if (showLoader) this.isLoading = true;
 
-        this.mediaLibraryService.getMediaLibrary(this.filter)
+        this.mediaLibraryService
+            .getMediaLibrary(this.filter)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (res: any) => {
@@ -95,14 +108,23 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
 
     deleteMedia(media: MediaLibrary): void {
         this.confirmAction({
-            message: 'Are you sure you want to delete this media?',
-            header: 'Confirm Deletion',
+            message:
+                'Deleting this media will also remove it from any campaigns it is assigned to. Are you sure?',
+            header: 'Delete Confirmation',
             accept: () => {
-                this.mediaLibraryService.deleteMedia(media.id)
+                this.mediaLibraryService
+                    .deleteMedia(media.id)
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
-                        next: () => {
-                            this.showMessage('Success', 'Media deleted successfully', 'success');
+                        next: (response: ApiResponse<MediaLibrary>) => {
+                            this.mediaList = this.mediaList.filter(
+                                (u) => u.id !== response.data.id,
+                            );
+                            this.showMessage(
+                                'Success',
+                                'Media deleted successfully',
+                                'success',
+                            );
                             this.loadMedia(false);
                         },
                         error: (err: any) => {
@@ -110,7 +132,8 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
                         },
                     });
             },
-            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info'),
+            reject: () =>
+                this.showMessage('Info', 'Deletion cancelled', 'info'),
         });
     }
 
@@ -120,7 +143,9 @@ export class MediaLibraryComponent extends AppComponent implements OnInit, OnDes
     }
 
     closePreview(): void {
-        const videoEl = document.querySelector('p-dialog video') as HTMLVideoElement;
+        const videoEl = document.querySelector(
+            'p-dialog video',
+        ) as HTMLVideoElement;
         if (videoEl) {
             videoEl.pause();
             videoEl.currentTime = 0;
