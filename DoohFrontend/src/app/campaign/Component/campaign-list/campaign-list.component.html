@@ -21,6 +21,7 @@
                 placeholder="Search Campaign"
                 class="search-input"
                 [(ngModel)]="filter.search"
+                [ngModelOptions]="{standalone: true}"
                 (keyup.enter)="applyFilter()"
             />
         </div>
@@ -28,6 +29,7 @@
         <p-dropdown
             [options]="statusOptions"
             [(ngModel)]="filter.status"
+            [ngModelOptions]="{standalone: true}"
             placeholder="All Status"
             optionLabel="label"
             optionValue="value"
@@ -90,11 +92,9 @@
                         [ngClass]="{
                             active: campaign.status === CampaignStatus.Active,
                             new: campaign.status === CampaignStatus.New,
-                            completed:
-                                campaign.status === CampaignStatus.Completed,
+                            completed: campaign.status === CampaignStatus.Completed,
                             paused: campaign.status === CampaignStatus.Paused,
-                            cancelled:
-                                campaign.status === CampaignStatus.Cancelled,
+                            cancelled: campaign.status === CampaignStatus.Cancelled
                         }"
                     >
                         {{
@@ -106,8 +106,7 @@
                                     ? 'Completed'
                                     : campaign.status === CampaignStatus.Paused
                                       ? 'Paused'
-                                      : campaign.status ===
-                                          CampaignStatus.Cancelled
+                                      : campaign.status === CampaignStatus.Cancelled
                                         ? 'Cancelled'
                                         : 'Unknown'
                         }}
@@ -122,12 +121,7 @@
                             severity="warning"
                             [rounded]="true"
                             pTooltip="Manage Campaign Media"
-                            (onClick)="
-                                campaignMedia.show(
-                                    campaign.id,
-                                    campaign.dateRanges
-                                )
-                            "
+                            (onClick)="campaignMedia.show(campaign.id, campaign.dateRanges)"
                         ></p-button>
                         <p-button
                             icon="pi pi-eye"
@@ -141,10 +135,7 @@
                             [text]="true"
                             severity="danger"
                             [rounded]="true"
-                            (onClick)="
-                                deleteCampaign(campaign);
-                                $event.stopPropagation()
-                            "
+                            (onClick)="deleteCampaign(campaign); $event.stopPropagation()"
                         ></p-button>
                     </div>
                 </td>

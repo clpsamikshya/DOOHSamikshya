@@ -47,9 +47,8 @@ export class AddEditScreenComponent
 
     draftSlot: OperatingHourSlot = this.createEmptySlot();
 
-    // TEMP UI ONLY (IMPORTANT)
-    draftStartTime: Date | null = null;
-    draftEndTime: Date | null = null;
+   draftStartTime: Date = this.getDefaultTime(0, 0, 0);
+draftEndTime: Date = this.getDefaultTime(23, 59, 59);
 
     existingOperatingHours: ScreenOperatingHour[] = [];
 
@@ -114,11 +113,17 @@ export class AddEditScreenComponent
         this.slotCounter = this.slotList.length;
         this.draftSlot = this.createEmptySlot();
 
-        this.draftStartTime = null;
-        this.draftEndTime = null;
+        this.draftStartTime = this.getDefaultTime(0, 0, 0);
+this.draftEndTime = this.getDefaultTime(23, 59, 59);
 
         this.isShow = true;
     }
+
+    private getDefaultTime(h: number, m: number, s: number): Date {
+    const d = new Date();
+    d.setHours(h, m, s, 0);
+    return d;
+}
 
     // =========================
     // EMPTY SLOT
@@ -156,8 +161,8 @@ export class AddEditScreenComponent
         });
 
         this.draftSlot = this.createEmptySlot();
-        this.draftStartTime = null;
-        this.draftEndTime = null;
+        this.getDefaultTime(0, 0, 0)
+this.getDefaultTime(23,59, 59)
     }
 
     // =========================
@@ -332,8 +337,8 @@ isEverydaySelected(): boolean {
         this.isShow = false;
         this.slotList = [];
         this.draftSlot = this.createEmptySlot();
-        this.draftStartTime = null;
-        this.draftEndTime = null;
+       this.getDefaultTime(0, 0, 0)
+this.getDefaultTime(23,59, 59)
     }
 
     ngOnDestroy(): void {

@@ -34,20 +34,10 @@
                         />
                     </div>
 
-                    <!-- <div class="form-field">
-                        <label class="form-label required">Resolution</label>
-                        <input
-                            pInputText
-                            name="resolution"
-                            [(ngModel)]="screen.resolution"
-                            placeholder="e.g., 1920x1080"
-                            class="w-full"
-                        />
-                    </div> -->
-
                     <div class="form-field">
                         <label class="form-label required">Resolution</label>
                         <p-dropdown
+                            name="resolution"
                             [options]="resolutionOptions"
                             [(ngModel)]="screen.resolution"
                             optionLabel="label"
@@ -98,9 +88,9 @@
                             separator=","
                             ngDefaultControl
                         />
-                        <small class="field-hint"
-                            >Press Enter or comma to add multiple tags</small
-                        >
+                        <small class="field-hint">
+                            Press Enter or comma to add multiple tags
+                        </small>
                     </div>
                 </div>
             </p-tabPanel>
@@ -113,9 +103,7 @@
                         <h3 class="section-title">Add Time Slot</h3>
 
                         <div class="form-field">
-                            <label class="form-label required"
-                                >Select Days</label
-                            >
+                            <label class="form-label required">Select Days</label>
                             <div class="day-pill-group">
                                 <button
                                     type="button"
@@ -129,20 +117,15 @@
                                     *ngFor="let day of dayOptions"
                                     type="button"
                                     class="day-pill"
-                                    [class.selected]="
-                                        draftSlot.selectedDays.includes(
-                                            day.value
-                                        )
-                                    "
+                                    [class.selected]="draftSlot.selectedDays.includes(day.value)"
                                     (click)="toggleDay(day.value)"
                                 >
                                     {{ day.label }}
                                 </button>
                             </div>
-                            <small class="field-hint"
-                                >Select one or more days for this time
-                                slot</small
-                            >
+                            <small class="field-hint">
+                                Select one or more days for this time slot
+                            </small>
                         </div>
 
                         <div class="time-row">
@@ -156,7 +139,7 @@
                                     hourFormat="24"
                                     appendTo="body"
                                     styleClass="w-full"
-                                ></p-calendar>
+                                />
                                 <p-calendar
                                     [(ngModel)]="draftEndTime"
                                     name="draftEndTime"
@@ -166,22 +149,7 @@
                                     hourFormat="24"
                                     appendTo="body"
                                     styleClass="w-full"
-                                ></p-calendar>
-
-                                <!-- <div class="form-field">
-                                    <label class="form-label"
-                                        >Avg. Audience</label
-                                    >
-                                    <input
-                                        pInputText
-                                        type="number"
-                                        [(ngModel)]="draftSlot.avgAudienceCount"
-                                        name="draftAudience"
-                                        placeholder="0"
-                                        min="0"
-                                        class="w-full"
-                                    />
-                                </div> -->
+                                />
                             </div>
                             <div class="form-field">
                                 <label class="form-label">Avg. Audience</label>
@@ -224,14 +192,9 @@
                             </thead>
                             <tbody>
                                 <ng-container
-                                    *ngFor="
-                                        let slot of slotList;
-                                        trackBy: trackBySlotId
-                                    "
+                                    *ngFor="let slot of slotList; trackBy: trackBySlotId"
                                 >
-                                    <tr
-                                        *ngFor="let day of getSlotDayRows(slot)"
-                                    >
+                                    <tr *ngFor="let day of getSlotDayRows(slot)">
                                         <td>{{ day.label }}</td>
                                         <td>{{ slot.startTime }}</td>
                                         <td>{{ slot.endTime }}</td>
@@ -244,9 +207,7 @@
                                                 [rounded]="true"
                                                 size="small"
                                                 type="button"
-                                                (click)="
-                                                    removeSlot(slot, day.value)
-                                                "
+                                                (click)="removeSlot(slot, day.value)"
                                             />
                                         </td>
                                     </tr>
@@ -255,10 +216,7 @@
                         </table>
 
                         <div *ngIf="slotList.length === 0" class="oh-empty">
-                            <i
-                                class="pi pi-clock"
-                                style="font-size: 2rem; opacity: 0.25"
-                            ></i>
+                            <i class="pi pi-clock" style="font-size: 2rem; opacity: 0.25"></i>
                             <p>No operating hours added yet.</p>
                             <small>Use the form above to add time slots.</small>
                         </div>

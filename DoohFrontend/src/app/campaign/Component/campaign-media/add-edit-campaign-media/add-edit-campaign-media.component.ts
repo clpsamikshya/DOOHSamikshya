@@ -1,29 +1,10 @@
-import {
-    Component,
-    EventEmitter,
-    Injector,
-    OnDestroy,
-    OnInit,
-    Output,
-} from '@angular/core';
-
+import { Component, EventEmitter, Injector, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { sharedImports } from '../../../../shared/sharedImports';
 import { AppComponent } from '../../../../app.component';
-
-import {
-    CampaignMedia,
-    CampaignMediaForm,
-    CampaignMediaRequest,
-} from '../../../Model/CampaignMedia';
+import { CampaignMedia, CampaignMediaForm, CampaignMediaRequest, SelectedMediaItem } from '../../../Model/CampaignMedia';
 import { DropdownItemScreen } from '../../../../screens/model/Screen';
 import { DropdownItemMedia } from '../../../../media/model/MediaLibrary';
-
-export interface SelectedMediaItem {
-    mediaId: number;
-    name: string;
-    playOrder: number;
-}
 
 @Component({
     selector: 'add-edit-campaign-media',
@@ -32,10 +13,7 @@ export interface SelectedMediaItem {
     templateUrl: './add-edit-campaign-media.component.html',
     styleUrl: './add-edit-campaign-media.component.scss',
 })
-export class AddEditCampaignMediaComponent
-    extends AppComponent
-    implements OnInit, OnDestroy
-{
+export class AddEditCampaignMediaComponent extends AppComponent implements OnInit, OnDestroy {
     @Output() onSave = new EventEmitter<void>();
 
     private destroy$ = new Subject<void>();
@@ -48,13 +26,9 @@ export class AddEditCampaignMediaComponent
     mediaOptions: DropdownItemMedia[] = [];
     mediaInfoData: any[] = [];
     selectedMediaFull: DropdownItemMedia[] = [];
-
-    // Campaign date ranges shown as info banner
-    campaignDateRanges: { startDateTime: string; endDateTime: string }[] = [];
-
-    // Multi-select state
     selectedMediaIds: number[] = [];
     selectedMediaItems: SelectedMediaItem[] = [];
+    campaignDateRanges: { startDateTime: string; endDateTime: string }[] = [];
 
     constructor(injector: Injector) {
         super(injector);
@@ -62,14 +36,8 @@ export class AddEditCampaignMediaComponent
 
     ngOnInit(): void {}
 
-    // =========================
-    // OPEN
-    // =========================
-    show(
-        campaignId: number,
-        dateRanges: { startDateTime: string; endDateTime: string }[],
-        data?: CampaignMedia
-    ): void {
+    // Open the form dialog
+    show(campaignId: number, dateRanges: { startDateTime: string; endDateTime: string }[], data?: CampaignMedia): void {
         this.existingData = data ?? null;
         this.campaignDateRanges = dateRanges ?? [];
         this.initializeForm(campaignId, data);
@@ -83,15 +51,9 @@ export class AddEditCampaignMediaComponent
         this.campaignMedia = new CampaignMediaForm();
         this.campaignMedia.campaignId = campaignId;
         this.campaignMedia.screenId = data?.screenId ?? 0;
-        this.campaignMedia.playDate = data?.playDate
-            ? this.formatDate(data.playDate)
-            : '';
-        this.campaignMedia.startTime = data?.startTime
-            ? this.formatTime(data.startTime)
-            : '';
-        this.campaignMedia.endTime = data?.endTime
-            ? this.formatTime(data.endTime)
-            : '';
+        this.campaignMedia.playDate = data?.playDate ? this.formatDate(data.playDate) : '';
+        this.campaignMedia.startTime = data?.startTime ? this.formatTime(data.startTime) : '';
+        this.campaignMedia.endTime = data?.endTime ? this.formatTime(data.endTime) : '';
         this.campaignMedia.duration = data?.duration ?? 0;
 
         this.selectedMediaIds = [];
@@ -100,132 +62,68 @@ export class AddEditCampaignMediaComponent
 
         if (data?.mediaId) {
             this.selectedMediaIds = [data.mediaId];
-            this.selectedMediaItems = [
-                {
-                    mediaId: data.mediaId,
-                    name: '', // resolved after mediaOptions loads
-                    playOrder: data.order ?? 1,
-                },
-            ];
+            this.selectedMediaItems = [{ mediaId: data.mediaId, name: '', playOrder: data.order ?? 1 }];
         }
     }
 
-    // =========================
-    // LOAD SCREEN OPTIONS
-    // =========================
     loadScreenOptions(campaignId: number): void {
-        this.screenService
-            .getScreenDdl(campaignId)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    this.screenOptions = res?.data || [];
-                },
-                error: (err) =>
-                    this.showMessage('Error', err.message, 'error'),
-            });
+        this.screenService.getScreenDdl(campaignId).pipe(takeUntil(this.destroy$)).subscribe({
+            next: (res) => { this.screenOptions = res?.data || []; },
+            error: (err) => this.showMessage('Error', err.message, 'error'),
+        });
     }
 
-    // =========================
-    // LOAD MEDIA OPTIONS
-    // =========================
     loadMediaOptions(campaignId: number): void {
-        this.mediaLibraryService
-            .getMediaLibraryDdl(campaignId)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res) => {
-                    const raw = res?.data || [];
+        this.mediaLibraryService.getMediaLibraryDdl(campaignId).pipe(takeUntil(this.destroy$)).subscribe({
+            next: (res) => {
+                const raw = res?.data || [];
+                this.mediaOptions = raw.map((x: any) => ({
+                    id: x.id ?? x.mediaId,
+                    name: x.name ?? x.mediaName ?? x.fileName ?? '',
+                    url: x.url ?? x.mediaUrl ?? x.filePath ?? x.thumbnailUrl ?? '',
+                    mediaType: x.mediaType ?? x.type ?? x.fileType ?? '',
+                    fileSize: x.fileSize ?? x.size ?? '',
+                    duration: x.duration ?? '',
+                }));
 
-                    this.mediaOptions = raw.map((x: any) => ({
-                        id: x.id ?? x.mediaId,
-                        name: x.name ?? x.mediaName ?? x.fileName ?? '',
-                        url: x.url ?? x.mediaUrl ?? x.filePath ?? x.thumbnailUrl ?? '',
-                        mediaType: x.mediaType ?? x.type ?? x.fileType ?? '',
-                        fileSize: x.fileSize ?? x.size ?? '',
-                        duration: x.duration ?? '',
-                    }));
-
-                    // Resolve names for any pre-populated items
-                    this.selectedMediaItems = this.selectedMediaItems.map((item) => ({
-                        ...item,
-                        name:
-                            this.mediaOptions.find((m) => m.id === item.mediaId)
-                                ?.name || item.name,
-                    }));
-                },
-                error: (err) =>
-                    this.showMessage('Error', err.message, 'error'),
-            });
+                // Resolve display names for pre-selected media (edit mode)
+                this.selectedMediaItems = this.selectedMediaItems.map((item) => ({
+                    ...item,
+                    name: this.mediaOptions.find((m) => m.id === item.mediaId)?.name || item.name,
+                }));
+            },
+            error: (err) => this.showMessage('Error', err.message, 'error'),
+        });
     }
 
-    // =========================
-    // LOAD EXISTING MEDIA INFO
-    // =========================
     loadMediaInfo(campaignId: number): void {
-        this.campaignMediaService
-            .getCampaignMedia({ campaignId })
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res: any) => {
-                    const raw = res?.data?.data || [];
-                    this.mediaInfoData = raw.map((x: any) => ({
-                        id: x.id,
-                        campaignId: x.campaignId ?? campaignId, // ← keep per-row campaignId
-                        mediaId: x.mediaId,
-                        screenId: x.screenId,
-                        screenName: x.screenName ?? '',
-                        playDate: x.playDate,                   // ← raw, no formatting
-                        playOrder: x.playOrder ?? 0,
-                        url: x.url ?? x.mediaUrl ?? x.filePath ?? '',
-                        mediaName: x.mediaName ?? x.name ?? x.fileName ?? '',
-                    }));
-                    this.sortMediaInfoData();
-                },
-                error: (err) =>
-                    this.showMessage('Error', err.error?.message || err.message, 'error'),
-            });
+        this.campaignMediaService.getCampaignMedia({ campaignId }).pipe(takeUntil(this.destroy$)).subscribe({
+            next: (res: any) => {
+                const raw = res?.data?.data || [];
+                this.mediaInfoData = raw.map((x: any) => ({
+                    id: x.id,
+                    campaignId: x.campaignId ?? campaignId,
+                    mediaId: x.mediaId,
+                    screenId: x.screenId,
+                    screenName: x.screenName ?? '',
+                    playDate: x.playDate,
+                    playOrder: x.playOrder ?? 0,
+                    url: x.url ?? x.mediaUrl ?? x.filePath ?? '',
+                    mediaName: x.mediaName ?? x.name ?? x.fileName ?? '',
+                }));
+                this.sortMediaInfoData();
+            },
+            error: (err) => this.showMessage('Error', err.error?.message || err.message, 'error'),
+        });
     }
 
-    // =========================
-    // MEDIA MULTI-SELECT
-    // =========================
     onMediaSelectionChange(newItems: DropdownItemMedia[]): void {
         this.selectedMediaFull = newItems;
-        const newIds = newItems.map((i) => i.id);
-
+        this.selectedMediaIds = newItems.map((i) => i.id);
         this.selectedMediaItems = newItems.map((item) => {
-            const existing = this.selectedMediaItems.find(
-                (x) => x.mediaId === item.id,
-            );
-            return {
-                mediaId: item.id,
-                name: item.name,
-                playOrder: existing?.playOrder ?? this.nextPlayOrder(),
-            };
+            const existing = this.selectedMediaItems.find((x) => x.mediaId === item.id);
+            return { mediaId: item.id, name: item.name, playOrder: existing?.playOrder ?? this.getNextPlayOrder() };
         });
-
-        this.selectedMediaIds = newIds;
-    }
-
-    // =========================
-    // PLAY ORDER LOGIC
-    // =========================
-    nextPlayOrder(): number {
-        const screenId = this.campaignMedia.screenId;
-        const playDate = this.campaignMedia.playDate;
-
-        const savedOrders = this.mediaInfoData
-            .filter(
-                (x) =>
-                    x.screenId === screenId &&
-                    this.formatDate(x.playDate) === playDate,
-            )
-            .map((x) => x.playOrder as number);
-
-        const formOrders = this.selectedMediaItems.map((i) => i.playOrder);
-        const allOrders = [...savedOrders, ...formOrders];
-        return allOrders.length > 0 ? Math.max(...allOrders) + 1 : 1;
     }
 
     onScreenOrDateChange(): void {
@@ -234,71 +132,48 @@ export class AddEditCampaignMediaComponent
         const screenId = this.campaignMedia.screenId;
         const playDate = this.campaignMedia.playDate;
 
-        const savedMax = this.mediaInfoData
-            .filter(
-                (x) =>
-                    x.screenId === screenId &&
-                    this.formatDate(x.playDate) === playDate,
-            )
+        const maxSavedOrder = this.mediaInfoData
+            .filter((x) => x.screenId === screenId && this.formatDate(x.playDate) === playDate)
             .reduce((max, x) => Math.max(max, x.playOrder ?? 0), 0);
 
         this.selectedMediaItems = this.selectedMediaItems.map((item, idx) => ({
             ...item,
-            playOrder: savedMax + idx + 1,
+            playOrder: maxSavedOrder + idx + 1,
         }));
     }
 
-    // =========================
-    // UPDATE SINGLE ROW PLAY ORDER
-    // =========================
     onPlayOrderChange(row: any): void {
         if (!row.playOrder || row.playOrder < 1) return;
 
-        const request: any = {
-            campaignId: row.campaignId,   // ← use row's own campaignId, not form's
+        const request = {
+            campaignId: row.campaignId,
             screenId: row.screenId,
-            playDate: row.playDate,       // ← raw from API, no formatting
+            playDate: row.playDate,
             updatedBy: 1,
             media: [{ mediaId: row.mediaId, playOrder: row.playOrder }],
         };
 
-        this.campaignMediaService
-            .updatecampaignMedia(request)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: () => {
-                    this.showMessage('Success', 'Play order updated', 'success');
-                    this.sortMediaInfoData();
-                },
-                error: (err) =>
-                    this.showMessage('Error', err.error?.message || err.message, 'error'),
-            });
+        this.campaignMediaService.updatecampaignMedia(request).pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                this.showMessage('Success', 'Play order updated', 'success');
+                this.sortMediaInfoData();
+            },
+            error: (err) => this.showMessage('Error', err.error?.message || err.message, 'error'),
+        });
     }
 
-    // =========================
-    // DELETE ROW
-    // =========================
     deleteMediaRow(row: any): void {
         if (!confirm('Are you sure you want to delete this item?')) return;
 
-        this.campaignMediaService
-            .deleteCampaignMedia(row.id, 1)
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: () => {
-                    this.showMessage('Success', 'Deleted successfully', 'success');
-                    this.mediaInfoData = this.mediaInfoData.filter(
-                        (x) => x.id !== row.id,
-                    );
-                },
-                error: (err) =>
-                    this.showMessage('Error', err.error?.message || err.message, 'error'),
-            });
+        this.campaignMediaService.deleteCampaignMedia(row.id, 1).pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                this.showMessage('Success', 'Deleted successfully', 'success');
+                this.mediaInfoData = this.mediaInfoData.filter((x) => x.id !== row.id);
+            },
+            error: (err) => this.showMessage('Error', err.error?.message || err.message, 'error'),
+        });
     }
 
-    // =========================
-    // SUBMIT (ADD / EDIT)
-    // =========================
     onSubmit(): void {
         if (!this.campaignMedia.screenId) { alert('Select a screen'); return; }
         if (!this.selectedMediaItems.length) { alert('Select at least one media'); return; }
@@ -312,11 +187,10 @@ export class AddEditCampaignMediaComponent
             return;
         }
 
-        const f = this.campaignMedia;
         const request: CampaignMediaRequest = {
-            campaignId: f.campaignId,
-            screenId: f.screenId,
-            playDate: f.playDate,
+            campaignId: this.campaignMedia.campaignId,
+            screenId: this.campaignMedia.screenId,
+            playDate: this.campaignMedia.playDate,
             createdBy: 1,
             media: this.selectedMediaItems.map((item) => ({
                 mediaId: item.mediaId,
@@ -324,31 +198,25 @@ export class AddEditCampaignMediaComponent
             })),
         };
 
-        const call$ = this.existingData
-            ? this.campaignMediaService.updatecampaignMedia(request)
-            : this.campaignMediaService.addCampaignMedia(request);
-
-        const successMsg = this.existingData
-            ? 'Campaign media updated successfully'
-            : 'Campaign media added successfully';
-
-        call$.pipe(takeUntil(this.destroy$)).subscribe({
-            next: () => {
-                this.showMessage('Success', successMsg, 'success');
-                this.isShow = false;
-                this.onSave.emit();
-            },
-            error: (err) =>
-                this.showMessage('Error', err.error?.message || err.message, 'error'),
-        });
-    }
-
-    // =========================
-    // UTIL
-    // =========================
-    isVideo(url: string): boolean {
-        if (!url) return false;
-        return /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i.test(url);
+        if (this.existingData) {
+            this.campaignMediaService.updatecampaignMedia(request).pipe(takeUntil(this.destroy$)).subscribe({
+                next: () => {
+                    this.showMessage('Success', 'Campaign media updated successfully', 'success');
+                    this.isShow = false;
+                    this.onSave.emit();
+                },
+                error: (err) => this.showMessage('Error', err.error?.message || err.message, 'error'),
+            });
+        } else {
+            this.campaignMediaService.addCampaignMedia(request).pipe(takeUntil(this.destroy$)).subscribe({
+                next: () => {
+                    this.showMessage('Success', 'Campaign media added successfully', 'success');
+                    this.isShow = false;
+                    this.onSave.emit();
+                },
+                error: (err) => this.showMessage('Error', err.error?.message || err.message, 'error'),
+            });
+        }
     }
 
     cancel(): void {
@@ -364,10 +232,27 @@ export class AddEditCampaignMediaComponent
         this.campaignDateRanges = [];
     }
 
+    isVideo(url: string): boolean {
+        if (!url) return false;
+        return /\.(mp4|webm|mov|avi|mkv)(\?.*)?$/i.test(url);
+    }
+
+    private getNextPlayOrder(): number {
+        const screenId = this.campaignMedia.screenId;
+        const playDate = this.campaignMedia.playDate;
+
+        const savedOrders = this.mediaInfoData
+            .filter((x) => x.screenId === screenId && this.formatDate(x.playDate) === playDate)
+            .map((x) => x.playOrder as number);
+
+        const formOrders = this.selectedMediaItems.map((i) => i.playOrder);
+        const allOrders = [...savedOrders, ...formOrders];
+        return allOrders.length > 0 ? Math.max(...allOrders) + 1 : 1;
+    }
+
     private sortMediaInfoData(): void {
         this.mediaInfoData.sort((a, b) => {
-            if (a.screenId !== b.screenId)
-                return (a.screenId ?? 0) - (b.screenId ?? 0);
+            if (a.screenId !== b.screenId) return (a.screenId ?? 0) - (b.screenId ?? 0);
             const dateA = new Date(a.playDate).getTime();
             const dateB = new Date(b.playDate).getTime();
             if (dateA !== dateB) return dateA - dateB;

@@ -44,6 +44,12 @@ export class CampaignMedia {
   }
 }
 
+export interface SelectedMediaItem {
+    mediaId: number;
+    name: string;
+    playOrder: number;
+}
+
 export class CampaignMediaFilter {
   campaignId?: number;
   screenId?: number;

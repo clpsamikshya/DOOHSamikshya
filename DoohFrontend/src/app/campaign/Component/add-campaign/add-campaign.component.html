@@ -7,7 +7,6 @@
     [maximizable]="false"
     header="Add Campaign"
     styleClass="add-campaign-dialog"
-    
 >
     <p-stepper [linear]="true" [(activeStep)]="activeStep">
         <!-- STEP 1 -->
@@ -19,50 +18,30 @@
                         <input
                             pInputText
                             [(ngModel)]="campaign.name"
+                            [ngModelOptions]="{standalone: true}"
                             placeholder="Enter campaign name"
                             class="w-full"
                         />
                     </div>
-                    <!-- <div class="field">
-                        <label>Status</label>
-                        <p-dropdown
-                            [options]="statusOptions"
-                            [(ngModel)]="campaign.status"
-                            optionLabel="label"
-                            optionValue="value"
-                            placeholder="Select status"
-                            class="w-full"
-                        />
-                    </div> -->
                     <div class="field">
                         <label>Remarks</label>
                         <input
                             pInputText
                             [(ngModel)]="campaign.remarks"
+                            [ngModelOptions]="{standalone: true}"
                             placeholder="Optional remarks"
                             class="w-full"
                         />
                     </div>
                     <div class="footer">
-                        <button
-                            pButton
-                            label="Back"
-                            (click)="goBack()"
-                        ></button>
-
+                        <button pButton label="Back" (click)="goBack()"></button>
                         <span class="spacer"></span>
-
                         <button
                             pButton
                             label="Next"
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <!-- <button
-                            pButton
-                            label="Cancel"
-                            (click)="cancel()"
-                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -73,21 +52,14 @@
             <ng-template pTemplate="content">
                 <div class="step-content">
                     <div
-                        *ngFor="
-                            let dateRange of campaign.dateRanges;
-                            let i = index;
-                            trackBy: trackByIndex
-                        "
+                        *ngFor="let dateRange of campaign.dateRanges; let i = index; trackBy: trackByIndex"
                         class="date-row"
                     >
                         <div class="field">
-                            <label
-                                >Start Date & Time
-                                <span class="req">*</span></label
-                            >
+                            <label>Start Date & Time <span class="req">*</span></label>
                             <p-calendar
                                 [(ngModel)]="dateRange.startDateTime"
-                                [name]="'startDate_' + i"
+                                [ngModelOptions]="{standalone: true}"
                                 [showTime]="true"
                                 [showSeconds]="false"
                                 dateFormat="dd/mm/yy"
@@ -101,13 +73,10 @@
                             />
                         </div>
                         <div class="field">
-                            <label
-                                >End Date & Time
-                                <span class="req">*</span></label
-                            >
+                            <label>End Date & Time <span class="req">*</span></label>
                             <p-calendar
                                 [(ngModel)]="dateRange.endDateTime"
-                                [name]="'endDate_' + i"
+                                [ngModelOptions]="{standalone: true}"
                                 [showTime]="true"
                                 [showSeconds]="false"
                                 dateFormat="dd/mm/yy"
@@ -122,9 +91,7 @@
                         </div>
                         <div
                             class="duration-pill"
-                            *ngIf="
-                                dateRange.startDateTime && dateRange.endDateTime
-                            "
+                            *ngIf="dateRange.startDateTime && dateRange.endDateTime"
                         >
                             <i class="pi pi-clock"></i>
                             {{ getDurationDays(dateRange) }} day(s)
@@ -147,8 +114,7 @@
 
                     <div class="total-duration" *ngIf="totalDurationDays > 0">
                         <i class="pi pi-calendar-plus"></i>
-                        Total Duration:
-                        <strong>{{ totalDurationDays }} day(s)</strong>
+                        Total Duration: <strong>{{ totalDurationDays }} day(s)</strong>
                     </div>
 
                     <button
@@ -160,25 +126,14 @@
                     ></button>
 
                     <div class="footer">
-                        <button
-                            pButton
-                            label="Back"
-                            (click)="goBack()"
-                        ></button>
-
+                        <button pButton label="Back" (click)="goBack()"></button>
                         <span class="spacer"></span>
-
                         <button
                             pButton
                             label="Next"
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <!-- <button
-                            pButton
-                            label="Cancel"
-                            (click)="cancel()"
-                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -195,6 +150,7 @@
                                 pInputText
                                 placeholder="Search screens..."
                                 [(ngModel)]="screenSearch"
+                                [ngModelOptions]="{standalone: true}"
                                 (ngModelChange)="filterScreens()"
                                 class="w-full"
                             />
@@ -221,9 +177,8 @@
                                         <p-checkbox
                                             [binary]="true"
                                             [ngModel]="allScreensSelected"
-                                            (ngModelChange)="
-                                                toggleAllScreens($event)
-                                            "
+                                            [ngModelOptions]="{standalone: true}"
+                                            (ngModelChange)="toggleAllScreens($event)"
                                             ngDefaultControl
                                         />
                                     </th>
@@ -237,10 +192,8 @@
                             <ng-template pTemplate="body" let-screen>
                                 <tr
                                     [ngClass]="{
-                                        'row-selected': isScreenSelected(
-                                            screen.id
-                                        ),
-                                        'row-inactive': screen.status !== 1,
+                                        'row-selected': isScreenSelected(screen.id),
+                                        'row-inactive': screen.status !== 1
                                     }"
                                     (click)="toggleScreen(screen)"
                                     style="cursor: pointer"
@@ -248,13 +201,9 @@
                                     <td>
                                         <p-checkbox
                                             [binary]="true"
-                                            [ngModel]="
-                                                isScreenSelected(screen.id)
-                                            "
-                                            [name]="'sc_' + screen.id"
-                                            (ngModelChange)="
-                                                toggleScreen(screen)
-                                            "
+                                            [ngModel]="isScreenSelected(screen.id)"
+                                            [ngModelOptions]="{standalone: true}"
+                                            (ngModelChange)="toggleScreen(screen)"
                                             [disabled]="screen.status !== 1"
                                             ngDefaultControl
                                             (click)="$event.stopPropagation()"
@@ -265,16 +214,8 @@
                                     <td>{{ screen.resolution }}</td>
                                     <td>
                                         <p-tag
-                                            [value]="
-                                                screen.status === 1
-                                                    ? 'Active'
-                                                    : 'Inactive'
-                                            "
-                                            [severity]="
-                                                screen.status === 1
-                                                    ? 'success'
-                                                    : 'danger'
-                                            "
+                                            [value]="screen.status === 1 ? 'Active' : 'Inactive'"
+                                            [severity]="screen.status === 1 ? 'success' : 'danger'"
                                         />
                                     </td>
                                     <td>
@@ -284,10 +225,7 @@
                                             class="p-button-sm p-button-text"
                                             pTooltip="View details"
                                             tooltipPosition="top"
-                                            (click)="
-                                                openScreenInfo(screen);
-                                                $event.stopPropagation()
-                                            "
+                                            (click)="openScreenInfo(screen); $event.stopPropagation()"
                                         ></button>
                                     </td>
                                 </tr>
@@ -301,26 +239,16 @@
                             </ng-template>
                         </p-table>
                     </div>
+
                     <div class="footer">
-                        <button
-                            pButton
-                            label="Back"
-                            (click)="goBack()"
-                        ></button>
-
+                        <button pButton label="Back" (click)="goBack()"></button>
                         <span class="spacer"></span>
-
                         <button
                             pButton
                             label="Next"
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <!-- <button
-                            pButton
-                            label="Cancel"
-                           (click)="cancel()" 
-                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -341,22 +269,15 @@
                         </div>
                         <div class="row">
                             <span class="key">Duration</span>
-                            <span class="val"
-                                >{{ totalDurationDays }} day(s)</span
-                            >
+                            <span class="val">{{ totalDurationDays }} day(s)</span>
                         </div>
                         <div class="row">
                             <span class="key">Dates</span>
                             <div class="list">
                                 <span *ngFor="let d of campaign.dateRanges">
-                                    {{
-                                        d.startDateTime
-                                            | date: 'dd/MM/yyyy HH:mm'
-                                    }}
+                                    {{ d.startDateTime | date: 'dd/MM/yyyy HH:mm' }}
                                     →
-                                    {{
-                                        d.endDateTime | date: 'dd/MM/yyyy HH:mm'
-                                    }}
+                                    {{ d.endDateTime | date: 'dd/MM/yyyy HH:mm' }}
                                 </span>
                             </div>
                         </div>
@@ -379,12 +300,7 @@
                             [loading]="isSubmitting"
                             (click)="onSubmit()"
                         ></button>
-                        <button
-                            pButton
-                            label="Back"
-                            (click)="goBack()"
-                        ></button>
-                        
+                        <button pButton label="Back" (click)="goBack()"></button>
                     </div>
                 </div>
             </ng-template>

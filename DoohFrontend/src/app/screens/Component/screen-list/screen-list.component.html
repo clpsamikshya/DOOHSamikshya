@@ -20,6 +20,7 @@
                 type="text"
                 placeholder="Search"
                 [(ngModel)]="filter.search"
+                [ngModelOptions]="{standalone: true}"
                 (keyup.enter)="applyFilter()"
                 class="search-input"
             />
@@ -28,6 +29,7 @@
         <p-dropdown
             [options]="statusOptions"
             [(ngModel)]="filter.status"
+            [ngModelOptions]="{standalone: true}"
             placeholder="All Status"
             (onChange)="applyFilter()"
             [showClear]="true"
@@ -39,6 +41,7 @@
         <p-dropdown
             [options]="orientationOptions"
             [(ngModel)]="filter.orientation"
+            [ngModelOptions]="{standalone: true}"
             placeholder="All Orientation"
             (onChange)="applyFilter()"
             [showClear]="true"
@@ -117,8 +120,7 @@
                         [ngClass]="{
                             active: screen.status === ScreenStatus.Active,
                             inactive: screen.status === ScreenStatus.InActive,
-                            maintenance:
-                                screen.status === ScreenStatus.UnderMaintenance,
+                            maintenance: screen.status === ScreenStatus.UnderMaintenance
                         }"
                     >
                         {{

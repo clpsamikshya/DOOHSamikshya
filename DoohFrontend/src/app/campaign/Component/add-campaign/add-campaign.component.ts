@@ -155,6 +155,12 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
         this.checkDateOverlap();
     }
 
+//     private setDefaultTime(date: Date, h: number, m: number, s: number): Date {
+//     const d = new Date(date);
+//     d.setHours(h, m, s, 0);
+//     return d;
+// }
+
     onDateChange(): void {
         // Set default times when date is selected
         this.campaign.dateRanges.forEach(range => {
