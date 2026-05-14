@@ -1,6 +1,3 @@
-<p-toast />
-<p-confirmDialog />
-
 <div class="page-header">
     <div class="page-actions">
         <p-button
@@ -83,22 +80,37 @@
 
         <ng-template pTemplate="body" let-campaign>
             <tr>
-                <td><strong>{{ campaign.name }}</strong></td>
+                <td>
+                    <strong>{{ campaign.name }}</strong>
+                </td>
                 <td>{{ campaign.durationInDays }} Days</td>
                 <td>
-                    <span class="status" [ngClass]="{
-                        active:    campaign.status === CampaignStatus.Active,
-                        new:       campaign.status === CampaignStatus.New,
-                        completed: campaign.status === CampaignStatus.Completed,
-                        paused:    campaign.status === CampaignStatus.Paused,
-                        cancelled: campaign.status === CampaignStatus.Cancelled
-                    }">
-                        {{ campaign.status === CampaignStatus.New       ? 'New'
-                         : campaign.status === CampaignStatus.Active     ? 'Active'
-                         : campaign.status === CampaignStatus.Completed  ? 'Completed'
-                         : campaign.status === CampaignStatus.Paused     ? 'Paused'
-                         : campaign.status === CampaignStatus.Cancelled  ? 'Cancelled'
-                         : 'Unknown' }}
+                    <span
+                        class="status"
+                        [ngClass]="{
+                            active: campaign.status === CampaignStatus.Active,
+                            new: campaign.status === CampaignStatus.New,
+                            completed:
+                                campaign.status === CampaignStatus.Completed,
+                            paused: campaign.status === CampaignStatus.Paused,
+                            cancelled:
+                                campaign.status === CampaignStatus.Cancelled,
+                        }"
+                    >
+                        {{
+                            campaign.status === CampaignStatus.New
+                                ? 'New'
+                                : campaign.status === CampaignStatus.Active
+                                  ? 'Active'
+                                  : campaign.status === CampaignStatus.Completed
+                                    ? 'Completed'
+                                    : campaign.status === CampaignStatus.Paused
+                                      ? 'Paused'
+                                      : campaign.status ===
+                                          CampaignStatus.Cancelled
+                                        ? 'Cancelled'
+                                        : 'Unknown'
+                        }}
                     </span>
                 </td>
                 <td>{{ campaign.remarks || '—' }}</td>
@@ -110,7 +122,12 @@
                             severity="warning"
                             [rounded]="true"
                             pTooltip="Manage Campaign Media"
-                            (onClick)="campaignMedia.show(campaign.id)"
+                            (onClick)="
+                                campaignMedia.show(
+                                    campaign.id,
+                                    campaign.dateRanges
+                                )
+                            "
                         ></p-button>
                         <p-button
                             icon="pi pi-eye"
@@ -124,7 +141,10 @@
                             [text]="true"
                             severity="danger"
                             [rounded]="true"
-                            (onClick)="deleteCampaign(campaign); $event.stopPropagation()"
+                            (onClick)="
+                                deleteCampaign(campaign);
+                                $event.stopPropagation()
+                            "
                         ></p-button>
                     </div>
                 </td>

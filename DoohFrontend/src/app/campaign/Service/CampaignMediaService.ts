@@ -65,6 +65,24 @@ export class CampaignMediaService {
             .pipe(catchError(this.handleError));
     }
 
+//     updatecampaignMedia(
+//     request: CampaignMediaRequest,
+// ): Observable<ApiResponse<CampaignMediaResponse>> {
+//     const payload = { request: request };  // Wrap it here
+//     return this.http
+//         .put<ApiResponse<CampaignMediaResponse>>(`${this.apiUrl}`, payload)
+//         .pipe(catchError(this.handleError));
+// }
+
+// addCampaignMedia(
+//     request: CampaignMediaRequest,
+// ): Observable<ApiResponse<CampaignMediaResponse>> {
+//     const payload = { request: request };  // Wrap it here too
+//     return this.http
+//         .post<ApiResponse<CampaignMediaResponse>>(this.apiUrl, payload)
+//         .pipe(catchError(this.handleError));
+// }
+
     deleteCampaignMedia(id: number, deletedBy: number): Observable<ApiResponse<CampaignMedia>> {
         let params = new HttpParams().set('deletedBy', deletedBy);
         return this.http

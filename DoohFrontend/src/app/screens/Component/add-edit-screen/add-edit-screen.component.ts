@@ -15,8 +15,13 @@ import {
     Screens,
     ScreenUpdate,
 } from '../../model/Screen';
-import { ScreenStatus, ScreenOrientation, DayOfWeek } from '../../model/ScreenEnum';
-import { Subject, takeUntil, forkJoin } from 'rxjs';
+import {
+    ScreenStatus,
+    ScreenOrientation,
+    DayOfWeek,
+    ScreenResolution,
+} from '../../model/ScreenEnum';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'add-edit-screen',
@@ -25,8 +30,10 @@ import { Subject, takeUntil, forkJoin } from 'rxjs';
     templateUrl: './add-edit-screen.component.html',
     styleUrl: './add-edit-screen.component.scss',
 })
-export class AddEditScreenComponent extends AppComponent implements OnInit, OnDestroy {
-
+export class AddEditScreenComponent
+    extends AppComponent
+    implements OnInit, OnDestroy
+{
     @Output() onSave = new EventEmitter<Screens>();
 
     private destroy$ = new Subject<void>();
@@ -35,37 +42,42 @@ export class AddEditScreenComponent extends AppComponent implements OnInit, OnDe
     existingData: Screens | null = null;
     screen: Screens = new Screens();
 
-    // Operating hour slots shown in the table
     slotList: OperatingHourSlot[] = [];
     private slotCounter = 0;
 
-    // Draft form for adding a new slot
     draftSlot: OperatingHourSlot = this.createEmptySlot();
 
-    // Existing DB records — needed to delete from API when editing
+    // TEMP UI ONLY (IMPORTANT)
+    draftStartTime: Date | null = null;
+    draftEndTime: Date | null = null;
+
     existingOperatingHours: ScreenOperatingHour[] = [];
 
-    readonly statusOptions = [
-        { label: 'Active', value: ScreenStatus.Active },
-        { label: 'Inactive', value: ScreenStatus.InActive },
-        { label: 'Under Maintenance', value: ScreenStatus.UnderMaintenance },
-    ];
+    readonly statusOptions = Object.values(ScreenStatus)
+        .filter(v => typeof v === 'number')
+        .map(v => ({
+            label: ScreenStatus[v as number],
+            value: v as number,
+        }));
 
-    readonly orientationOptions = [
-        { label: 'Portrait', value: ScreenOrientation.Portrait },
-        { label: 'Square', value: ScreenOrientation.Square },
-        { label: 'Landscape', value: ScreenOrientation.Landscape },
-    ];
+    readonly orientationOptions = Object.values(ScreenOrientation)
+        .filter(v => typeof v === 'number')
+        .map(v => ({
+            label: ScreenOrientation[v as number],
+            value: v as number,
+        }));
 
-    readonly dayOptions = [
-        { label: 'Sunday', value: DayOfWeek.Sunday },
-        { label: 'Monday', value: DayOfWeek.Monday },
-        { label: 'Tuesday', value: DayOfWeek.Tuesday },
-        { label: 'Wednesday', value: DayOfWeek.Wednesday },
-        { label: 'Thursday', value: DayOfWeek.Thursday },
-        { label: 'Friday', value: DayOfWeek.Friday },
-        { label: 'Saturday', value: DayOfWeek.Saturday },
-    ];
+    resolutionOptions = Object.values(ScreenResolution).map(v => ({
+        label: v,
+        value: v,
+    }));
+
+    readonly dayOptions = Object.values(DayOfWeek)
+        .filter(v => typeof v === 'number')
+        .map(v => ({
+            label: DayOfWeek[v as number],
+            value: v as number,
+        }));
 
     constructor(injector: Injector) {
         super(injector);
@@ -73,7 +85,9 @@ export class AddEditScreenComponent extends AppComponent implements OnInit, OnDe
 
     ngOnInit(): void {}
 
-    // Called from parent to open the dialog
+    // =========================
+    // OPEN
+    // =========================
     show(screen?: Screens): void {
         this.existingData = screen ?? null;
 
@@ -82,7 +96,7 @@ export class AddEditScreenComponent extends AppComponent implements OnInit, OnDe
             tenantId: 1,
             name: screen?.name || '',
             location: screen?.location || '',
-            resolution: screen?.resolution || '',
+            resolution: screen?.resolution ?? ScreenResolution.R1920x1080,
             tag: screen?.tag ?? null,
             orientation: screen?.orientation ?? ScreenOrientation.Landscape,
             status: screen?.status ?? ScreenStatus.Active,
@@ -93,93 +107,105 @@ export class AddEditScreenComponent extends AppComponent implements OnInit, OnDe
         };
 
         this.existingOperatingHours = screen?.operatingHour || [];
-        this.slotList = this.convertOperatingHoursToSlots(screen?.operatingHour || []);
+        this.slotList = this.convertOperatingHoursToSlots(
+            screen?.operatingHour || [],
+        );
+
         this.slotCounter = this.slotList.length;
         this.draftSlot = this.createEmptySlot();
+
+        this.draftStartTime = null;
+        this.draftEndTime = null;
+
         this.isShow = true;
     }
 
-    // ─── Draft slot form ──────────────────────────────────────────
-
+    // =========================
+    // EMPTY SLOT
+    // =========================
     createEmptySlot(): OperatingHourSlot {
-        return { id: '', selectedDays: [], startTime: '', endTime: '', avgAudienceCount: 0 };
+        return {
+            id: '',
+            selectedDays: [],
+            startTime: '',
+            endTime: '',
+            avgAudienceCount: 0,
+        };
     }
 
-    toggleDay(dayValue: number): void {
-        const index = this.draftSlot.selectedDays.indexOf(dayValue);
-        if (index === -1) {
-            this.draftSlot.selectedDays.push(dayValue);
-        } else {
-            this.draftSlot.selectedDays.splice(index, 1);
-        }
+    // =========================
+    // TIME CONVERT
+    // =========================
+    private formatTime(date: Date | null): string {
+        if (!date) return '';
+        return date.toTimeString().split(' ')[0]; // HH:mm:ss
     }
 
-    toggleEveryday(): void {
-        this.draftSlot.selectedDays = this.isEverydaySelected()
-            ? []
-            : this.dayOptions.map(d => d.value);
-    }
-
-    isEverydaySelected(): boolean {
-        return this.draftSlot.selectedDays.length === this.dayOptions.length;
-    }
-
-    // Adds the draft slot to the slot list after validation
+    // =========================
+    // ADD SLOT
+    // =========================
     confirmSlot(): void {
         if (!this.validateDraftSlot()) return;
 
         this.slotList.push({
-            ...this.draftSlot,
             id: `slot_${this.slotCounter++}`,
+            selectedDays: this.draftSlot.selectedDays,
+            startTime: this.formatTime(this.draftStartTime),
+            endTime: this.formatTime(this.draftEndTime),
+            avgAudienceCount: this.draftSlot.avgAudienceCount,
         });
 
         this.draftSlot = this.createEmptySlot();
+        this.draftStartTime = null;
+        this.draftEndTime = null;
     }
 
-    // ─── Slot removal ─────────────────────────────────────────────
+    // =========================
+    // VALIDATION (STRING SAFE)
+    // =========================
+    private validateDraftSlot(): boolean {
+        const slot = this.draftSlot;
 
-    // Removes a specific day or the whole slot
-    // If editing an existing screen, deletes from API first
-    removeSlot(slot: OperatingHourSlot, dayValue?: number): void {
-        if (this.existingData === null) {
-            this.removeSlotLocally(slot, dayValue);
-            return;
+        if (!slot.selectedDays.length) {
+            this.showMessage('Validation Error', 'Select at least one day', 'warn');
+            return false;
         }
 
-        const recordsToDelete = this.findMatchingOperatingHours(slot, dayValue);
+        const start = this.formatTime(this.draftStartTime);
+        const end = this.formatTime(this.draftEndTime);
 
-        if (recordsToDelete.length === 0) {
-            this.removeSlotLocally(slot, dayValue);
-            return;
+        if (!start || !end) {
+            this.showMessage('Validation Error', 'Start/end required', 'warn');
+            return false;
         }
 
-        this.confirmAction({
-            message: `Remove operating hours for ${this.buildDayLabel(slot, dayValue)}?`,
-            header: 'Remove Operating Hours',
-            accept: () => {
-                const deletes = recordsToDelete.map(r =>
-                    this.screenService.deleteOperatingHour(r.id, this.existingData!.id)
-                );
+        if (start >= end) {
+            this.showMessage('Validation Error', 'End must be after start', 'warn');
+            return false;
+        }
 
-                forkJoin(deletes)
-                    .pipe(takeUntil(this.destroy$))
-                    .subscribe({
-                        next: () => {
-                            this.showMessage('Success', 'Operating hours removed', 'success');
-                            this.removeSlotLocally(slot, dayValue);
-                            const deletedIds = new Set(recordsToDelete.map(r => r.id));
-                            this.existingOperatingHours = this.existingOperatingHours
-                                .filter(h => !deletedIds.has(h.id));
-                        },
-                        error: (err) => {
-                            this.showMessage('Error', err?.message || 'Failed to delete', 'error');
-                        }
-                    });
+        for (const day of slot.selectedDays) {
+            for (const existing of this.slotList) {
+                if (!existing.selectedDays.includes(day)) continue;
+
+                if (start < existing.endTime && end > existing.startTime) {
+                    this.showMessage(
+                        'Validation Error',
+                        `${this.getDayLabel(day)} overlap detected`,
+                        'error',
+                    );
+                    return false;
+                }
             }
-        });
+        }
+
+        return true;
     }
 
-    private removeSlotLocally(slot: OperatingHourSlot, dayValue?: number): void {
+    // =========================
+    // REMOVE SLOT
+    // =========================
+    removeSlot(slot: OperatingHourSlot, dayValue?: number): void {
         if (dayValue !== undefined) {
             slot.selectedDays = slot.selectedDays.filter(d => d !== dayValue);
             if (slot.selectedDays.length === 0) {
@@ -190,151 +216,124 @@ export class AddEditScreenComponent extends AppComponent implements OnInit, OnDe
         }
     }
 
-    private findMatchingOperatingHours(slot: OperatingHourSlot, dayValue?: number): ScreenOperatingHour[] {
-        const daysToMatch = dayValue !== undefined ? [dayValue] : slot.selectedDays;
-        return this.existingOperatingHours.filter(h =>
-            daysToMatch.includes(h.dayOfWeek) &&
-            h.startTime.startsWith(slot.startTime) &&
-            h.endTime.startsWith(slot.endTime)
+    // =========================
+    // HELPERS
+    // =========================
+    getSlotDayRows(slot: OperatingHourSlot) {
+        return this.dayOptions.filter(d =>
+            slot.selectedDays.includes(d.value),
         );
-    }
-
-    // ─── Display helpers ──────────────────────────────────────────
-
-    getSlotDayRows(slot: OperatingHourSlot): { label: string; value: number }[] {
-        return this.dayOptions.filter(d => slot.selectedDays.includes(d.value));
     }
 
     getDayLabel(dayValue: number): string {
         return this.dayOptions.find(d => d.value === dayValue)?.label || '';
     }
 
-    private buildDayLabel(slot: OperatingHourSlot, dayValue?: number): string {
-        if (dayValue !== undefined) return this.getDayLabel(dayValue);
-        return this.dayOptions
-            .filter(d => slot.selectedDays.includes(d.value))
-            .map(d => d.label)
-            .join(', ');
-    }
-
     trackBySlotId(index: number, slot: OperatingHourSlot): string {
         return slot.id;
     }
 
-    // ─── Validation ───────────────────────────────────────────────
+    toggleDay(dayValue: number): void {
+    const index = this.draftSlot.selectedDays.indexOf(dayValue);
 
-    private validateDraftSlot(): boolean {
-        if (this.draftSlot.selectedDays.length === 0) {
-            alert('Select at least one day');
-            return false;
-        }
-        if (!this.draftSlot.startTime || !this.draftSlot.endTime) {
-            alert('Start and end time are required');
-            return false;
-        }
-        if (this.draftSlot.startTime >= this.draftSlot.endTime) {
-            alert('End time must be after start time');
-            return false;
-        }
-        if (!this.isSlotTimeValid(this.draftSlot)) {
-            alert('Time slot overlaps with an existing schedule');
-            return false;
-        }
-        return true;
+    if (index === -1) {
+        this.draftSlot.selectedDays.push(dayValue);
+    } else {
+        this.draftSlot.selectedDays.splice(index, 1);
     }
+}
 
-    private isSlotTimeValid(proposed: OperatingHourSlot): boolean {
-        for (const day of proposed.selectedDays) {
-            const existingForDay = this.slotList.filter(s => s.selectedDays.includes(day));
-            for (const existing of existingForDay) {
-                if (proposed.startTime < existing.endTime && proposed.endTime > existing.startTime) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+toggleEveryday(): void {
+    this.draftSlot.selectedDays =
+        this.isEverydaySelected()
+            ? []
+            : this.dayOptions.map(d => d.value);
+}
 
-    // ─── Submit ───────────────────────────────────────────────────
+isEverydaySelected(): boolean {
+    return (
+        this.draftSlot.selectedDays.length === this.dayOptions.length &&
+        this.dayOptions.length > 0
+    );
+}
 
-    onSubmit(): void {
-        if (!this.screen.name?.trim()) { alert('Screen name is required'); return; }
-        if (!this.screen.location?.trim()) { alert('Location is required'); return; }
-        if (!this.screen.resolution?.trim()) { alert('Resolution is required'); return; }
-        if (this.slotList.length === 0) { alert('Add at least one operating hour slot'); return; }
-
-        this.screen.operatingHour = this.slotList.flatMap(slot =>
-            slot.selectedDays.map(dayOfWeek => {
-                const hour = new ScreenOperatingHour();
-                hour.dayOfWeek = dayOfWeek;
-                hour.startTime = `${slot.startTime}:00`;
-                hour.endTime = `${slot.endTime}:00`;
-                hour.avgAudienceCount = slot.avgAudienceCount;
-                hour.createdBy = 1;
-                hour.updatedBy = 1;
-                return hour;
-            })
-        );
-
-        if (this.existingData) {
-            this.screenService.update(this.screen as ScreenUpdate)
-                .pipe(takeUntil(this.destroy$))
-                .subscribe({
-                    next: (res: any) => {
-                        this.showMessage('Success', 'Screen updated successfully', 'success');
-                        this.isShow = false;
-                        this.onSave.emit(res?.data);
-                    },
-                    error: (err: any) => {
-                        this.showMessage('Error', err?.message || 'Failed to update screen', 'error');
-                    }
-                });
-        } else {
-            this.screenService.add(this.screen as ScreenInsert)
-                .pipe(takeUntil(this.destroy$))
-                .subscribe({
-                    next: (res: any) => {
-                        this.showMessage('Success', 'Screen created successfully', 'success');
-                        this.isShow = false;
-                        this.onSave.emit(res?.data);
-                    },
-                    error: (err: any) => {
-                        this.showMessage('Error', err?.message || 'Failed to create screen', 'error');
-                    }
-                });
-        }
-    }
-
-    cancel(): void {
-        this.isShow = false;
-        this.existingData = null;
-        this.screen = new Screens();
-        this.slotList = [];
-        this.draftSlot = this.createEmptySlot();
-        this.existingOperatingHours = [];
-    }
-
-    // ─── Conversion helpers ───────────────────────────────────────
-
-    private convertOperatingHoursToSlots(hours: ScreenOperatingHour[]): OperatingHourSlot[] {
+    // =========================
+    // CONVERT BACKEND → UI
+    // =========================
+    private convertOperatingHoursToSlots(
+        hours: ScreenOperatingHour[],
+    ): OperatingHourSlot[] {
         const grouped = new Map<string, OperatingHourSlot>();
         let counter = 0;
 
         for (const hour of hours) {
             const key = `${hour.startTime}|${hour.endTime}|${hour.avgAudienceCount}`;
+
             if (!grouped.has(key)) {
                 grouped.set(key, {
                     id: `slot_${counter++}`,
                     selectedDays: [],
-                    startTime: hour.startTime.substring(0, 5),
-                    endTime: hour.endTime.substring(0, 5),
+                    startTime: hour.startTime?.substring(0, 8) ?? '',
+                    endTime: hour.endTime?.substring(0, 8) ?? '',
                     avgAudienceCount: hour.avgAudienceCount,
                 });
             }
+
             grouped.get(key)!.selectedDays.push(hour.dayOfWeek);
         }
 
         return Array.from(grouped.values());
+    }
+
+    // =========================
+    // SUBMIT
+    // =========================
+    onSubmit(): void {
+        if (!this.screen.name?.trim()) {
+            alert('Screen name required');
+            return;
+        }
+
+        if (!this.slotList.length) {
+            alert('Add slots');
+            return;
+        }
+
+        this.screen.operatingHour = this.slotList.flatMap(slot =>
+            slot.selectedDays.map(day => {
+                const h = new ScreenOperatingHour();
+                h.dayOfWeek = day;
+                h.startTime = slot.startTime;
+                h.endTime = slot.endTime;
+                h.avgAudienceCount = slot.avgAudienceCount;
+                h.createdBy = 1;
+                h.updatedBy = 1;
+                return h;
+            }),
+        );
+
+        const req$ = this.existingData
+            ? this.screenService.update(this.screen as ScreenUpdate)
+            : this.screenService.add(this.screen as ScreenInsert);
+
+        req$.pipe(takeUntil(this.destroy$)).subscribe({
+            next: () => {
+                this.showMessage('Success', 'Saved', 'success');
+                this.isShow = false;
+                this.onSave.emit();
+            },
+            error: err => {
+                this.showMessage('Error', err?.message, 'error');
+            },
+        });
+    }
+
+    cancel(): void {
+        this.isShow = false;
+        this.slotList = [];
+        this.draftSlot = this.createEmptySlot();
+        this.draftStartTime = null;
+        this.draftEndTime = null;
     }
 
     ngOnDestroy(): void {

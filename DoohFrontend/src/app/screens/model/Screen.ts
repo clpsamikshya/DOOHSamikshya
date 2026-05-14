@@ -1,4 +1,4 @@
-import { ScreenStatus, ScreenOrientation } from "./ScreenEnum";  
+import { ScreenStatus, ScreenOrientation, ScreenResolution } from "./ScreenEnum";  
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -123,9 +123,9 @@ export class ScreenInsert {
   tenantId: number;
   name: string;
   location: string;
-  resolution: string;
+  //resolution: string;
   tag: string[] | null;
-
+  resolution : ScreenResolution;
   orientation: ScreenOrientation;
   status: ScreenStatus;
 
@@ -137,7 +137,7 @@ export class ScreenInsert {
     this.tenantId = 0;
     this.name = '';
     this.location = '';
-    this.resolution = '';
+    this.resolution = ScreenResolution.R1920x1080;
 
     this.tag = null;
 
@@ -155,7 +155,7 @@ export class ScreenUpdate {
 
   name: string;
   location: string;
-  resolution: string;
+  resolution : ScreenResolution;
   tag: string[] | null;
 
   orientation: ScreenOrientation;
@@ -170,7 +170,7 @@ export class ScreenUpdate {
 
     this.name = '';
     this.location = '';
-    this.resolution = '';
+    this.resolution = ScreenResolution.R1920x1080;
 
     this.tag = null;
 

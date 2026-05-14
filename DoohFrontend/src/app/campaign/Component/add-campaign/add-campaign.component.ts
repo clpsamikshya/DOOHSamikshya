@@ -256,7 +256,7 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
         const payload: CampaignInsert = {
             tenantId: 1,
             name: this.campaign.name,
-            status: 1,
+            status: CampaignStatus.New,
             remarks: this.campaign.remarks,
             createdBy: 1,
             date: this.campaign.dateRanges
