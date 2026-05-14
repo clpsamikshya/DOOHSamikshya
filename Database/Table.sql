@@ -159,18 +159,5 @@ CREATE TABLE [dbo].[CampaignMedia] (
 	CONSTRAINT FK_CampaignMedia_DeletedBy FOREIGN KEY (DeletedBy) REFERENCES core.[User](Id)
 );
 
-CREATE TABLE [report].[ProofOfPlay] (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
-    ScreenId INT NOT NULL,
-    MediaId INT NOT NULL,
-    CampaignId INT NOT NULL,
-    PlayedAt DATETIMEOFFSET NOT NULL,
-    PlayedDuration INT NOT NULL,
-    Status INT NOT NULL DEFAULT 1,
-
-    CONSTRAINT FK_ProofOfPlay_Screen FOREIGN KEY (ScreenId) REFERENCES [Inv].[Screen](Id),
-    CONSTRAINT FK_ProofOfPlay_Media FOREIGN KEY (MediaId) REFERENCES [dbo].[MediaLibrary](Id),
-    CONSTRAINT FK_ProofOfPlay_Campaign FOREIGN KEY (CampaignId) REFERENCES [dbo].[Campaign](Id)
-);
 
 

@@ -8,38 +8,23 @@
     styleClass="screen-info-dialog"
     (onHide)="close()"
 >
-
     <!-- LOADING STATE (no spinner as requested) -->
     <div *ngIf="isLoading" class="loading-wrap">
-        <p-message
-            severity="info"
-            text="Loading screen details..."
-        ></p-message>
+        <p-message severity="info" text="Loading screen details..."></p-message>
     </div>
 
     <!-- DATA STATE -->
     <div *ngIf="!isLoading && screen" class="screen-info">
-
-        <!-- =====================================================
-             BASIC INFORMATION
-        ====================================================== -->
+        
+<!-- basic information -->
         <div class="section">
-            <div class="section-title">
-                Basic Information
-            </div>
+            <div class="section-title">Basic Information</div>
 
             <div class="info-grid">
-
                 <div class="info-item">
                     <label>Name</label>
                     <span>{{ screen.name }}</span>
                 </div>
-
-                <div class="info-item">
-                    <label>Code</label>
-                    <span>{{ screen.code }}</span>
-                </div>
-
                 <div class="info-item">
                     <label>Location</label>
                     <span>{{ screen.location }}</span>
@@ -51,74 +36,69 @@
                 </div>
 
                 <div class="info-item">
-                    <label>Orientation</label>
-                    <span>{{ screen.orientationName }}</span>
+                    <label>Resolution</label>
+                    <span>{{ screen?.statusLabel }}</span>
                 </div>
-
-                <div class="info-item">
-                    <label>Status</label>
-                    <p-tag
-                        [value]="screen.statusName"
-                        [severity]="screen.status === 1 ? 'success' : 'danger'"
-                    ></p-tag>
-                </div>
-
             </div>
         </div>
 
         <!-- =====================================================
      OPERATING HOURS
 ====================================================== -->
-<div class="section" *ngIf="screen.operatingHour && screen.operatingHour.length > 0">
-    <div class="section-title">
-        Operating Hours
-    </div>
+        <div
+            class="section"
+            *ngIf="screen.operatingHour && screen.operatingHour.length > 0"
+        >
+            <div class="section-title">Operating Hours</div>
 
-    <div class="operating-hours-list">
-        <div *ngFor="let hour of screen.operatingHour" class="hour-item">
-            <div class="hour-day">
-                <i class="pi pi-calendar"></i>
-                <span>{{ getDayName(hour.dayOfWeek) }}</span>
+            <div class="operating-hours-list">
+                <div
+                    *ngFor="let hour of screen.operatingHour"
+                    class="hour-item"
+                >
+                    <div class="hour-day">
+                        <i class="pi pi-calendar"></i>
+                        <span>{{ getDayName(hour.dayOfWeek) }}</span>
+                    </div>
+                    <div class="hour-time">
+                        <i class="pi pi-clock"></i>
+                        <span
+                            >{{ hour.startTime | slice: 0 : 5 }} -
+                            {{ hour.endTime | slice: 0 : 5 }}</span
+                        >
+                    </div>
+                    <div class="hour-audience">
+                        <i class="pi pi-users"></i>
+                        <span>{{ hour.avgAudienceCount }} avg</span>
+                    </div>
+                    <p-tag
+                        *ngIf="hour.isDeleted"
+                        severity="danger"
+                        value="Deleted"
+                        styleClass="ml-2"
+                    />
+                </div>
             </div>
-            <div class="hour-time">
-                <i class="pi pi-clock"></i>
-                <span>{{ hour.startTime | slice:0:5 }} - {{ hour.endTime | slice:0:5 }}</span>
-            </div>
-            <div class="hour-audience">
-                <i class="pi pi-users"></i>
-                <span>{{ hour.avgAudienceCount }} avg</span>
-            </div>
-            <p-tag 
-                *ngIf="hour.isDeleted" 
-                severity="danger" 
-                value="Deleted"
-                styleClass="ml-2"
-            />
         </div>
-    </div>
-</div>
 
-<div class="section" *ngIf="!screen.operatingHour || screen.operatingHour.length === 0">
-    <div class="section-title">
-        Operating Hours
-    </div>
-    <p-message
-        severity="info"
-        text="No operating hours configured."
-        styleClass="w-full"
-    ></p-message>
-</div>
-
+        <div
+            class="section"
+            *ngIf="!screen.operatingHour || screen.operatingHour.length === 0"
+        >
+            <div class="section-title">Operating Hours</div>
+            <p-message
+                severity="info"
+                text="No operating hours configured."
+                styleClass="w-full"
+            ></p-message>
+        </div>
     </div>
 
     <!-- =====================================================
          EMPTY STATE (safety fallback)
     ====================================================== -->
     <div *ngIf="!isLoading && !screen">
-        <p-message
-            severity="warn"
-            text="No screen data found."
-        ></p-message>
+        <p-message severity="warn" text="No screen data found."></p-message>
     </div>
 
     <!-- FOOTER -->
@@ -130,5 +110,4 @@
             (onClick)="close()"
         ></p-button>
     </ng-template>
-
 </p-dialog>

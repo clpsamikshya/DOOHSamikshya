@@ -16,7 +16,7 @@ export class ScreenInfoComponent extends AppComponent implements OnDestroy {
 
     isShow = false;
     isLoading = false;
-    screen: any = null;  // KEEP AS 'any'
+    screen: any = null;  
 
     constructor(injector: Injector) {
         super(injector);
@@ -30,36 +30,49 @@ export class ScreenInfoComponent extends AppComponent implements OnDestroy {
     }
 
     loadScreen(id: number): void {
-        this.isLoading = true;
+    this.isLoading = true;
 
-        this.screenService
-            .getAll({
-                search: '',
-                status: null,
-                orientation: null,
-                offset: 0,
-                pageSize: 1000,
-            })
-            .pipe(takeUntil(this.destroy$))
-            .subscribe({
-                next: (res: any) => {
-                    const screens = res.data?.data ?? [];
+    this.screenService
+        .getAll({
+            search: '',
+            status: null,
+            orientation: null,
+            offset: 0,
+            pageSize: 1000,
+        })
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+            next: (res: any) => {
+                const screens = res.data?.data ?? [];
 
-                    this.screen = screens.find((x: any) => x.id === id);
+                const foundScreen = screens.find((x: any) => x.id === id);
 
+                if (!foundScreen) {
                     this.isLoading = false;
-
-                    if (!this.screen) {
-                        this.showMessage('Error', 'Screen not found', 'error');
-                        this.close();
-                    }
-                },
-                error: (err: any) => {
-                    this.isLoading = false;
-                    this.showMessage('Error', err.message, 'error');
+                    this.showMessage('Error', 'Screen not found', 'error');
+                    this.close();
+                    return;
                 }
-            });
-    }
+
+                this.screen = {
+                    ...foundScreen,
+
+                    statusLabel:
+                        foundScreen.status === 1
+                            ? 'Active'
+                            : foundScreen.status === 2
+                            ? 'Inactive'
+                            : 'Unknown',
+                };
+
+                this.isLoading = false;
+            },
+            error: (err: any) => {
+                this.isLoading = false;
+                this.showMessage('Error', err.message, 'error');
+            }
+        });
+}
     getDayName(dayOfWeek: number): string {
         const days = ['','Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         return days[dayOfWeek] || 'Unknown';
