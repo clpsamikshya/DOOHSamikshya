@@ -1,3 +1,4 @@
+import { CampaignStatus } from "./CampaignEnum";
 
 
 export interface ApiResponse<T> {
@@ -9,7 +10,7 @@ export interface ApiResponse<T> {
 
 export interface CampaignFilter {
     search?: string;
-    status?: number | null;
+    status?: CampaignStatus | null;
     campaignId?: number | null;
     offset?: number;
     pageSize?: number;
@@ -50,7 +51,7 @@ export class Campaign {
     tenantId: number;
 
     name: string;
-    status: number;
+    status: CampaignStatus;
     durationInDays: number;
     remarks: string;
 
@@ -76,6 +77,7 @@ export class Campaign {
         this.tenantId = 0;
 
         this.name = '';
+        // this.status = CampaignStatus.New;
         this.status = 1;
         this.durationInDays = 0;
         this.remarks = '';
@@ -107,7 +109,7 @@ export class CampaignInsert {
     tenantId: number = 1;
 
     name: string = '';
-    status: number = 1;
+    status: CampaignStatus;
     remarks: string = '';
 
     createdBy: number = 1;
@@ -134,7 +136,7 @@ export class CampaignUpdate {
     id: number;
 
     name: string;
-    status: number;
+    status: CampaignStatus;
     remarks: string;
 
     updatedBy: number;

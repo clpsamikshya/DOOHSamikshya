@@ -251,7 +251,8 @@ export class AddCampaignComponent extends AppComponent implements OnInit, OnDest
     }
 
     goBack(): void {
-        this.activeStep--;
+        // this.activeStep--;
+        this.activeStep;
     }
 
     // Submit the campaign to backend
