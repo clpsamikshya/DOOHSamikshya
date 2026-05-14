@@ -26,6 +26,10 @@ import { AddEditCampaignMediaComponent } from '../campaign-media/add-edit-campai
 })
 export class CampaignListComponent extends AppComponent implements OnInit, OnDestroy {
 
+    @ViewChild('addedit') addedit!: AddCampaignComponent;
+    @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
+    @ViewChild('campaignMedia') campaignMedia!: AddEditCampaignMediaComponent;
+
     private destroy$ = new Subject<void>();
 
     campaigns: Campaign[] = [];
@@ -51,14 +55,7 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
         pageSize: 10,
     };
 
-    @ViewChild('addedit') addedit!: AddCampaignComponent;
-    @ViewChild('campaignInfo') campaignInfo!: CampaignInfoComponent;
-    @ViewChild('campaignMedia') campaignMedia!: AddEditCampaignMediaComponent;
-
-    constructor(
-        injector: Injector,
-        private route: ActivatedRoute
-    ) {
+    constructor(injector: Injector, private route: ActivatedRoute) {
         super(injector);
     }
 
@@ -71,9 +68,8 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
             });
     }
 
-    /* ================= LOAD ================= */
-    loadCampaigns(): void {
-        this.isLoading = true;
+    loadCampaigns(showLoader = true): void {
+        if (showLoader) this.isLoading = true;
 
         this.campaignService.getCampaigns(this.filter)
             .pipe(takeUntil(this.destroy$))
@@ -90,70 +86,50 @@ export class CampaignListComponent extends AppComponent implements OnInit, OnDes
             });
     }
 
-    /* ================= FILTER ================= */
     applyFilter(): void {
-        this.loadCampaigns();
+        this.filter.offset = 0;
+        this.loadCampaigns(false);
     }
 
     clearFilter(): void {
-        this.filter = {
-            search: '',
-            status: null,
-            campaignId: null,
-            offset: 0,
-            pageSize: this.pageSize,
-        };
-        this.loadCampaigns();
+        this.filter.search = '';
+        this.filter.status = null;
+        this.filter.offset = 0;
+        this.filter.pageSize = this.pageSize;
+        this.loadCampaigns(false);
     }
 
-    /* ================= PAGINATION ================= */
     onPageChange(event: any): void {
         this.filter.offset = event.first;
         this.filter.pageSize = event.rows;
         this.loadCampaigns();
     }
 
-    /* ================= ACTIONS ================= */
-    openAddCampaign(): void {
-        this.addedit?.onShow();
-    }
-
-    openCampaignInfo(campaign: Campaign): void {
-        this.campaignInfo?.show(campaign);
-    }
-
-    openCampaignMedia(campaign: Campaign): void {
-        this.campaignMedia?.onShow(campaign.id);
-    }
-
-    onSaveCampaign(): void {
-        this.loadCampaigns();
-    }
-
-    /* ================= DELETE ================= */
     deleteCampaign(campaign: Campaign): void {
         this.confirmAction({
             message: `Are you sure you want to delete ${campaign.name}?`,
             header: 'Delete Confirmation',
-
             accept: () => {
                 this.campaignService.deleteCampaign(campaign.id)
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: () => {
                             this.showMessage('Success', 'Deleted successfully', 'success');
-                            this.loadCampaigns();
+                            this.loadCampaigns(false);
                         },
                         error: (err) => {
                             this.showMessage('Error', err.message, 'error');
                         },
                     });
             },
-
             reject: () => {
                 this.showMessage('Info', 'Cancelled', 'info');
             },
         });
+    }
+
+    trackById(index: number, item: Campaign): number {
+        return item.id;
     }
 
     ngOnDestroy(): void {

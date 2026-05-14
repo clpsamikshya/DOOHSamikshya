@@ -1,80 +1,99 @@
-.op-hours-dialog-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-
-    .op-hours-screen-name {
-        font-weight: 400;
-        color: var(--text-color-secondary);
-        font-size: 0.875rem;
-
-        &::before {
-            content: '—';
-            margin-right: 0.35rem;
-        }
-    }
+// ── Dialog overrides ──────────────────────────────────────────
+.screen-info-dialog .p-dialog-content {
+    padding: 0;
 }
-.operating-hours-list {
+
+// ── Loading ───────────────────────────────────────────────────
+.loading-wrap {
+    padding: 1.5rem;
+}
+
+// ── Main wrapper ──────────────────────────────────────────────
+.screen-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.25rem 1.5rem;
+}
+
+// ── Section ───────────────────────────────────────────────────
+.section {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
+.section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-color-secondary);
+    padding-bottom: 0.5rem;
+    border-bottom: 0.5px solid var(--surface-border);
+}
+
+// ── Info grid ─────────────────────────────────────────────────
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    label {
+        font-size: 11px;
+        color: var(--text-color-secondary);
+        font-weight: 400;
+    }
+
+    span {
+        font-size: 14px;
+        color: var(--text-color);
+        font-weight: 400;
+    }
+}
+
+// ── Operating hours ───────────────────────────────────────────
+.operating-hours-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .hour-item {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background-color: var(--surface-50);
-    border-radius: 6px;
-    border-left: 3px solid var(--primary-color);
+    gap: 1.25rem;
+    padding: 0.6rem 0.875rem;
+    background: var(--surface-ground);
+    border-radius: var(--border-radius);
+    border: 0.5px solid var(--surface-border);
 
-    .hour-day,
+    .hour-day {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 120px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-color);
+
+        i { font-size: 14px; color: var(--text-color-secondary); }
+    }
+
     .hour-time,
     .hour-audience {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        
-        i {
-            color: var(--primary-color);
-        }
-    }
-
-    .hour-day {
-        min-width: 120px;
-        font-weight: 500;
-    }
-
-    .hour-time {
-        min-width: 140px;
-    }
-
-    .hour-audience {
-        min-width: 100px;
+        gap: 6px;
+        font-size: 13px;
         color: var(--text-color-secondary);
-        font-size: 0.9rem;
-    }
-}
 
-.no-hours-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    color: var(--text-color-secondary);
-    gap: 0.5rem;
-
-    i {
-        font-size: 2rem;
-        opacity: 0.4;
-    }
-
-    p {
-        margin: 0;
-        font-size: 0.9rem;
+        i { font-size: 14px; }
     }
 }

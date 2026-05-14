@@ -1,11 +1,6 @@
-import {
-    Component,
-    Injector,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from '@angular/core';
+import { Component, Injector, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
+
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/sharedImports';
 import { MediaFilter, MediaLibrary } from '../../model/MediaLibrary';
@@ -18,18 +13,17 @@ import { AddMediaComponent } from '../add-media/add-media.component';
     templateUrl: './media-library.component.html',
     styleUrls: ['./media-library.component.scss'],
 })
-export class MediaLibraryComponent
-    extends AppComponent
-    implements OnInit, OnDestroy
-{
-    private readonly destroy$ = new Subject<void>();
+export class MediaLibraryComponent extends AppComponent implements OnInit, OnDestroy {
 
     @ViewChild('addMedia') addMedia!: AddMediaComponent;
+
+    private destroy$ = new Subject<void>();
 
     mediaList: MediaLibrary[] = [];
     isLoading = false;
     totalRecords = 0;
     pageSize = 10;
+
     previewVisible = false;
     previewMedia: MediaLibrary | null = null;
 
@@ -52,6 +46,7 @@ export class MediaLibraryComponent
         { label: 'Image', value: false },
         { label: 'Video', value: true },
     ];
+
     constructor(injector: Injector) {
         super(injector);
     }
@@ -60,35 +55,10 @@ export class MediaLibraryComponent
         this.loadMedia();
     }
 
-    applyFilter(): void {
-        this.filter = { ...this.filter, offset: 0 };
-        this.loadMedia();
-    }
+    loadMedia(showLoader = true): void {
+        if (showLoader) this.isLoading = true;
 
-    clearFilter(): void {
-        this.filter = {
-            search: '',
-            isVideo: undefined,
-            deleteMode: 'active',
-            offset: 0,
-            pageSize: this.pageSize,
-        };
-        this.loadMedia();
-    }
-
-    onPageChange(event: any): void {
-        this.filter = {
-            ...this.filter,
-            offset: event.first,
-            pageSize: event.rows,
-        };
-        this.loadMedia();
-    }
-
-    loadMedia(): void {
-        this.isLoading = true;
-        this.mediaLibraryService
-            .getMediaLibrary(this.filter)
+        this.mediaLibraryService.getMediaLibrary(this.filter)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (res: any) => {
@@ -103,30 +73,44 @@ export class MediaLibraryComponent
             });
     }
 
-    onDelete(media: MediaLibrary): void {
+    applyFilter(): void {
+        this.filter.offset = 0;
+        this.loadMedia(false);
+    }
+
+    clearFilter(): void {
+        this.filter.search = '';
+        this.filter.isVideo = undefined;
+        this.filter.deleteMode = 'active';
+        this.filter.offset = 0;
+        this.filter.pageSize = this.pageSize;
+        this.loadMedia(false);
+    }
+
+    onPageChange(event: any): void {
+        this.filter.offset = event.first;
+        this.filter.pageSize = event.rows;
+        this.loadMedia();
+    }
+
+    deleteMedia(media: MediaLibrary): void {
         this.confirmAction({
             message: 'Are you sure you want to delete this media?',
             header: 'Confirm Deletion',
             accept: () => {
-                this.mediaLibraryService
-                    .deleteMedia(media.id)
+                this.mediaLibraryService.deleteMedia(media.id)
                     .pipe(takeUntil(this.destroy$))
                     .subscribe({
                         next: () => {
-                            this.showMessage(
-                                'Success',
-                                'Media deleted successfully',
-                                'success',
-                            );
-                            this.loadMedia();
+                            this.showMessage('Success', 'Media deleted successfully', 'success');
+                            this.loadMedia(false);
                         },
                         error: (err: any) => {
                             this.showMessage('Error', err.message, 'error');
                         },
                     });
             },
-            reject: () =>
-                this.showMessage('Info', 'Deletion cancelled', 'info'),
+            reject: () => this.showMessage('Info', 'Deletion cancelled', 'info'),
         });
     }
 
@@ -135,21 +119,18 @@ export class MediaLibraryComponent
         this.previewVisible = true;
     }
 
-    // closePreview(): void {
-    //     this.previewVisible = false;
-    //     this.previewMedia = null;
-    // }
-
     closePreview(): void {
-        const videoEl = document.querySelector(
-            'p-dialog video',
-        ) as HTMLVideoElement;
+        const videoEl = document.querySelector('p-dialog video') as HTMLVideoElement;
         if (videoEl) {
             videoEl.pause();
             videoEl.currentTime = 0;
         }
         this.previewVisible = false;
         this.previewMedia = null;
+    }
+
+    trackById(index: number, item: MediaLibrary): number {
+        return item.id;
     }
 
     ngOnDestroy(): void {

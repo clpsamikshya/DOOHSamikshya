@@ -5,86 +5,51 @@
     [style]="{ width: '750px' }"
     [draggable]="false"
     [resizable]="false"
-    styleClass="screen-dialog"
-    (onHide)="onCancel()"
+    (onHide)="cancel()"
 >
     <form (ngSubmit)="onSubmit()" #screenForm="ngForm">
         <p-tabView>
-            <!-- ─── TAB 1: Screen Details ─── -->
+
+            <!-- TAB 1: Screen Details -->
             <p-tabPanel header="Screen">
                 <div class="form-grid">
+
                     <div class="form-field">
-                        <label for="name" class="form-label required">
-                            Screen Name
-                        </label>
+                        <label class="form-label required">Screen Name</label>
                         <input
                             pInputText
-                            id="name"
                             name="name"
                             [(ngModel)]="screen.name"
                             placeholder="Enter screen name"
-                            required
-                            #nameInput="ngModel"
                             class="w-full"
                         />
-                        <small
-                            class="error-message"
-                            *ngIf="nameInput.invalid && nameInput.touched"
-                        >
-                            Screen name is required
-                        </small>
                     </div>
 
                     <div class="form-field">
-                        <label for="location" class="form-label required">
-                            Location
-                        </label>
+                        <label class="form-label required">Location</label>
                         <input
                             pInputText
-                            id="location"
                             name="location"
                             [(ngModel)]="screen.location"
                             placeholder="e.g., 27.7172, 85.3240"
-                            required
-                            #locationInput="ngModel"
                             class="w-full"
                         />
-                        <small
-                            class="error-message"
-                            *ngIf="locationInput.invalid && locationInput.touched"
-                        >
-                            Location is required
-                        </small>
                     </div>
 
                     <div class="form-field">
-                        <label for="resolution" class="form-label required">
-                            Resolution
-                        </label>
+                        <label class="form-label required">Resolution</label>
                         <input
                             pInputText
-                            id="resolution"
                             name="resolution"
                             [(ngModel)]="screen.resolution"
                             placeholder="e.g., 1920x1080"
-                            required
-                            #resolutionInput="ngModel"
                             class="w-full"
                         />
-                        <small
-                            class="error-message"
-                            *ngIf="resolutionInput.invalid && resolutionInput.touched"
-                        >
-                            Resolution is required
-                        </small>
                     </div>
 
                     <div class="form-field">
-                        <label for="orientation" class="form-label">
-                            Orientation
-                        </label>
+                        <label class="form-label">Orientation</label>
                         <p-dropdown
-                            id="orientation"
                             name="orientation"
                             [(ngModel)]="screen.orientation"
                             [options]="orientationOptions"
@@ -96,11 +61,8 @@
                     </div>
 
                     <div class="form-field">
-                        <label for="status" class="form-label">
-                            Status
-                        </label>
+                        <label class="form-label">Status</label>
                         <p-dropdown
-                            id="status"
                             name="status"
                             [(ngModel)]="screen.status"
                             [options]="statusOptions"
@@ -112,11 +74,8 @@
                     </div>
 
                     <div class="form-field full-width">
-                        <label for="tags" class="form-label">
-                            Tags
-                        </label>
+                        <label class="form-label">Tags</label>
                         <p-chips
-                            id="tags"
                             name="tags"
                             [(ngModel)]="screen.tag"
                             placeholder="Add tags (press Enter)"
@@ -124,38 +83,125 @@
                             separator=","
                             ngDefaultControl
                         />
-                        <small class="field-hint">
-                            Press Enter or comma to add multiple tags
-                        </small>
+                        <small class="field-hint">Press Enter or comma to add multiple tags</small>
                     </div>
+
                 </div>
             </p-tabPanel>
 
-            <!-- ─── TAB 2: Operating Hours (Embedded Child Component) ─── -->
+            <!-- TAB 2: Operating Hours -->
             <p-tabPanel header="Operating Hours">
-                <add-edit-operating-hour
-                    [slotList]="slotList"
-                    [screenId]="existingData?.id ?? null"
-                    [existingOperatingHours]="existingData?.operatingHour || []"
-                    (slotsUpdated)="onSlotsUpdated($event)"
-                    [isEmbedded]="true"
-                ></add-edit-operating-hour>
+                <div class="operating-hours-editor">
+
+                    <!-- Add Slot Form -->
+                    <div class="oh-form-card">
+                        <h3 class="section-title">Add Time Slot</h3>
+
+                        <div class="form-field">
+                            <label class="form-label required">Select Days</label>
+                            <div class="day-pill-group">
+                                <button
+                                    type="button"
+                                    class="day-pill"
+                                    [class.selected]="isEverydaySelected()"
+                                    (click)="toggleEveryday()"
+                                >
+                                    Everyday
+                                </button>
+                                <button
+                                    *ngFor="let day of dayOptions"
+                                    type="button"
+                                    class="day-pill"
+                                    [class.selected]="draftSlot.selectedDays.includes(day.value)"
+                                    (click)="toggleDay(day.value)"
+                                >
+                                    {{ day.label.slice(0, 3) }}
+                                </button>
+                            </div>
+                            <small class="field-hint">Select one or more days for this time slot</small>
+                        </div>
+
+                        <div class="time-row">
+                            <div class="form-field">
+                                <label class="form-label required">Start Time</label>
+                                <input pInputText type="time" [(ngModel)]="draftSlot.startTime" name="draftStart" class="w-full" />
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label required">End Time</label>
+                                <input pInputText type="time" [(ngModel)]="draftSlot.endTime" name="draftEnd" class="w-full" />
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label">Avg. Audience</label>
+                                <input pInputText type="number" [(ngModel)]="draftSlot.avgAudienceCount" name="draftAudience" placeholder="0" min="0" class="w-full" />
+                            </div>
+                        </div>
+
+                        <p-button
+                            label="Add Slot"
+                            icon="pi pi-plus"
+                            severity="success"
+                            [outlined]="true"
+                            size="small"
+                            type="button"
+                            (click)="confirmSlot()"
+                        />
+                    </div>
+
+                    <!-- Slot Table -->
+                    <div class="oh-list-section">
+                        <h3 class="section-title">Current Schedule</h3>
+
+                        <table *ngIf="slotList.length > 0" class="oh-table">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Open</th>
+                                    <th>Close</th>
+                                    <th>Avg. Audience</th>
+                                    <th style="width: 50px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngFor="let slot of slotList; trackBy: trackBySlotId">
+                                    <tr *ngFor="let day of getSlotDayRows(slot)">
+                                        <td>{{ day.label }}</td>
+                                        <td>{{ slot.startTime }}</td>
+                                        <td>{{ slot.endTime }}</td>
+                                        <td>{{ slot.avgAudienceCount }}</td>
+                                        <td>
+                                            <p-button
+                                                icon="pi pi-trash"
+                                                severity="danger"
+                                                [text]="true"
+                                                [rounded]="true"
+                                                size="small"
+                                                type="button"
+                                                (click)="removeSlot(slot, day.value)"
+                                            />
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+
+                        <div *ngIf="slotList.length === 0" class="oh-empty">
+                            <i class="pi pi-clock" style="font-size: 2rem; opacity: 0.25"></i>
+                            <p>No operating hours added yet.</p>
+                            <small>Use the form above to add time slots.</small>
+                        </div>
+                    </div>
+
+                </div>
             </p-tabPanel>
+
         </p-tabView>
 
         <!-- Footer -->
         <div class="dialog-footer">
-            <p-button
-                label="Cancel"
-                severity="secondary"
-                [text]="true"
-                (click)="onCancel()"
-                type="button"
-            />
+            <p-button label="Cancel" severity="secondary" [text]="true" type="button" (click)="cancel()" />
             <p-button
                 [label]="(existingData ? 'Update' : 'Add') + ' Screen'"
                 severity="success"
-                [disabled]="screenForm.invalid"
                 type="submit"
             />
         </div>

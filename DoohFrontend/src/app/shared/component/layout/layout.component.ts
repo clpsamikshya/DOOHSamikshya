@@ -16,25 +16,18 @@ export class LayoutComponent implements OnInit {
   pageTitle = 'Dashboard';
 
   mainNav = [
-    { key: 'dashboard', label: 'Dashboard', route: '/dashboard',   badge: null },
-  ]; 
-  manageNav = [ 
-    { key: 'screens',   label: 'Screens',   route: '/screen-name', badge: null },
-    { key: 'media',   label: 'Media',   route: '/media-library', badge: null }, 
-    { key: 'campaigns', label: 'Campaigns', route: '/campaigns-list',   badge: null },
-    // { key: 'Tenant', label: 'Tenant', route: '/tenant',   badge: null },
-    // { key: 'reports',   label: 'Reports',   route: '/reports',     badge: null },
+    { key: 'dashboard', label: 'Dashboard', route: '/dashboard', icon: 'pi pi-home', badge: null },
   ];
 
-  // manageNav = [
-  //   { key: 'users',    label: 'Users',    route: '/users',    badge: null },
-  //   { key: 'settings', label: 'Settings', route: '/settings', badge: null },
-  // ];
+  manageNav = [
+    { key: 'screens',   label: 'Screens',   route: '/screen-name',    icon: 'pi pi-desktop' },
+    { key: 'media',     label: 'Media',     route: '/media-library',  icon: 'pi pi-images' },
+    { key: 'campaigns', label: 'Campaigns', route: '/campaigns-list', icon: 'pi pi-megaphone' },
+  ];
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-   
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: any) => {

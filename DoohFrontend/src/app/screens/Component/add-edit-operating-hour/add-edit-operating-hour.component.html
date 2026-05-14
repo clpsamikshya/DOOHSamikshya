@@ -40,15 +40,28 @@
         <!-- ─── Add New Slot Form ─── -->
         <div class="oh-form-card">
             <h3 class="section-title">Add Time Slot</h3>
-            
+
             <div class="form-field">
                 <label class="form-label required">Select Days</label>
                 <div class="day-pill-group">
+                    <!-- Select All Days -->
+                    <button
+                        type="button"
+                        class="day-pill"
+                        [class.selected]="isEverydaySelected()"
+                        (click)="toggleEveryday()"
+                    >
+                        Everyday
+                    </button>
+
+                    <!-- Individual Days -->
                     <button
                         *ngFor="let day of dayOptions"
                         type="button"
                         class="day-pill"
-                        [class.selected]="draftSlot.selectedDays.includes(day.value)"
+                        [class.selected]="
+                            draftSlot.selectedDays.includes(day.value)
+                        "
                         (click)="toggleDay(day.value)"
                     >
                         {{ day.label.slice(0, 3) }}
@@ -70,7 +83,7 @@
                         class="w-full"
                     />
                 </div>
-                
+
                 <div class="form-field">
                     <label class="form-label required">End Time</label>
                     <input
@@ -81,7 +94,7 @@
                         class="w-full"
                     />
                 </div>
-                
+
                 <div class="form-field">
                     <label class="form-label">Avg. Audience</label>
                     <input
@@ -123,7 +136,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <ng-container *ngFor="let slot of getActiveSlotList(); trackBy: trackBySlotId">
+                        <ng-container
+                            *ngFor="
+                                let slot of getActiveSlotList();
+                                trackBy: trackBySlotId
+                            "
+                        >
                             <tr *ngFor="let day of getSlotDayRows(slot)">
                                 <td>{{ day.label }}</td>
                                 <td>{{ slot.startTime }}</td>
@@ -134,7 +152,8 @@
                                         icon="pi pi-trash"
                                         severity="danger"
                                         [text]="true"
-                                        [rounded]="true"a
+                                        [rounded]="true"
+                                        a
                                         size="small"
                                         type="button"
                                         (click)="removeSlot(slot, day.value)"
@@ -148,7 +167,10 @@
 
             <!-- Empty State -->
             <div *ngIf="getActiveSlotList().length === 0" class="oh-empty">
-                <i class="pi pi-clock" style="font-size: 2rem; opacity: 0.25"></i>
+                <i
+                    class="pi pi-clock"
+                    style="font-size: 2rem; opacity: 0.25"
+                ></i>
                 <p>No operating hours added yet.</p>
                 <small>Use the form above to add time slots.</small>
             </div>

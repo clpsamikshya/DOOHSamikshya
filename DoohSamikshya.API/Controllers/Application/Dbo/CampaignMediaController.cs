@@ -40,7 +40,7 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
         {
             try
             {
-                var response = await cms.AddCampaignMedia(request);
+                var response = await cms.AddCampaignMedia (request);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)

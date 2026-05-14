@@ -7,7 +7,7 @@
     [maximizable]="false"
     header="Add Campaign"
     styleClass="add-campaign-dialog"
-    (onHide)="onCancel()"
+    
 >
     <p-stepper [linear]="true" [(activeStep)]="activeStep">
         <!-- STEP 1 -->
@@ -58,11 +58,11 @@
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <button
+                        <!-- <button
                             pButton
                             label="Cancel"
-                            (click)="onCancel()"
-                        ></button>
+                            (click)="cancel()"
+                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -174,11 +174,11 @@
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <button
+                        <!-- <button
                             pButton
                             label="Cancel"
-                            (click)="onCancel()"
-                        ></button>
+                            (click)="cancel()"
+                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -316,11 +316,11 @@
                             icon="pi pi-arrow-right"
                             (click)="goNext()"
                         ></button>
-                        <button
+                        <!-- <button
                             pButton
                             label="Cancel"
-                            (click)="onCancel()"
-                        ></button>
+                           (click)="cancel()" 
+                        ></button> -->
                     </div>
                 </div>
             </ng-template>
@@ -384,6 +384,7 @@
                             label="Back"
                             (click)="goBack()"
                         ></button>
+                        
                     </div>
                 </div>
             </ng-template>

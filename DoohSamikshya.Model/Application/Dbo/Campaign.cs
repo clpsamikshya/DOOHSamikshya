@@ -46,6 +46,7 @@ namespace DoohSamikshya.Model.Application.Dbo
         public string ScreenName { get; set; }
 
         public DateTime? PlayDate { get; set; }
+        public string? Url { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int CreatedBy { get; set; }
 

@@ -75,11 +75,6 @@ export class AddEditOperatingHourComponent
             this.slotCounter = this.findMaxSlotCounter(this.slotList);
         }
     }
-
-    /**
-     * Opens the editor dialog with existing slots.
-     * ONLY USED IN DIALOG MODE (isEmbedded = false)
-     */
     open(
         currentSlots: OperatingHourSlot[],
         screenId: number | null,
@@ -96,10 +91,6 @@ export class AddEditOperatingHourComponent
         this.isVisible = true;
     }
 
-    /**
-     * Finds the highest slot counter from existing slots.
-     * Ensures new slots get unique IDs even after editing.
-     */
     private findMaxSlotCounter(slots: OperatingHourSlot[]): number {
         if (slots.length === 0) return 0;
 
@@ -112,11 +103,8 @@ export class AddEditOperatingHourComponent
 
         return maxId + 1;
     }
-
-    /**
-     * Creates a new empty slot with default values.
-     */
-    private createEmptySlot(): OperatingHourSlot {
+    
+    createEmptySlot(): OperatingHourSlot {
         return {
             id: '',
             selectedDays: [],
@@ -140,10 +128,19 @@ export class AddEditOperatingHourComponent
         }
     }
 
-    /**
-     * Validates the draft slot before adding it to the list.
-     * Checks for required fields and time logic.
-     */
+    toggleEveryday(): void {
+    if (this.isEverydaySelected()) {
+        this.draftSlot.selectedDays = [];
+    } else {
+        this.draftSlot.selectedDays = this.dayOptions.map(day => day.value);
+    }
+}
+
+isEverydaySelected(): boolean {
+    return this.draftSlot.selectedDays.length === this.dayOptions.length;
+}
+
+
     private validateDraftSlot(): boolean {
         if (this.draftSlot.selectedDays.length === 0) {
             this.showMessage('Validation', 'Select at least one day', 'warn');

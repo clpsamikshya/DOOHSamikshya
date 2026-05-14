@@ -1,5 +1,4 @@
 <div class="page-header">
-    <!-- <h1 class="page-title">Screen</h1><br> -->
     <div class="page-actions">
         <p-button
             icon="pi pi-plus"
@@ -7,13 +6,12 @@
             [rounded]="true"
             size="small"
             label="Add Screen"
-            (onClick)="addedit.onShow()"
+            (onClick)="addedit.show()"
         />
     </div>
 </div>
 
 <div class="table-card">
-    <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="search-wrapper">
             <i class="pi pi-search search-icon"></i>
@@ -21,11 +19,9 @@
                 pInputText
                 type="text"
                 placeholder="Search"
-                s
                 [(ngModel)]="filter.search"
                 (keyup.enter)="applyFilter()"
                 class="search-input"
-                (onChange)="applyFilter()"
             />
         </div>
 
@@ -79,18 +75,18 @@
         [rowsPerPageOptions]="[5, 10, 20]"
         [loading]="isLoading"
         responsiveLayout="scroll"
-        class="p-datatable-sm"
+        styleClass="p-datatable-sm"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} screens"
-s    >
+    >
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="name">Name</th>
+                <th>Name</th>
                 <th>Location</th>
                 <th>Resolution</th>
                 <th>Tags</th>
-                <th pSortableColumn="orientation">Orientation</th>
-                <th pSortableColumn="status">Status</th>
+                <th>Orientation</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </ng-template>
@@ -102,23 +98,19 @@ s    >
                 </td>
                 <td>{{ screen.location }}</td>
                 <td>{{ screen.resolution }}</td>
-
                 <td>
                     <ng-container *ngIf="screen.tag?.length; else noTags">
                         <p-chip
-                            *ngFor="let t of screen.tag"
+                            *ngFor="let t of screen.tag; trackBy: trackById"
                             [label]="t"
                             class="mr-1"
                         />
                     </ng-container>
                     <ng-template #noTags>—</ng-template>
                 </td>
-
                 <td>
                     {{ screen.orientation === 1 ? 'Portrait' : 'Landscape' }}
                 </td>
-
-                <!-- STATUS CELL — screen variable is valid here -->
                 <td>
                     <span
                         class="status"
@@ -138,14 +130,22 @@ s    >
                         }}
                     </span>
                 </td>
-
                 <td class="action-cell">
+                    <p-button
+                        icon="pi pi-eye"
+                        severity="info"
+                        [rounded]="true"
+                        [text]="true"
+                        pTooltip="View details"
+                        tooltipPosition="top"
+                        (onClick)="screenInfo.show(screen.id)"
+                    />
                     <p-button
                         icon="pi pi-pencil"
                         severity="info"
                         [rounded]="true"
                         [text]="true"
-                        (onClick)="addedit.onShow(screen)"
+                        (onClick)="addedit.show(screen)"
                     />
                     <p-button
                         icon="pi pi-trash"
@@ -154,7 +154,6 @@ s    >
                         [text]="true"
                         (onClick)="deleteScreen(screen)"
                     />
-                    <!-- <p-button icon="pi pi-clock"  severity="secondary" [rounded]="true" [text]="true" (onClick)="opHours.onShow(screen)" /> -->
                 </td>
             </tr>
         </ng-template>
@@ -169,5 +168,5 @@ s    >
     </p-table>
 </div>
 
-<add-edit-screen #addedit (onSave)="loadScreens()" />
-
+<add-edit-screen #addedit (onSave)="loadScreens(false)" />
+<screen-info #screenInfo />

@@ -3,10 +3,10 @@
     [modal]="true"
     [closable]="true"
     [draggable]="false"
-    [style]="{ width: '650px' }"
+    [style]="{ width: '700px' }"
     [header]="existingData ? 'Edit Campaign Media' : 'Add Campaign Media'"
 >
-    <!-- ================= FORM SECTION ================= -->
+    <!-- FORM SECTION -->
     <div class="section">
         <div class="section-title">Campaign Media Form</div>
         <div class="form-grid">
@@ -21,31 +21,24 @@
                     placeholder="Select screen"
                     [showClear]="true"
                     [filter]="true"
+                    (onChange)="onScreenOrDateChange()"
                 ></p-dropdown>
             </div>
-            <!-- Media -->
-            <div class="flex flex-column gap-2">
-                <label>Media *</label>
-                <p-dropdown
-                    [(ngModel)]="campaignMedia.mediaId"
-                    [options]="mediaOptions"
-                    optionLabel="name"
-                    optionValue="id"
-                    placeholder="Select media"
-                    [showClear]="true"
-                    [filter]="true"
-                ></p-dropdown>
-            </div>
+
             <!-- Play Date -->
+             
             <div class="flex flex-column gap-2">
                 <label>Play Date *</label>
                 <input
                     type="date"
                     pInputText
                     [(ngModel)]="campaignMedia.playDate"
+                    (change)="onScreenOrDateChange()"
                 />
             </div>
-            <!-- Time -->
+            
+
+            <!-- Time row -->
             <div class="time-grid">
                 <div class="flex flex-column gap-2">
                     <label>Start *</label>
@@ -64,6 +57,7 @@
                     />
                 </div>
             </div>
+
             <!-- Duration -->
             <div class="flex flex-column gap-2">
                 <label>Duration</label>
@@ -72,97 +66,264 @@
                     [min]="0"
                 ></p-inputNumber>
             </div>
-            <!-- Order -->
-            <div class="flex flex-column gap-2">
-                <label>Order</label>
-                <p-inputNumber
-                    [(ngModel)]="campaignMedia.order"
-                    [min]="1"
-                ></p-inputNumber>
+
+            <!-- Multi-select Media -->
+            <div class="flex flex-column gap-2" style="grid-column: 1 / -1">
+                <label>
+                    Media *
+                    <span class="text-color-secondary text-sm">(select one or more)</span>
+                </label>
+
+                <p-multiSelect
+                    [options]="mediaOptions"
+                    [(ngModel)]="selectedMediaIds"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Select media"
+                    [filter]="true"
+                    [showClear]="true"
+                    display="chip"
+                    (onChange)="onMediaSelectionChange($event.value)"
+                >
+                    <!-- Dropdown list item: thumbnail + name + type -->
+                    <ng-template let-item pTemplate="item">
+                        <div style="display:flex; align-items:center; gap:10px; padding:4px 0;">
+
+                            <!-- Video placeholder -->
+                            <ng-container *ngIf="isVideo(item.url); else imgThumb">
+                                <div style="
+                                    width:48px; height:34px; border-radius:4px;
+                                    background:#1a1a2e; flex-shrink:0;
+                                    display:flex; align-items:center; justify-content:center;
+                                ">
+                                    <i class="pi pi-play" style="color:#7c6ff7; font-size:14px;"></i>
+                                </div>
+                            </ng-container>
+
+                            <!-- Image thumbnail -->
+                            <ng-template #imgThumb>
+                                <img
+                                    [src]="item.url"
+                                    [alt]="item.name"
+                                    style="
+                                        width:48px; height:34px; object-fit:cover;
+                                        border-radius:4px; flex-shrink:0;
+                                        border:0.5px solid #ddd;
+                                    "
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                />
+                                <!-- Fallback when image fails to load -->
+                                <div style="
+                                    display:none; width:48px; height:34px;
+                                    border-radius:4px; background:#f0f0f0; flex-shrink:0;
+                                    align-items:center; justify-content:center;
+                                ">
+                                    <i class="pi pi-image" style="color:#aaa; font-size:14px;"></i>
+                                </div>
+                            </ng-template>
+
+                            <!-- Name + type badge -->
+                            <div style="flex:1; min-width:0;">
+                                <div style="
+                                    font-size:13px; font-weight:500;
+                                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+                                ">{{ item.name }}</div>
+                                <div style="font-size:11px; color:#888; margin-top:1px;">
+                                    <span *ngIf="isVideo(item.url)">Video</span>
+                                    <span *ngIf="!isVideo(item.url)">Image</span>
+                                    <span *ngIf="item.fileSize"> · {{ item.fileSize }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Selected chip: tiny thumbnail beside the name -->
+                    <ng-template let-item pTemplate="selectedItem">
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <ng-container *ngIf="isVideo(item.url); else chipImg">
+                                <i class="pi pi-play" style="font-size:10px; color:#7c6ff7;"></i>
+                            </ng-container>
+                            <ng-template #chipImg>
+                                <img
+                                    [src]="item.url"
+                                    [alt]="item.name"
+                                    style="
+                                        width:20px; height:14px; object-fit:cover;
+                                        border-radius:2px; border:0.5px solid #ddd;
+                                    "
+                                    onerror="this.style.display='none';"
+                                />
+                            </ng-template>
+                            <span style="font-size:13px;">{{ item.name }}</span>
+                        </div>
+                    </ng-template>
+                </p-multiSelect>
+            </div>
+
+            <!-- Per-media play order table -->
+            <div
+                *ngIf="selectedMediaItems.length > 0"
+                class="flex flex-column gap-2"
+                style="grid-column: 1 / -1"
+            >
+                <label class="text-sm font-medium">
+                    Play Order
+                    <span class="text-color-secondary font-normal">
+                        — scoped to selected screen &amp; date
+                    </span>
+                </label>
+
+                <p-table [value]="selectedMediaItems" styleClass="p-datatable-sm">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:60%">Media</th>
+                            <th style="width:40%">Play Order</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-item let-i="rowIndex">
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>
+                                <p-inputNumber
+                                    [(ngModel)]="item.playOrder"
+                                    [min]="1"
+                                    [showButtons]="true"
+                                    buttonLayout="horizontal"
+                                    incrementButtonIcon="pi pi-plus"
+                                    decrementButtonIcon="pi pi-minus"
+                                    [style]="{ width: '130px' }"
+                                ></p-inputNumber>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <small *ngIf="selectedMediaItems.length > 1" class="text-color-secondary">
+                    <i class="pi pi-info-circle"></i>
+                    Each media must have a unique play order for the same screen and date.
+                </small>
             </div>
         </div>
     </div>
 
-    <!-- ================= MEDIA INFO SECTION ================= -->
-    <div class="section" *ngIf="mediaInfoData.length > 0" (click)="$event.stopPropagation()">
+    <!-- EXISTING MEDIA SECTION -->
+    <div
+        class="section"
+        *ngIf="mediaInfoData.length > 0"
+        (click)="$event.stopPropagation()"
+    >
         <div class="section-title">Existing Campaign Media</div>
         <p-table
             [value]="mediaInfoData"
             [scrollable]="true"
-            scrollHeight="250px"
+            scrollHeight="300px"
+            styleClass="p-datatable-sm p-datatable-gridlines"
         >
             <ng-template pTemplate="header">
                 <tr>
+                    <th style="width:80px;">Preview</th>
                     <th>Screen</th>
-                    <th>Media</th>
                     <th>Play Date</th>
-                    <th>Play Order</th>
-                    <th>Actions</th>
+                    <th>Media</th>
+                    <th style="width:160px;">Play Order</th>
+                    <th style="width:70px;">Del</th>
                 </tr>
             </ng-template>
+
             <ng-template pTemplate="body" let-row>
                 <tr>
+                    <!-- Preview thumbnail -->
+                    <td style="padding:6px 8px;">
+                        <ng-container *ngIf="isVideo(row.url); else rowImgThumb">
+                            <div style="
+                                width:64px; height:42px; border-radius:5px;
+                                background:#1a1a2e;
+                                display:flex; align-items:center; justify-content:center;
+                            ">
+                                <i class="pi pi-play" style="color:#7c6ff7; font-size:16px;"></i>
+                            </div>
+                        </ng-container>
+
+                        <ng-template #rowImgThumb>
+                            <ng-container *ngIf="row.url; else noThumb">
+                                <img
+                                    [src]="row.url"
+                                    [alt]="row.mediaName"
+                                    style="
+                                        width:64px; height:42px; object-fit:cover;
+                                        border-radius:5px; border:0.5px solid #ddd;
+                                        display:block;
+                                    "
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                />
+                                <!-- Fallback -->
+                                <div style="
+                                    display:none; width:64px; height:42px;
+                                    border-radius:5px; background:#f4f4f4;
+                                    align-items:center; justify-content:center;
+                                    border:0.5px solid #ddd;
+                                ">
+                                    <i class="pi pi-image" style="color:#bbb; font-size:16px;"></i>
+                                </div>
+                            </ng-container>
+                            <ng-template #noThumb>
+                                <div style="
+                                    width:64px; height:42px; border-radius:5px;
+                                    background:#f4f4f4; border:0.5px solid #ddd;
+                                    display:flex; align-items:center; justify-content:center;
+                                ">
+                                    <i class="pi pi-image" style="color:#bbb; font-size:16px;"></i>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+                    </td>
+
                     <td>{{ row.screenName }}</td>
-                    <td>{{ row.mediaName }}</td>
                     <td>{{ row.playDate | date: 'yyyy-MM-dd' }}</td>
-                    <!-- <td>
-                        <p-inputNumber
-                            [(ngModel)]="row.playOrder"
-                            [min]="1"
-                            [showButtons]="false"
-                            (onBlur)="onPlayOrderChange(row)">
-                        </p-inputNumber>
-                    </td> -->
+                    <td>{{ row.mediaName }}</td>
+
                     <td>
-                        <div class="flex align-items-center gap-2">
+                        <div class="flex align-items-center gap-1">
                             <p-inputNumber
                                 [(ngModel)]="row.playOrder"
                                 [min]="1"
                                 [showButtons]="false"
-                            >
-                            </p-inputNumber>
+                                [style]="{ width: '75px' }"
+                            ></p-inputNumber>
                             <p-button
                                 icon="pi pi-check"
                                 severity="success"
                                 [text]="true"
-                                (onClick)="
-                                    onPlayOrderChange(row);
-                                    $event.stopPropagation()
-                                "
-                            >
-                            </p-button>
+                                pTooltip="Save order"
+                                (onClick)="onPlayOrderChange(row); $event.stopPropagation()"
+                            ></p-button>
                         </div>
                     </td>
+
                     <td>
                         <p-button
                             icon="pi pi-trash"
                             severity="danger"
                             [text]="true"
                             (onClick)="deleteMediaRow(row)"
-                        >
-                        </p-button>
+                        ></p-button>
                     </td>
                 </tr>
             </ng-template>
+
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="5" class="text-center">No media found.</td>
+                    <td colspan="6" class="text-center">No media found.</td>
                 </tr>
             </ng-template>
         </p-table>
     </div>
 
-    <!-- ================= FOOTER ================= -->
+    <!-- FOOTER -->
     <ng-template pTemplate="footer">
         <div class="flex justify-content-end gap-2">
-            <p-button
-                label="Cancel"
-                severity="secondary"
-                (onClick)="onCancel()"
-            >
-            </p-button>
-            <p-button label="Save" severity="primary" (onClick)="onSubmit()">
-            </p-button>
+            <p-button label="Cancel" severity="secondary" (onClick)="cancel()"></p-button>
+            <p-button label="Save" severity="primary" (onClick)="onSubmit()"></p-button>
         </div>
     </ng-template>
 </p-dialog>

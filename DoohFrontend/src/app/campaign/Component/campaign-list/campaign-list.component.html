@@ -1,4 +1,6 @@
-<!-- HEADER -->
+<p-toast />
+<p-confirmDialog />
+
 <div class="page-header">
     <div class="page-actions">
         <p-button
@@ -7,19 +9,15 @@
             severity="success"
             [rounded]="true"
             size="small"
-            (onClick)="openAddCampaign()"
+            (onClick)="addedit.show()"
         ></p-button>
     </div>
 </div>
 
-<!-- TABLE CARD -->
 <div class="table-card">
-    <!-- FILTER BAR -->
     <div class="filter-bar">
-        <!-- SEARCH -->
         <div class="search-wrapper">
             <i class="pi pi-search search-icon"></i>
-
             <input
                 pInputText
                 type="text"
@@ -30,7 +28,6 @@
             />
         </div>
 
-        <!-- STATUS -->
         <p-dropdown
             [options]="statusOptions"
             [(ngModel)]="filter.status"
@@ -42,7 +39,6 @@
             class="status-filter"
         ></p-dropdown>
 
-        <!-- SEARCH BUTTON -->
         <p-button
             icon="pi pi-search"
             label="Search"
@@ -51,7 +47,6 @@
             (onClick)="applyFilter()"
         ></p-button>
 
-        <!-- CLEAR BUTTON -->
         <p-button
             icon="pi pi-times"
             label="Clear"
@@ -62,7 +57,6 @@
         ></p-button>
     </div>
 
-    <!-- TABLE -->
     <p-table
         [value]="campaigns"
         [lazy]="true"
@@ -73,74 +67,41 @@
         [rowsPerPageOptions]="[5, 10, 20]"
         [loading]="isLoading"
         responsiveLayout="scroll"
-        class="p-datatable-sm"
+        styleClass="p-datatable-striped p-datatable-sm"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} campaigns"
     >
-        <!-- HEADER -->
         <ng-template pTemplate="header">
             <tr>
                 <th>Name</th>
                 <th>Duration</th>
                 <th>Status</th>
                 <th>Remarks</th>
-                <th>Actions</th>
+                <th style="text-align: center">Actions</th>
             </tr>
         </ng-template>
 
-        <!-- BODY -->
         <ng-template pTemplate="body" let-campaign>
             <tr>
-                <td>
-                    <strong>{{ campaign.name }}</strong>
-                </td>
-
+                <td><strong>{{ campaign.name }}</strong></td>
                 <td>{{ campaign.durationInDays }} Days</td>
-
                 <td>
-                    <span
-                        class="status"
-                        [ngClass]="{
-                            active: campaign.status === CampaignStatus.Active,
-                            new: campaign.status === CampaignStatus.New,
-                            completed:
-                                campaign.status === CampaignStatus.Completed,
-                            paused: campaign.status === CampaignStatus.Paused,
-                            cancelled:
-                                campaign.status === CampaignStatus.Cancelled,
-                        }"
-                    >
-                        {{
-                            campaign.status === CampaignStatus.New
-                                ? 'New'
-                                : campaign.status === CampaignStatus.Active
-                                  ? 'Active'
-                                  : campaign.status === CampaignStatus.Completed
-                                    ? 'Completed'
-                                    : campaign.status === CampaignStatus.Paused
-                                      ? 'Paused'
-                                      : campaign.status ===
-                                          CampaignStatus.Cancelled
-                                        ? 'Cancelled'
-                                        : 'Unknown'
-                        }}
+                    <span class="status" [ngClass]="{
+                        active:    campaign.status === CampaignStatus.Active,
+                        new:       campaign.status === CampaignStatus.New,
+                        completed: campaign.status === CampaignStatus.Completed,
+                        paused:    campaign.status === CampaignStatus.Paused,
+                        cancelled: campaign.status === CampaignStatus.Cancelled
+                    }">
+                        {{ campaign.status === CampaignStatus.New       ? 'New'
+                         : campaign.status === CampaignStatus.Active     ? 'Active'
+                         : campaign.status === CampaignStatus.Completed  ? 'Completed'
+                         : campaign.status === CampaignStatus.Paused     ? 'Paused'
+                         : campaign.status === CampaignStatus.Cancelled  ? 'Cancelled'
+                         : 'Unknown' }}
                     </span>
                 </td>
-
-                <td>
-                    {{ campaign.remarks || '—' }}
-                </td>
-
-                <!-- <td>
-                    <p-chip
-                        *ngFor="let s of campaign.screen"
-                        [label]="s.screenName"
-                    >
-                    </p-chip>
-
-                    <span *ngIf="!campaign.screen?.length">—</span>
-                </td> -->
-
+                <td>{{ campaign.remarks || '—' }}</td>
                 <td class="action-cell">
                     <div class="action-wrapper">
                         <p-button
@@ -149,44 +110,37 @@
                             severity="warning"
                             [rounded]="true"
                             pTooltip="Manage Campaign Media"
-                            (onClick)="openCampaignMedia(campaign)"
+                            (onClick)="campaignMedia.show(campaign.id)"
                         ></p-button>
                         <p-button
                             icon="pi pi-eye"
                             [text]="true"
                             severity="info"
                             [rounded]="true"
-                            (onClick)="openCampaignInfo(campaign)"
+                            (onClick)="campaignInfo.show(campaign)"
                         ></p-button>
-
                         <p-button
                             icon="pi pi-trash"
                             [text]="true"
                             severity="danger"
                             [rounded]="true"
-                            (onClick)="
-                                deleteCampaign(campaign);
-                                $event.stopPropagation()
-                            "
+                            (onClick)="deleteCampaign(campaign); $event.stopPropagation()"
                         ></p-button>
                     </div>
                 </td>
             </tr>
         </ng-template>
 
-        <!-- EMPTY -->
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6" class="text-center py-4 text-color-secondary">
+                <td colspan="5" class="text-center py-4 text-color-secondary">
                     No campaigns found.
                 </td>
             </tr>
         </ng-template>
     </p-table>
 </div>
-<add-edit-campaign #addedit (onSave)="loadCampaigns()" />
+
+<add-edit-campaign #addedit (onSave)="loadCampaigns(false)" />
 <campaign-info #campaignInfo />
-<add-edit-campaign-media
-    #campaignMedia
-    (onSave)="loadCampaigns()"
-></add-edit-campaign-media>
+<add-edit-campaign-media #campaignMedia (onSave)="loadCampaigns(false)" />

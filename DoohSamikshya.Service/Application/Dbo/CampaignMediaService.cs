@@ -51,7 +51,8 @@ namespace DoohSamikshya.Service.Application.Dbo
                     {
                         filter.CampaignId,
                         filter.ScreenId,
-                        filter.PlayDate
+                        filter.PlayDate,
+                        //filter.Url
                     },
                     filter.Offset,
                     filter.PageSize

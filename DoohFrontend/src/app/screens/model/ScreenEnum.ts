@@ -21,3 +21,7 @@ export enum ScreenOrientation {
     
 }
 
+export enum ScreenResultion{
+
+
+}

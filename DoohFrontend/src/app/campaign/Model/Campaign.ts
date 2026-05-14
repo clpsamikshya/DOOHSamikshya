@@ -117,7 +117,7 @@ export class CampaignInsert {
     screen: { screenId: number }[] = [];
 
     constructor() {
-        this.tenantId = 0;
+        this.tenantId = 1;
 
         this.name = '';
         this.status = 1;
@@ -185,9 +185,9 @@ export class CampaignMediaItem {
 export class CampaignMediaGroup {
     screenId: number;
     screenName: string;
-
+    url:  string;
     playDate: string;
-
+     
     createdAt?: string;
     createdBy?: number;
 
@@ -196,7 +196,7 @@ export class CampaignMediaGroup {
     constructor() {
         this.screenId = 0;
         this.screenName = '';
-
+        this.url = '';
         this.playDate = '';
 
         this.createdAt = '';
@@ -204,4 +204,14 @@ export class CampaignMediaGroup {
 
         this.media = [];
     }
+    
+}
+
+export interface DropdownItemMedia {
+  id: number;
+  name: string;
+  url: string;        
+  mediaType: string;   
+  fileSize?: string;
+  duration?: string;  
 }

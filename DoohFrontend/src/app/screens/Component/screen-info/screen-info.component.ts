@@ -61,7 +61,7 @@ export class ScreenInfoComponent extends AppComponent implements OnDestroy {
             });
     }
     getDayName(dayOfWeek: number): string {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const days = ['','Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         return days[dayOfWeek] || 'Unknown';
     }
 
