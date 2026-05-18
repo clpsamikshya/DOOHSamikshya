@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DoohSamikshya.Model.Application.Dbo
 {
-    public class CampaignDate
+    public class MvCampaignDate
     {
         public int Id { get; set; }
         public int CampaignId { get; set; }

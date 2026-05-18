@@ -5,6 +5,6 @@ namespace DoohSamikshya.Interface.Shared
 {
         public interface IMediaService
         {
-            Task<MediaUploadResult> UploadAsync(MediaUploadParam param);
+            Task<MvMediaUploadResult> UploadAsync(MvMediaUploadParam param);
         }
     }

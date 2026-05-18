@@ -19,7 +19,6 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
 
     private destroy$ = new Subject<void>();
 
-    // ✅ FIX: match HTML
     isShow = false;
 
     isLoading = false;
@@ -40,17 +39,16 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
         super(injector);
     }
 
-    /* ================= OPEN ================= */
+    /* OPEN  */
     show(campaign: Campaign): void {
         this.campaign = campaign;
 
-        // FIX: keep HTML working
         this.isShow = true;
 
         this.loadData(campaign.id);
     }
 
-    /* ================= LOAD ================= */
+    /* LOAD  */
     loadData(id: number): void {
         this.isLoading = true;
 
@@ -127,8 +125,6 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
         });
     }
 
-    /* ================= FIXED METHODS (MATCH HTML) ================= */
-
     getStatusSeverity(status: number) {
         switch (status) {
             case CampaignStatus.Active:
@@ -144,12 +140,10 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
         }
     }
 
-    // FIX: match template name
     getMediaTypeLabel(isVideo: boolean): string {
         return isVideo ? 'Video' : 'Image';
     }
 
-    // FIX: add missing method used in HTML
     getMediaTypeSeverity(isVideo: boolean): 'info' | 'success' {
         return isVideo ? 'info' : 'success';
     }
@@ -160,7 +154,7 @@ export class CampaignInfoComponent extends AppComponent implements OnDestroy {
         );
     }
 
-    /* ================= CLOSE ================= */
+    /* CLOSE */
     close(): void {
         this.isShow = false;
         this.campaign = null;

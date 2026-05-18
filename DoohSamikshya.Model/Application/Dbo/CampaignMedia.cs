@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DoohSamikshya.Model.Application.Dbo
 {
-    public class CampaignMedia
+    public class MvCampaignMedia
     {
         public int Id { get; set; }
         public int CampaignId { get; set; }
@@ -23,16 +23,16 @@ namespace DoohSamikshya.Model.Application.Dbo
         public int? DeletedBy { get; set; }
     }
 
-    public class CampaignMediaRequest
+    public class MvCampaignMediaRequest
     {
         public int CampaignId { get; set; }
         public int ScreenId { get; set; }
         public DateTime PlayDate { get; set; }
         public int CreatedBy { get; set; }
-        public List<MediaItem> Media { get; set; }
+        public List<MvMediaItem> Media { get; set; }
     }
 
-    public class MediaItem
+    public class MvMediaItem
     {
         public int Id { get; set; }
         public int MediaId { get; set; }
@@ -47,31 +47,30 @@ namespace DoohSamikshya.Model.Application.Dbo
         public int CreatedBy { get; set; }
     }
 
-    public class CampaignMediaResponse
+    public class MvCampaignMediaResponse
     {
         public int CampaignId { get; set; }
         public int ScreenId { get; set; }
         public DateTime PlayDate { get; set; }
-        public List<MediaItem> Media { get; set; }
+        public List<MvMediaItem> Media { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
     }
-    public class CampaignMediaFilter
+    public class MvCampaignMediaFilter
     {
         public int CampaignId { get; set; }
         public int? ScreenId { get; set; }
         public DateTime? PlayDate { get; set; }
-        public int Offset { get; set; }
-        public int PageSize { get; set; }
+     
     }
 
-    public class CampaignMediaList
+    public class MvCampaignMediaList
     {
-        public List<CampaignMediaItem> Data { get; set; }
+        public List<MvCampaignMediaItem> Data { get; set; }
         public int TotalRows { get; set; }
     }
 
-    public class CampaignMediaItem
+    public class MvCampaignMediaItem
     {
         public int Id { get; set; }
         public int CampaignId { get; set; }

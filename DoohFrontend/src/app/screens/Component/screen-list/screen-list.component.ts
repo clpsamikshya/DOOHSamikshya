@@ -4,11 +4,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { AppComponent } from '../../../app.component';
 import { sharedImports } from '../../../shared/sharedImports';
 
-import { Screens, ScreenFilter } from '../../model/Screen';
+import { Screens, ScreenFilter, ScreenResponse } from '../../model/Screen';
 import { ScreenStatus, ScreenOrientation } from '../../model/ScreenEnum';
 
 import { AddEditScreenComponent } from '../add-edit-screen/add-edit-screen.component';
 import { ScreenInfoComponent } from '../screen-info/screen-info.component';
+import { ApiResponse } from '../../../campaign/Model/CampaignMedia';
 
 @Component({
     selector: 'screen-list',
@@ -64,7 +65,7 @@ export class ScreenListComponent extends AppComponent implements OnInit, OnDestr
         this.screenService.getAll(this.filter)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (res) => {
+                next: (res : ApiResponse<ScreenResponse>) => {
                     this.screens = res?.data?.data ?? [];
                     this.totalRecords = res?.data?.totalRows ?? 0;
                     this.isLoading = false;
@@ -118,11 +119,6 @@ export class ScreenListComponent extends AppComponent implements OnInit, OnDestr
             },
         });
     }
-
-    trackById(index: number, item: Screens): number {
-        return item.id;
-    }
-
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

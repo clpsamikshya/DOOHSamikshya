@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace DoohSamikshya.Model.Application.Media
 {
-    public class InsertMedia
+    public class MvInsertMedia
     {
         public required IFormFile File { get; set; }
 
@@ -18,7 +18,7 @@ namespace DoohSamikshya.Model.Application.Media
         public int CreatedBy { get; set; }
     }
 
-    public class MediaFilter
+    public class MvMediaFilter
     {
         public string? Search { get; set; }
         public bool? IsVideo { get; set; }
@@ -29,13 +29,13 @@ namespace DoohSamikshya.Model.Application.Media
         public int PageSize { get; set; } = 10;
     }
 
-    public class MediaLibraryResponse
+    public class MvMediaLibraryResponse
     {
         public int TotalRows { get; set; }   
-        public List<MediaLibrary>? Data { get; set; }
+        public List<MvMediaLibrary>? Data { get; set; }
     }
 
-    public class DropdownItem
+    public class MvDropdownItem
     {
         public int Id { get; set; }
         public string? Url { get; set; }

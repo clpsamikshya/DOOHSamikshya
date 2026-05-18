@@ -14,11 +14,11 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
     {
 
         [HttpGet("ddl")]
-        public async Task<IActionResult> DropDown([FromQuery] int? campaignId)
+        public async Task<IActionResult> GetDropDown([FromQuery] int? campaignId)
         {
             try
             {
-                var response = await ss.DropDown(campaignId);
+                var response = await ss.GetDropDown(campaignId);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -29,23 +29,11 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
 
         [HttpGet]
         public async Task<IActionResult> GetScreen(
-    [FromQuery] string? search,
-    [FromQuery] ScreenStatus? status,
-    [FromQuery] ScreenOrientation? orientation,
-    [FromQuery] int offset = 0,        
-    [FromQuery] int pageSize = 10)
+    [FromQuery] MvParamReqOption<MvScreenFilter> param)
         {
             try
             {
-                var filter = new ScreenFilter
-                {
-                    Search = search,
-                    Status = status,
-                    Orientation = orientation,
-                    Offset = offset,
-                    PageSize = pageSize
-                };
-                var response = await ss.GetScreen(filter);
+                var response = await ss.GetScreen(param);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -55,7 +43,7 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddScreens([FromBody] Screen screen)
+        public async Task<IActionResult> AddScreen([FromBody] MvScreen screen)
         {
             try
             {
@@ -71,7 +59,7 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
 
         
         [HttpPut]
-        public async Task<IActionResult> UpdateScreens([FromBody] Screen screen)
+        public async Task<IActionResult> UpdateScreen([FromBody] MvScreen screen)
         {
             try
             {
@@ -101,11 +89,11 @@ namespace DoohSamikshya.API.Controllers.Application.Inv
         //}
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteScreen([FromRoute] int id, [FromQuery] bool cascadeDelete = true)
+        public async Task<IActionResult> DeleteScreen([FromRoute] int id)
         {
             try
             {
-                var result = await ss.DeleteScreen(id, cascadeDelete);
+                var result = await ss.DeleteScreen(id);
                 return Ok(ApiResponse.Success(result));
             }
             catch (Exception ex)

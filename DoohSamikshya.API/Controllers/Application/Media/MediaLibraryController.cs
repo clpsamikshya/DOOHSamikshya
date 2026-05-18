@@ -1,6 +1,7 @@
 ﻿using DoohSamikshya.API.Controllers.Shared;
 using DoohSamikshya.Interface.Application.Media;
 using DoohSamikshya.Interface.Shared;
+using DoohSamikshya.Model.Application.Inv;
 using DoohSamikshya.Model.Application.Media;
 using DoohSamikshya.Model.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -12,33 +13,20 @@ namespace DoohSamikshya.API.Controllers.Application.Media
         IMediaService ms) : SharedController
     {
           [HttpGet]
-        public async Task<IActionResult> GetMediaLibrary(
-     [FromQuery] string? search,
-     [FromQuery] bool? isVideo,
-     [FromQuery] bool? includeDeleted,
-     [FromQuery] bool? deletedOnly,
-     [FromQuery] int offset = 0,   
-     [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetMediaLibrary([FromQuery] MvParamReqOption<MvMediaFilter> param)
         {
             try
             {
-                var filter = new MediaFilter
-                {
-                    Search = search,
-                    IsVideo = isVideo,
-                    IncludeDeleted = includeDeleted,
-                    DeletedOnly = deletedOnly,
-                    Offset = offset,     
-                    PageSize = pageSize
-                };
-                var response = await mls.GetMediaLibrary(filter);
+
+                var response = await mls.GetMediaLibrary(param);
                 return Ok(ApiResponse.Success(response));
             }
+        
             catch (Exception ex)
             {
                 return BadRequest(ApiResponse.Fail(ex.Message));
-            }
-        }
+    }
+}
 
         [HttpGet("ddl")]
         public async Task<IActionResult> GetMediaLibraryDdl([FromQuery] int? campaignId)
@@ -57,12 +45,12 @@ namespace DoohSamikshya.API.Controllers.Application.Media
 
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> InsertMedia([FromForm] InsertMedia request)
+        public async Task<IActionResult> InsertMedia([FromForm] MvInsertMedia request)
         {
             try
             {
                
-                var uploaded = await ms.UploadAsync(new MediaUploadParam
+                var uploaded = await ms.UploadAsync(new MvMediaUploadParam
                 {
                     File = request.File
                 });

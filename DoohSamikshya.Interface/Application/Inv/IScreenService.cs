@@ -1,4 +1,5 @@
 ﻿using DoohSamikshya.Model.Application.Inv;
+using DoohSamikshya.Model.Shared;
 
 namespace DoohSamikshya.Interface.Application.Inv
 {
@@ -6,12 +7,12 @@ namespace DoohSamikshya.Interface.Application.Inv
     {
         //Task<List<Screen>?> GetScreen(ScreenFilter filter);
 
-        Task<ScreenResponse?> GetScreen(ScreenFilter filter);
-        Task<List<Screen>?> AddScreen(Screen screen);
-        Task<List<Screen>?> UpdateScreen(Screen screen);
-        Task<List<Screen>?> DropDown(int? campaignId);
+        Task<MvScreenResponse?> GetScreen(MvParamReqOption<MvScreenFilter> param);
+        Task<List<MvScreen>?> AddScreen(MvScreen screen);
+        Task<List<MvScreen>?> UpdateScreen(MvScreen screen);
+        Task<List<MvScreen>?> GetDropDown(int? campaignId);
         // Task<Screen?> DeleteScreen(int id);                                        
-        Task<Screen?> DeleteScreen(int id, bool cascadeDelete);
+        Task<MvScreen?> DeleteScreen(int id);
         Task<string> DeleteOperatingHour(int id, int screenId, int deletedBy);     
     }
 }

@@ -231,11 +231,6 @@ export class AddEditScreenComponent
         return this.dayOptions.find((d) => d.value === dayValue)?.label || '';
     }
 
-    // Helps Angular identify each slot
-    trackBySlotId(index: number, slot: OperatingHourSlot): string {
-        return slot.id;
-    }
-
     toggleDay(dayValue: number): void {
         const index = this.draftSlot.selectedDays.indexOf(dayValue);
 

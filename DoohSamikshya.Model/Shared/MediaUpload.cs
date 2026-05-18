@@ -2,7 +2,7 @@
 
 namespace DoohSamikshya.Model.Shared
 {
-    public class MediaUploadParam
+    public class MvMediaUploadParam
     {
         public IFormFile File { get; set; } = null!;
         //public int TenantId { get; set; }
@@ -10,7 +10,7 @@ namespace DoohSamikshya.Model.Shared
         //public bool IsVideo { get; set; }
     }
 
-    public class MediaUploadResult
+    public class MvMediaUploadResult
     {
         public string FileName { get; set; } = null!;
         public string Url { get; set; } = null!;

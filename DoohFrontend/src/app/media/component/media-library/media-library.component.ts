@@ -154,10 +154,6 @@ export class MediaLibraryComponent
         this.previewMedia = null;
     }
 
-    trackById(index: number, item: MediaLibrary): number {
-        return item.id;
-    }
-
     ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();

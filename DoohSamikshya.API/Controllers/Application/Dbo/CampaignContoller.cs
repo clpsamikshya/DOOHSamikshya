@@ -10,21 +10,11 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
     {
         [HttpGet]
         public async Task<IActionResult> GetCampaign(
-    [FromQuery] string? Search,
-    [FromQuery] int? CampaignId,   
-    [FromQuery] int OffSet = 0,
-    [FromQuery] int PageSize = 10)
+    [FromQuery] MvParamReqOption<MvCampaignFilter> param)
         {
             try
             {
-                var filter = new CampaignFilter
-                {
-                    Search = Search,
-                    CampaignId = CampaignId,   
-                    Offset = OffSet,
-                    PageSize = PageSize
-                };
-                var response = await cs.GetCampaign(filter);
+                var response = await cs.GetCampaign(param);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -34,7 +24,7 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCampaign([FromBody] Campaign campaign)
+        public async Task<IActionResult> AddCampaign([FromBody] MvCampaign campaign)
         {
             try
             {

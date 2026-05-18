@@ -10,9 +10,10 @@ namespace DoohSamikshya.Model.Shared.Enum
     {
         New = 1,
         Active = 2,
-        Completed = 3,
-        Paused= 4,
-        Cancelled= 5,
+        Inactive = 3,
+        Completed = 4,
+        Paused= 5,
+        Cancelled= 6,
 
 
     }

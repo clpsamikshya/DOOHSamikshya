@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DoohSamikshya.Model.Application.Dbo
 {
-    public class CampaignScreen
+    public class MvCampaignScreen
     {
         public int Id { get; set; }
         public string? ScreenName { get; set; }

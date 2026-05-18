@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DoohSamikshya.Model.Application.Media
 {
 
-    public class MediaLibrary
+    public class MvMediaLibrary
     {
         public int Id { get; set; }
         public int TenantId { get; set; }

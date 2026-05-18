@@ -182,8 +182,3 @@ export class ScreenUpdate {
     this.operatingHour = [];
   }
 }
-
-
-
-
-

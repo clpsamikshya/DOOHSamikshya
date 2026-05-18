@@ -1,27 +1,35 @@
 using DoohSamikshya.DataAccess;
+using DoohSamikshya.Interface.Application.BackgroundJobs;
+using DoohSamikshya.Interface.Application.Dbo;
 using DoohSamikshya.Interface.Application.Inv;
 using DoohSamikshya.Interface.Application.Media;
+using DoohSamikshya.Interface.Shared;
+using DoohSamikshya.Service.Application.BackgroundJobs;
+using DoohSamikshya.Service.Application.Dbo;
 using DoohSamikshya.Service.Application.Inv;
 using DoohSamikshya.Service.Application.Media;
 using DoohSamikshya.Service.Shared;
-using DoohSamikshya.Interface.Shared;
-using DoohSamikshya.Service.Shared;
-using DoohSamikshya.Interface.Application.Dbo;
-using DoohSamikshya.Service.Application.Dbo;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Add services
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddScoped<IDataAccessService, DataAccessService>()
                 .AddScoped<IScreenService, ScreenService>()
                 .AddScoped<IMediaLibraryService, MediaLibraryService>()
                 .AddScoped<ICampaignService, CampaignService>()
                 .AddScoped<ICampaignMediaService, CampaignMediaService>();
+builder.Services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+builder.Services.AddHostedService<QueuedHostedService>();
+builder.Services.AddHostedService<CampaignStatusHostedService>();
+
+
 builder.Services.AddScoped<IMediaService>(provider =>
 {
     var env = provider.GetRequiredService<IWebHostEnvironment>();
@@ -38,13 +46,18 @@ builder.Services.AddCors(options =>
     });
 });
 
-var uploadPath = Path.Combine(builder.Environment.WebRootPath ??
-                 Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "media");
+var uploadPath = Path.Combine(
+    builder.Environment.WebRootPath ??
+    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"),
+    "uploads",
+    "media"
+);
+
 Directory.CreateDirectory(uploadPath);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -52,14 +65,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAngular");
-
 
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-

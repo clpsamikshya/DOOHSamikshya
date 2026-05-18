@@ -1,15 +1,17 @@
 ﻿using DoohSamikshya.Model.Shared.Enum;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace DoohSamikshya.Model.Application.Inv
 {
-    public class Screen
+    public class MvScreen
     {
         public int Id { get; set; }
         public int TenantId { get; set; }
         public string Name { get; set; } = null!;
         public string Location { get; set; } = null!;
         public string Resolution { get; set; } = "1920x1080";
+        [NotMapped]
         public string? ResolutionName { get; set; }
 
         [JsonIgnore]
@@ -45,22 +47,7 @@ namespace DoohSamikshya.Model.Application.Inv
         public int? UpdatedBy { get; set; }
         public DateTimeOffset? DeletedAt { get; set; }
         public int? DeletedBy { get; set; }
-        public List<ScreenOperatingHour> OperatingHour { get; set; } = new();
-    }
-
-    public class ScreenFilter
-    {
-        public string? Search { get; set; }
-        public ScreenStatus? Status { get; set; }
-        public ScreenOrientation? Orientation { get; set; }
-        public int Offset { get; set; } = 0;     
-        public int PageSize { get; set; } = 10;
-    }
-
-    public class ScreenResponse
-    {
-        public int TotalRows { get; set; }  
-        public List<Screen>? Data { get; set; }
+        public List<MvScreenOperatingHour> OperatingHour { get; set; } = new();
     }
 }
 

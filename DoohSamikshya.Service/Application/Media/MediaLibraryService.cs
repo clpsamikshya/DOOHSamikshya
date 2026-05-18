@@ -1,6 +1,7 @@
 ﻿using DoohSamikshya.DataAccess;
 using DoohSamikshya.Interface.Application.Media;
 using DoohSamikshya.Model.Application.Media;
+using DoohSamikshya.Model.Shared;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 
@@ -20,7 +21,7 @@ namespace DoohSamikshya.Service.Application.Media
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"
         };
 
-        public async Task<List<MediaLibrary>> AddMediaLibrary(InsertMedia request)
+        public async Task<List<MvMediaLibrary>> AddMediaLibrary(MvInsertMedia request)
         {
             try
             {
@@ -105,7 +106,7 @@ namespace DoohSamikshya.Service.Application.Media
 
                 string json = JsonConvert.SerializeObject(param);
                 string result = await da.ActionProcedure("[dbo].[SpMediaLibraryIns]", json);
-                return JsonConvert.DeserializeObject<List<MediaLibrary>>(result)
+                return JsonConvert.DeserializeObject<List<MvMediaLibrary>>(result)
                        ?? throw new Exception("Insert failed or returned null.");
             }
             catch (SqlException ex)
@@ -114,7 +115,7 @@ namespace DoohSamikshya.Service.Application.Media
             }
         }
 
-        public async Task<MediaLibrary?> DeleteMediaLibrary(int id)
+        public async Task<MvMediaLibrary?> DeleteMediaLibrary(int id)
         {
             try
             {
@@ -126,7 +127,7 @@ namespace DoohSamikshya.Service.Application.Media
                 };
                 string json = JsonConvert.SerializeObject(payload);
                 string result = await da.ActionProcedure("[dbo].[SpMediaLibraryDel]", json);
-                return JsonConvert.DeserializeObject<MediaLibrary>(result);
+                return JsonConvert.DeserializeObject<MvMediaLibrary>(result);
             }
             catch (SqlException ex)
             {
@@ -134,7 +135,7 @@ namespace DoohSamikshya.Service.Application.Media
             }
         }
 
-        public async Task<List<DropdownItem>?> GetMediaLibraryDdl(int? campaignId = null)
+        public async Task<List<MvDropdownItem>?> GetMediaLibraryDdl(int? campaignId = null)
         {
             try
             {
@@ -144,7 +145,7 @@ namespace DoohSamikshya.Service.Application.Media
                 });
 
                 string result = await da.RetrievalProcedure("[dbo].[SpMediaLibraryDdlSel]", json);
-                return JsonConvert.DeserializeObject<List<DropdownItem>>(result);
+                return JsonConvert.DeserializeObject<List<MvDropdownItem>>(result);
             }
             catch (SqlException ex)
             {
@@ -152,25 +153,13 @@ namespace DoohSamikshya.Service.Application.Media
             }
         }
 
-        public async Task<MediaLibraryResponse?> GetMediaLibrary(MediaFilter filter)
+        public async Task<MvMediaLibraryResponse?> GetMediaLibrary(MvParamReqOption<MvMediaFilter> param)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(new
-                {
-                    Offset = filter.Offset,
-                    PageSize = filter.PageSize,
-                    Filter = new
-                    {
-                        Search = filter.Search ?? "",
-                        IsVideo = filter.IsVideo,
-                        ActiveOnly = filter.ActiveOnly ?? false,
-                        IncludeDeleted = filter.IncludeDeleted ?? false,
-                        DeletedOnly = filter.DeletedOnly ?? false
-                    }
-                });
+                string json = JsonConvert.SerializeObject(param);
                 string result = await da.RetrievalProcedure("[dbo].[SpMediaLibrarySel]", json);
-                return JsonConvert.DeserializeObject<MediaLibraryResponse>(result);
+                return JsonConvert.DeserializeObject<MvMediaLibraryResponse>(result);
             }
             catch (SqlException ex)
             {

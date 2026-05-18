@@ -10,23 +10,11 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
     {
         [HttpGet]
         public async Task<IActionResult> GetCampaignMedia(
-            [FromQuery] int campaignId,
-            [FromQuery] int? screenId = null,
-            [FromQuery] DateTime? playDate = null,
-            [FromQuery] int offset = 0,
-            [FromQuery] int pageSize = 10)
+                   [FromQuery] MvParamReqOption<MvCampaignMediaFilter> param)
         {
             try
             {
-                var filter = new CampaignMediaFilter
-                {
-                    CampaignId = campaignId,
-                    ScreenId = screenId,
-                    PlayDate = playDate,
-                    Offset = offset,
-                    PageSize = pageSize
-                };
-                var response = await cms.GetCampaignMedia(filter);
+                var response = await cms.GetCampaignMedia(param);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -35,12 +23,13 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
             }
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> AddCampaignMedia([FromBody] CampaignMediaRequest request)
+        public async Task<IActionResult> AddCampaignMedia([FromBody] MvCampaignMediaRequest request)
         {
             try
             {
-                var response = await cms.AddCampaignMedia (request);
+                var response = await cms.AddCampaignMedia(request);
                 return Ok(ApiResponse.Success(response));
             }
             catch (Exception ex)
@@ -64,7 +53,7 @@ namespace DoohSamikshya.API.Controllers.Application.Dbo
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCampaignMedia([FromBody] CampaignMediaRequest request)
+        public async Task<IActionResult> UpdateCampaignMedia([FromBody] MvCampaignMediaRequest request)
         {
             try
             {

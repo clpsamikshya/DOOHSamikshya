@@ -21,7 +21,7 @@ namespace DoohSamikshya.Service.Shared
             new(StringComparer.OrdinalIgnoreCase)
             { ".mp4", ".webm", ".mov", ".avi" };
 
-        public async Task<MediaUploadResult> UploadAsync(MediaUploadParam param)
+        public async Task<MvMediaUploadResult> UploadAsync(MvMediaUploadParam param)
         {
             // 1. Validate
             ValidateFile(param.File, out var isVideo, out var extension);
@@ -53,7 +53,7 @@ namespace DoohSamikshya.Service.Shared
                 ? await ExtractVideoMetadataAsync(savePath)
                 : ExtractImageMetadata(savePath);
 
-            return new MediaUploadResult
+            return new MvMediaUploadResult
             {
                 FileName = fileName,
                 Url = $"/{folder.Replace("\\", "/")}/{fileName}",

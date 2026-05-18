@@ -1,6 +1,7 @@
 ﻿using DoohSamikshya.DataAccess;
 using DoohSamikshya.Interface.Application.Dbo;
 using DoohSamikshya.Model.Application.Dbo;
+using DoohSamikshya.Model.Shared;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 
@@ -10,13 +11,13 @@ namespace DoohSamikshya.Service.Application.Dbo
     public class CampaignMediaService(IDataAccessService da) : ICampaignMediaService
     {
 
-        public async Task<CampaignMediaResponse> AddCampaignMedia(CampaignMediaRequest request)
+        public async Task<MvCampaignMediaResponse> AddCampaignMedia(MvCampaignMediaRequest request)
         {
             try
             {
                 string json = JsonConvert.SerializeObject(request);
                 string result = await da.ActionProcedure("dbo.SpCampaignMediaIns", json);
-                return JsonConvert.DeserializeObject<CampaignMediaResponse>(result);
+                return JsonConvert.DeserializeObject<MvCampaignMediaResponse>(result);
             }
             catch (SqlException ex)
             {
@@ -24,7 +25,7 @@ namespace DoohSamikshya.Service.Application.Dbo
             }
         }
 
-        public async Task<CampaignMedia> DeleteCampaignMedia(int id, int deletedBy)
+        public async Task<MvCampaignMedia> DeleteCampaignMedia(int id, int deletedBy)
         {
             try
             {
@@ -34,31 +35,25 @@ namespace DoohSamikshya.Service.Application.Dbo
                     DeletedBy = deletedBy
                 });
                 string result = await da.ActionProcedure("dbo.SpCampaignMediaDel", json);
-                return JsonConvert.DeserializeObject<CampaignMedia>(result);
+                return JsonConvert.DeserializeObject<MvCampaignMedia>(result);
             }
             catch (SqlException ex)
             {
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<CampaignMediaList?> GetCampaignMedia(CampaignMediaFilter filter)
+        //public async Task<CampaignMediaList?> GetCampaignMedia(MvParamReqOption<CampaignFilter> param)
+        //{
+            
+        //}
+
+        public async Task<object> GetCampaignMedia(MvParamReqOption<MvCampaignMediaFilter> param)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(new
-                {
-                    Filter = new
-                    {
-                        filter.CampaignId,
-                        filter.ScreenId,
-                        filter.PlayDate,
-                        //filter.Url
-                    },
-                    filter.Offset,
-                    filter.PageSize
-                });
+                string json = JsonConvert.SerializeObject(param);
                 string result = await da.RetrievalProcedure("dbo.SpCampaignMediaSel", json);
-                return JsonConvert.DeserializeObject<CampaignMediaList>(result);
+                return JsonConvert.DeserializeObject<MvCampaignMediaList>(result);
             }
             catch (SqlException ex)
             {
@@ -66,13 +61,13 @@ namespace DoohSamikshya.Service.Application.Dbo
             }
         }
 
-        public async Task<CampaignMediaResponse?> UpdateCampaignMedia(CampaignMediaRequest request)
+        public async Task<MvCampaignMediaResponse?> UpdateCampaignMedia(MvCampaignMediaRequest request)
         {
             try
             {
                 string json = JsonConvert.SerializeObject(request);
                 string result = await da.ActionProcedure("dbo.SpCampaignMediaUpd", json);
-                return JsonConvert.DeserializeObject<CampaignMediaResponse>(result);
+                return JsonConvert.DeserializeObject<MvCampaignMediaResponse>(result);
             }
             catch (SqlException ex)
             {

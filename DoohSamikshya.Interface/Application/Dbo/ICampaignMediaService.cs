@@ -1,4 +1,5 @@
 ﻿using DoohSamikshya.Model.Application.Dbo;
+using DoohSamikshya.Model.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace DoohSamikshya.Interface.Application.Dbo
 {
     public interface ICampaignMediaService
     {
-        Task<CampaignMediaResponse> AddCampaignMedia(CampaignMediaRequest request);
-        Task<CampaignMedia> DeleteCampaignMedia(int id, int deletedBy);
+        Task<MvCampaignMediaResponse> AddCampaignMedia(MvCampaignMediaRequest request);
+        Task<MvCampaignMedia> DeleteCampaignMedia(int id, int deletedBy);
         //Task<CampaignMediaResponse?> GetCampaignMedia(CampaignMediaFilter filter);
-        Task<CampaignMediaList?> GetCampaignMedia(CampaignMediaFilter filter);
-        Task<CampaignMediaResponse?> UpdateCampaignMedia(CampaignMediaRequest request);
+        Task<object> GetCampaignMedia(MvParamReqOption<MvCampaignMediaFilter> param);
+        Task<MvCampaignMediaResponse?> UpdateCampaignMedia(MvCampaignMediaRequest request);
     }
 }

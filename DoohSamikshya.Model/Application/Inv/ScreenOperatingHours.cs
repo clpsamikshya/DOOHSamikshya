@@ -2,7 +2,7 @@
 
 namespace DoohSamikshya.Model.Application.Inv
 {
-    public class ScreenOperatingHour
+    public class MvScreenOperatingHour
     {
         public int Id { get; set; }
         public int ScreenId { get; set; }

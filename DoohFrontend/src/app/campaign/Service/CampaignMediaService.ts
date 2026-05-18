@@ -24,24 +24,22 @@ export class CampaignMediaService {
         return throwError(() => new Error(message));
     }
 
-   getCampaignMedia(
-    filter: CampaignMediaFilter,
-): Observable<ApiResponse<CampaignMedia[]>> {
+getCampaignMedia(filter: CampaignMediaFilter): Observable<ApiResponse<CampaignMedia[]>> {
 
     let params = new HttpParams()
-        .set('offset', filter.offset ?? 0)
-        .set('pageSize', filter.pageSize ?? 10);
+        .set('Offset', filter.offset ?? 0)
+        .set('PageSize', filter.pageSize ?? 10);
 
     if (filter.campaignId != null) {
-        params = params.set('campaignId', filter.campaignId);
+        params = params.set('Filter.CampaignId', filter.campaignId);
     }
 
     if (filter.screenId != null) {
-        params = params.set('screenId', filter.screenId);
+        params = params.set('Filter.ScreenId', filter.screenId);
     }
 
     if (filter.playDate) {
-        params = params.set('playDate', filter.playDate);
+        params = params.set('Filter.PlayDate', filter.playDate);
     }
 
     return this.http

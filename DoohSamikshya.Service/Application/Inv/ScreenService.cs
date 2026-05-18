@@ -1,6 +1,7 @@
 ﻿using DoohSamikshya.DataAccess;
 using DoohSamikshya.Interface.Application.Inv;
 using DoohSamikshya.Model.Application.Inv;
+using DoohSamikshya.Model.Shared;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 
@@ -8,28 +9,16 @@ namespace DoohSamikshya.Service.Application.Inv
 {
     public class ScreenService(IDataAccessService da) : IScreenService
     {
-        public async Task<ScreenResponse?> GetScreen(ScreenFilter filter)
+        public async Task<MvScreenResponse?> GetScreen(MvParamReqOption<MvScreenFilter> param)
         {
-            string json = JsonConvert.SerializeObject(new
-            {
-                Offset = filter.Offset,
-                PageSize = filter.PageSize,
-                Filter = new
-                {
-                    TenantId = 1,
-                    Search = filter.Search ?? "",
-                    Status = filter.Status.HasValue ? (int?)filter.Status.Value : null,
-                    Orientation = filter.Orientation.HasValue ? (int?)filter.Orientation.Value : null
-                }
-            });
+            string json = JsonConvert.SerializeObject(param);
 
             string result = await da.RetrievalProcedure("inv.SpScreenSel", json);
 
-
-            return JsonConvert.DeserializeObject<ScreenResponse>(result);
+            return JsonConvert.DeserializeObject<MvScreenResponse>(result);
         }
 
-        public async Task<List<Screen>?> AddScreen(Screen screen)
+        public async Task<List<MvScreen>?> AddScreen(MvScreen screen)
         {
             try
             {
@@ -38,12 +27,12 @@ namespace DoohSamikshya.Service.Application.Inv
 
                 string json = JsonConvert.SerializeObject(screen);
                 string result = await da.ActionProcedure("inv.SpScreenIns", json);
-                return JsonConvert.DeserializeObject<List<Screen>>(result);
+                return JsonConvert.DeserializeObject<List<MvScreen>>(result);
             }
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        public async Task<List<Screen>?> UpdateScreen(Screen screen)
+        public async Task<List<MvScreen>?> UpdateScreen(MvScreen screen)
         {
             try
             {
@@ -51,8 +40,8 @@ namespace DoohSamikshya.Service.Application.Inv
                     screen.Tag = string.Join(",", screen.TagList.Select(t => t.Trim()));
 
                 string json = JsonConvert.SerializeObject(screen);
-                string result = await da.ActionProcedure("inv.SpScreenUpd", json);
-                return JsonConvert.DeserializeObject<List<Screen>>(result);
+                string result = await da.ActionProcedure("[inv].[SpScreenTsk]", json);
+                return JsonConvert.DeserializeObject<List<MvScreen>>(result);
             }
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
@@ -68,7 +57,7 @@ namespace DoohSamikshya.Service.Application.Inv
         //    catch (SqlException ex) { throw new Exception(ex.Message); }
         //}
 
-        public async Task<Screen?> DeleteScreen(int id, bool cascadeDelete)
+        public async Task<MvScreen?> DeleteScreen(int id)
         {
             try
             {
@@ -77,10 +66,10 @@ namespace DoohSamikshya.Service.Application.Inv
                     ScreenId = id,
                     TenantId = 1,
                     DeletedBy = 1,
-                    CascadeDelete = cascadeDelete
+                    //CascadeDelete = cascadeDelete
                 });
                 string result = await da.ActionProcedure("inv.SpScreenDel", json);
-                return JsonConvert.DeserializeObject<Screen>(result);
+                return JsonConvert.DeserializeObject<MvScreen>(result);
             }
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
@@ -96,7 +85,7 @@ namespace DoohSamikshya.Service.Application.Inv
             catch (SqlException ex) { throw new Exception(ex.Message); }
         }
 
-        public async Task<List<Screen>?> DropDown(int? campaignId)
+        public async Task<List<MvScreen>?> GetDropDown(int? campaignId)
         {
             var json = JsonConvert.SerializeObject(new
             {
@@ -105,7 +94,7 @@ namespace DoohSamikshya.Service.Application.Inv
 
             string result = await da.RetrievalProcedure("[inv].[SpScreenDdlSel]", json);
 
-            return JsonConvert.DeserializeObject<List<Screen>>(result);
+            return JsonConvert.DeserializeObject<List<MvScreen>>(result);
         }
     }
 }

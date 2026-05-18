@@ -1,15 +1,8 @@
-﻿using DoohSamikshya.Model.Application.Inv;
-using DoohSamikshya.Model.Shared.Enum;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DoohSamikshya.Model.Shared.Enum;
 
 namespace DoohSamikshya.Model.Application.Dbo
 {
-    public class Campaign
+    public class MvCampaign
     {
         public int Id { get; set; }
         public int TenantId { get; set; }
@@ -18,29 +11,28 @@ namespace DoohSamikshya.Model.Application.Dbo
         public int DurationInDays { get; set; }
         public string? Remarks { get; set; }
         public int CreatedBy { get; set; }
-        public List<CampaignDate> Date { get; set; }
-        public List<CampaignScreen> Screen { get; set; }
+        public List<MvCampaignDate> Date { get; set; }
+        public List<MvCampaignScreen> Screen { get; set; }
 
-        public List<CampaignMediaGroup>? CampaignMedia { get; set; }
+        public List<MvCampaignMediaGroup>? CampaignMedia { get; set; }
     }
 
-    public class CampaignFilter
+    public class MvCampaignFilter
     {
         public string? Search { get; set; }
        
         public CampaignStatus? Status { get; set; }
         public int? CampaignId { get; set; }  
-        public int Offset { get; set; } = 0;
-        public int PageSize { get; set; } = 10;
+       
     }
 
-    public class CampaignResponse
+    public class MvCampaignResponse
     {
         public int TotalRows { get; set; }
-        public List<Campaign>? Data { get; set; }
+        public List<MvCampaign>? Data { get; set; }
     }
 
-    public class CampaignMediaGroup
+    public class MvCampaignMediaGroup
     {
         public int ScreenId { get; set; }
         public string ScreenName { get; set; }
@@ -50,6 +42,6 @@ namespace DoohSamikshya.Model.Application.Dbo
         public DateTime? CreatedAt { get; set; }
         public int CreatedBy { get; set; }
 
-        public List<MediaItem> Media { get; set; } = new();
+        public List<MvMediaItem> Media { get; set; } = new();
     }
 }
